@@ -17,4 +17,13 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT new com.ssonsal.football.team.dto.response.TeamListDto(t.id, t.name, t.preferredArea, t.skillScore) FROM Team t")
     List<TeamListDto> findAllByOrderByIdDesc();
 
+    /**
+     * 모집 중인 팀을 내림차순으로 가져온다.
+     *
+     * @param recruit 모집 중 인지 여부
+     * @return 모집중인 팀 목록
+     */
+    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamListDto(t.id, t.name, t.preferredArea, t.skillScore) FROM Team t WHERE t.recruit = ?1")
+    List<TeamListDto> findAllByRecruitOrderByIdDesc(Integer recruit);
+
 }

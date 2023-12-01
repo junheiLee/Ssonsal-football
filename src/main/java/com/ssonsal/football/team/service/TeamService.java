@@ -20,4 +20,11 @@ public interface TeamService {
      * @return 팀 랭킹값
      */
     Integer findTeamRanking(Long teamId);
+
+    /**
+     * 모집 중인 팀만 내림차순으로 정렬해서 가져온다.
+     *
+     * @return 모집 중인 팀 목록
+     */
+    List<TeamListDto> findRecruitList();
 }

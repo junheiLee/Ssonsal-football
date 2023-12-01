@@ -52,4 +52,22 @@ public class TeamServiceImpl implements TeamService {
 
         return ranking;
     }
+
+    /**
+     * 모집 중인 팀만 내림차순으로 정렬해서 가져온다.
+     *
+     * @return 모집 중인 팀 목록
+     */
+    @Override
+    public List<TeamListDto> findRecruitList() {
+
+        List<TeamListDto> team = teamRepository.findAllByRecruitOrderByIdDesc(1);
+
+        for (TeamListDto teamListDto : team) {
+            teamListDto.setRanking(findTeamRanking(teamListDto.getId()));
+            teamListDto.setAgeAverage(userRepository.findAverageAgeByTeamId(teamListDto.getId()));
+        }
+
+        return team;
+    }
 }
