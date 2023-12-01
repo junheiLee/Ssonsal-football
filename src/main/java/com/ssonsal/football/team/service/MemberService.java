@@ -13,6 +13,14 @@ public interface MemberService {
     Role isUserLevel(Long userId);
 
     /**
+     * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
+     *
+     * @param userId 유저 아이디
+     * @return 유저 권한
+     */
+    Role isUserLevel(Long teamId, Long userId);
+
+    /**
      * 유저가 특정 팀에 신청 중 인지 확인합니다.
      *
      * @param userId 유저 아이디
@@ -25,5 +33,29 @@ public interface MemberService {
      * @param userId 유저 아이디
      */
     boolean isUserTeamExists(Long userId);
+
+    /**
+     * 유저가 팀장인지 확인합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 유저 아이디
+     */
+    boolean isTeamLeader(Long teamId, Long userId);
+
+    /**
+     * 유저가 특정 팀의 소속인지 확인합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 유저 아이디
+     */
+    boolean isUserTeamMember(Long teamId, Long userId);
+
+    /**
+     * 유저가 해당 팀에 신청 중 인지 확인합니다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     */
+    boolean isUserApply(Long userId, Long teamId);
 
 }

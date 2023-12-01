@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -89,5 +90,28 @@ public class TeamController {
         return "teamList";
     }
 
+    /**
+     * 특정 팀 상세정보를 가져온다.
+     *
+     * @param teamId 팀 아이디
+     * @return 팀 아이디에 맞는 팀 정보
+     */
+    @GetMapping("/{teamId}")
+    public String showTeamDetail(@PathVariable Long teamId, Model model) {
+
+        // 추후 토큰값으로 교체할 부분임
+        Long user = 1L;
+
+        if (user == null) {
+            model.addAttribute("userlevel", Role.GUEST);
+        } else {
+            model.addAttribute("userlevel", memberService.isUserLevel(teamId, user));
+        }
+
+        model.addAttribute("detail", teamService.findDetail(teamId));
+        model.addAttribute("members", teamService.findMemberList(teamId));
+
+        return "teamDetail";
+    }
 
 }

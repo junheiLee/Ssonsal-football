@@ -1,5 +1,6 @@
 package com.ssonsal.football.team.repository;
 
+import com.ssonsal.football.team.dto.response.TeamDetailDto;
 import com.ssonsal.football.team.dto.response.TeamListDto;
 import com.ssonsal.football.team.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,4 +37,24 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     @Query("SELECT new com.ssonsal.football.team.dto.response.TeamListDto(t.id, t.name, t.preferredArea, t.skillScore) FROM Team t WHERE t.name LIKE %:keyword%")
     List<TeamListDto> findByNameContaining(@Param("keyword") String keyword);
 
+    /**
+     * 팀 상세정보를 팀 전적과 함께 가져온다.
+     *
+     * @param teamId
+     * @return 팀 상세정보
+     */
+    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamDetailDto(t.id, t.name, t.preferredArea, t.preferredTime, t.intro, " +
+            "tr.winCount, tr.drawCount, tr.loseCount, t.mannerScore, t.skillScore) " +
+            "FROM Team t " +
+            "JOIN TeamRecord tr ON t.id = tr.team.id " +
+            "WHERE t.id = :teamId")
+    TeamDetailDto findTeamDtoWithRecord(@Param("teamId") Long teamId);
+
+    /**
+     * 유저가 팀장인지 확인한다.
+     *
+     * @param teamId
+     * @param userId
+     */
+    boolean existsByIdAndLeaderId(Long teamId, Long userId);
 }

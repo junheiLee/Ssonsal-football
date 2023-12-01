@@ -40,6 +40,31 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
+     * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     * @return 유저 권한
+     */
+    @Override
+    public Role isUserLevel(Long teamId, Long userId) {
+
+        if (isTeamLeader(teamId, userId)) {
+            return Role.TEAM_LEADER;
+        } else if (isUserTeamMember(teamId, userId)) {
+            return Role.TEAM_MEMBER;
+        } else if (isUserApply(userId, teamId)) {
+            return Role.TEAM_APPLY;
+        } else if (isUserOtherApply(userId)) {
+            return Role.OTHER_TEAM_APPLY;
+        } else if (isUserTeamExists(userId)) {
+            return Role.USER;
+        }
+
+        return Role.OTHER_TEAM_MEMBER;
+    }
+
+    /**
      * 유저가 특정 팀에 신청 중 인지 확인합니다.
      *
      * @param userId 유저 아이디
@@ -59,6 +84,42 @@ public class MemberServiceImpl implements MemberService {
     public boolean isUserTeamExists(Long userId) {
 
         return userRepository.existsByIdAndTeamIsNull(userId);
+    }
+
+    /**
+     * 유저가 팀장인지 확인합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 유저 아이디
+     */
+    @Override
+    public boolean isTeamLeader(Long teamId, Long userId) {
+
+        return teamRepository.existsByIdAndLeaderId(teamId, userId);
+    }
+
+    /**
+     * 유저가 특정 팀의 소속인지 확인합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 유저 아이디
+     */
+    @Override
+    public boolean isUserTeamMember(Long teamId, Long userId) {
+
+        return userRepository.existsByIdAndTeamId(userId, teamId);
+    }
+
+    /**
+     * 유저가 해당 팀에 신청 중 인지 확인합니다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     */
+    @Override
+    public boolean isUserApply(Long userId, Long teamId) {
+
+        return teamApplyRepository.existsByIdAndTeamId(userId, teamId);
     }
 
 }
