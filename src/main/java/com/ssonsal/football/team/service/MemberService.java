@@ -14,6 +14,7 @@ public interface MemberService {
 
     /**
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
+     * teamId,userId를 이용해 팀장인지,팀원인지,팀이 없는지 구분한다.
      *
      * @param teamId 팀 아이디
      * @param userId 유저 아이디
