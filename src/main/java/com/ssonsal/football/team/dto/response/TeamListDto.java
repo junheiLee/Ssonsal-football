@@ -17,7 +17,11 @@ public class TeamListDto {
 
     private Float skillScore;
 
+<<<<<<< HEAD
     private String ageAverage;
+=======
+    private Float ageAverage;
+>>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
 
     public TeamListDto(long id, String name, String preferredArea, float skillScore) {
         this.id = id;
