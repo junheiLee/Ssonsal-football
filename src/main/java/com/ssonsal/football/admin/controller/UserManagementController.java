@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class UserController {
+public class UserManagementController {
 
     private final UserService userService;
 
