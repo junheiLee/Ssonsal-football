@@ -15,6 +15,7 @@ public interface MemberService {
     /**
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
      *
+     * @param teamId 팀 아이디
      * @param userId 유저 아이디
      * @return 유저 권한
      */
