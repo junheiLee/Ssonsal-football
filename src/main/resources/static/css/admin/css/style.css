@@ -1043,18 +1043,7 @@ header .form-inline {
         padding: 0;
         text-overflow: ellipsis; }
 
-.header-menu {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: end;
-      -ms-flex-pack: end;
-          justify-content: flex-end; }
-  .header-menu .dropdown {
-    line-height: 55px;
-    margin-top: 0 !important; }
-    .header-menu .dropdown .dropdown-toggle {
-      line-height: 55px; }
+
 
 .user-area .dropdown-toggle {
   position: relative;
