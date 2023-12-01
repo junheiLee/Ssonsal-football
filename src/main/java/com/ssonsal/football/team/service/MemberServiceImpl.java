@@ -37,10 +37,10 @@ public class MemberServiceImpl implements MemberService {
         if (isUserOtherApply(userId)) {
             return Role.TEAM_APPLY;
         } else if (isUserHasTeam(userId)) {
-            return Role.USER;
+            return Role.TEAM_MEMBER;
         }
 
-        return Role.TEAM_MEMBER;
+        return Role.USER;
     }
 
     /**
