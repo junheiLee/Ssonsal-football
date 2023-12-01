@@ -1,18 +1,19 @@
 package com.ssonsal.football.team.entity;
 
 import com.ssonsal.football.global.entity.BaseEntity;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "team_record")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 public class TeamRecord extends BaseEntity {
 
     @Id
@@ -38,5 +39,7 @@ public class TeamRecord extends BaseEntity {
     @ColumnDefault("0")
     private Integer totalGameCount;
 
-
+    public TeamRecord(Team team){
+        this.team= team;
+    }
 }

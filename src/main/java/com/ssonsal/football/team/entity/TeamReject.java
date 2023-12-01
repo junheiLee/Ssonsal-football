@@ -1,25 +1,31 @@
 package com.ssonsal.football.team.entity;
 
 
-import com.ssonsal.football.global.entity.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "team_reject")
-public class TeamReject extends BaseEntity {
+public class TeamReject {
 
     @EmbeddedId
     private RejectId rejectId;
+
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    public TeamReject(RejectId rejectId) {
+        this.rejectId = rejectId;
+    }
 
 }
