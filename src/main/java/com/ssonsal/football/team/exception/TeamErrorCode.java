@@ -21,19 +21,18 @@ public enum TeamErrorCode implements ResponseCode {
     USER_OTHER_TEAM(HttpStatus.NOT_FOUND, "다른 팀 소속입니다."),
     USER_TEAM_BANNED(HttpStatus.FORBIDDEN, "밴 또는 거절된 팀입니다"),
     USER_NOT_MEMBER(HttpStatus.NOT_FOUND, "팀원이 아닙니다."),
-    DUPLICATE_TEAM_NAME(HttpStatus.CONFLICT, "팀 이름이 중복입니다.")
-    ;
+    DUPLICATE_TEAM_NAME(HttpStatus.CONFLICT, "팀 이름이 중복입니다.");
 
 
     private final HttpStatus httpStatus;
     private final String message;
 
-    TeamErrorCode(HttpStatus httpStatus, String message){
+    TeamErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
     }
 
-    public String getCode(){
+    public String getCode() {
         return name();
     }
 }

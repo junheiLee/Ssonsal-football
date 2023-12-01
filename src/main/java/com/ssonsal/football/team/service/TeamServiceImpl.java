@@ -189,9 +189,9 @@ public class TeamServiceImpl implements TeamService {
         Integer average = teamRepository.getTeamAgeAverage(teamId);
 
         String numberAsString = Integer.toString(average);
-        int firstNumber = (average/10)*10;
+        int firstNumber = (average / 10) * 10;
 
-        return firstNumber  + findAgeGroup(numberAsString.charAt(1));
+        return firstNumber + findAgeGroup(numberAsString.charAt(1));
     }
 
     /**

@@ -26,5 +26,5 @@ public class TeamListDto {
         this.preferredArea = preferredArea;
         this.skillScore = skillScore;
     }
-    
+
 }

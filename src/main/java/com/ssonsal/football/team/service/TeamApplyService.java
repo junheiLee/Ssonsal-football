@@ -6,7 +6,7 @@ public interface TeamApplyService {
 
     void deleteUserApply(Long userId);
 
-    String userApplyAccept(Long userId,Long teamId);
+    String userApplyAccept(Long userId, Long teamId);
 
     String userApplyReject(Long userId, Long teamId);
 }

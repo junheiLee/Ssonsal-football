@@ -60,8 +60,8 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     boolean existsByIdAndLeaderId(Long teamId, Long userId);
 
     /**
-     *팀 평균나이 값을 구한다.
-     * 
+     * 팀 평균나이 값을 구한다.
+     *
      * @param teamId 팀 아이디
      * @return 팀 평균 나이
      */
@@ -91,5 +91,5 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      * @param userId 유저 아이디
      * @param teamId 팀 아이디
      */
-    boolean existsUsersByIdAndUsersId(Long teamId,Long userId);
+    boolean existsUsersByIdAndUsersId(Long teamId, Long userId);
 }

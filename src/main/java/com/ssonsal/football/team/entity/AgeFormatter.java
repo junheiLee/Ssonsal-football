@@ -10,8 +10,7 @@ public enum AgeFormatter {
 
     EARLY("대 초반"),
     MID("대 중반"),
-    LATE("대 후반")
-    ;
+    LATE("대 후반");
 
     private final String ageGroup;
 

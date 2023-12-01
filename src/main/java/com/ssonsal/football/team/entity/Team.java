@@ -3,7 +3,10 @@ package com.ssonsal.football.team.entity;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;

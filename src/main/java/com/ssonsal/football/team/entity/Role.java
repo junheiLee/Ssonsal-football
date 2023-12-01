@@ -14,8 +14,7 @@ public enum Role {
     TEAM_MEMBER("팀원"),
     OTHER_TEAM_APPLY("다른팀 신청자"),
     TEAM_APPLY("신청자"),
-    OTHER_TEAM_MEMBER("다른팀 팀원")
-    ;
+    OTHER_TEAM_MEMBER("다른팀 팀원");
 
     private final String role;
 

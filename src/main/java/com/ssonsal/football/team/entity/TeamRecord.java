@@ -41,6 +41,7 @@ public class TeamRecord extends BaseEntity {
 
     @ColumnDefault("-1")
     private Integer rank;
+
     public TeamRecord(Team team) {
         this.team = team;
     }
