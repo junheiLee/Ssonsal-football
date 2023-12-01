@@ -28,11 +28,11 @@ public interface MemberService {
     boolean isUserOtherApply(Long userId);
 
     /**
-     * 유저가 팀을 가지고 있는지 확인합니다. -> null 일때 true
+     * 유저가 팀을 가지고 있는지 확인합니다.
      *
      * @param userId 유저 아이디
      */
-    boolean isUserTeamExists(Long userId);
+    boolean isUserHasTeam(Long userId);
 
 
     /**

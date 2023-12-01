@@ -39,7 +39,7 @@ public class TeamController {
             model.addAttribute("userlevel", memberService.isUserLevel(user));
         }
 
-        model.addAttribute("teams", teamService.findList());
+        model.addAttribute("teams", teamService.findAllList());
 
         return "team/teamList";
     }

@@ -15,7 +15,7 @@ public interface TeamService {
      *
      * @return teamListDto 전체 팀 목록
      */
-    List<TeamListDto> findList();
+    List<TeamListDto> findAllList();
 
     /**
      * 팀 랭킹을 구한다
@@ -23,7 +23,7 @@ public interface TeamService {
      * @param teamId 팀 아이디
      * @return 팀 랭킹값
      */
-    Integer findRanking(Long teamId);
+    Integer findRank(Long teamId);
 
     /**
      * 모집 중인 팀만 내림차순으로 정렬해서 가져온다.

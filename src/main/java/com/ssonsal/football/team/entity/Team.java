@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,8 +15,6 @@ import java.util.List;
 @Entity
 @Getter
 @Table(name = "team")
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 public class Team extends BaseEntity {
@@ -25,7 +24,7 @@ public class Team extends BaseEntity {
     private Long id;
 
     @Column(unique = true)
-    @NotNull
+    @NotBlank
     private String name;
 
     @Column(length = 1000)

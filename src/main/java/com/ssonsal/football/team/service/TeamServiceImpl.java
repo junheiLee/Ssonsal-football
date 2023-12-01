@@ -4,6 +4,7 @@ import com.ssonsal.football.team.dto.response.TeamApplyDto;
 import com.ssonsal.football.team.dto.response.TeamDetailDto;
 import com.ssonsal.football.team.dto.response.TeamListDto;
 import com.ssonsal.football.team.dto.response.TeamMemberListDto;
+import com.ssonsal.football.team.entity.AgeFormatter;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
@@ -35,16 +36,16 @@ public class TeamServiceImpl implements TeamService {
      * @return teamListDto 전체 팀 목록
      */
     @Override
-    public List<TeamListDto> findList() {
+    public List<TeamListDto> findAllList() {
 
-        List<TeamListDto> team = teamRepository.findAllByOrderByIdDesc();
+        List<TeamListDto> teams = teamRepository.findAllByOrderByIdDesc();
 
-        for (TeamListDto teamListDto : team) {
-            teamListDto.setRanking(findRanking(teamListDto.getId()));
+        for (TeamListDto teamListDto : teams) {
+            teamListDto.setRanking(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
-        return team;
+        return teams;
     }
 
     /**
@@ -55,15 +56,15 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> findRecruitList() {
 
-        List<TeamListDto> team = teamRepository.findAllByRecruitOrderByIdDesc(1);
+        List<TeamListDto> teams = teamRepository.findAllByRecruitOrderByIdDesc(1);
 
-        for (TeamListDto teamListDto : team) {
-            teamListDto.setRanking(findRanking(teamListDto.getId()));
+        for (TeamListDto teamListDto : teams) {
+            teamListDto.setRanking(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
 
-        return team;
+        return teams;
     }
 
     /**
@@ -75,14 +76,14 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> searchName(String keyword) {
 
-        List<TeamListDto> team = teamRepository.findByNameContaining(keyword);
+        List<TeamListDto> teams = teamRepository.findByNameContaining(keyword);
 
-        for (TeamListDto teamListDto : team) {
-            teamListDto.setRanking(findRanking(teamListDto.getId()));
+        for (TeamListDto teamListDto : teams) {
+            teamListDto.setRanking(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
-        return team;
+        return teams;
     }
 
     /**
@@ -96,7 +97,7 @@ public class TeamServiceImpl implements TeamService {
 
         TeamDetailDto teamDetailDto = teamRepository.findTeamDtoWithRecord(teamId);
 
-        teamDetailDto.setRanking(findRanking(teamId));
+        teamDetailDto.setRanking(findRank(teamId));
         teamDetailDto.setLeaderName(findLeader(teamId));
 
         return teamDetailDto;
@@ -170,7 +171,7 @@ public class TeamServiceImpl implements TeamService {
      * @return 팀 랭킹값
      */
     @Override
-    public Integer findRanking(Long teamId) {
+    public Integer findRank(Long teamId) {
 
         Integer ranking = teamRecordRepository.findRankById(teamId);
 
@@ -188,9 +189,9 @@ public class TeamServiceImpl implements TeamService {
         Integer average = teamRepository.getTeamAgeAverage(teamId);
 
         String numberAsString = Integer.toString(average);
-        char first = numberAsString.charAt(0);
+        int firstNumber = (average/10)*10;
 
-        return first + "0대 " + findAgeGroup(numberAsString.charAt(1));
+        return firstNumber  + findAgeGroup(numberAsString.charAt(1));
     }
 
     /**
@@ -203,11 +204,11 @@ public class TeamServiceImpl implements TeamService {
     public String findAgeGroup(char secondNumber) {
         int second = Character.getNumericValue(secondNumber);
         if (second >= 0 && second <= 3) {
-            return "초반";
+            return AgeFormatter.EARLY.getAgeGroup();
         } else if (second >= 4 && second <= 6) {
-            return "중반";
+            return AgeFormatter.MID.getAgeGroup();
         } else {
-            return "후반";
+            return AgeFormatter.LATE.getAgeGroup();
         }
     }
 

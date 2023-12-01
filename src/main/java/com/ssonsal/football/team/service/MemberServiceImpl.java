@@ -30,7 +30,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (isUserOtherApply(userId)) {
             return Role.TEAM_APPLY;
-        } else if (isUserTeamExists(userId)) {
+        } else if (isUserHasTeam(userId)) {
             return Role.USER;
         }
 
@@ -55,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
             return Role.TEAM_APPLY;
         } else if (isUserOtherApply(userId)) {
             return Role.OTHER_TEAM_APPLY;
-        } else if (!isUserTeamExists(userId)) {
+        } else if (!isUserHasTeam(userId)) {
             return Role.USER;
         }
 
@@ -79,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
      * @param userId 유저 아이디
      */
     @Override
-    public boolean isUserTeamExists(Long userId) {
+    public boolean isUserHasTeam(Long userId) {
 
         return teamRepository.existsByUserId(userId);
     }
