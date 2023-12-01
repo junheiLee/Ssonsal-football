@@ -15,7 +15,7 @@ public interface TeamService {
      *
      * @return teamListDto 전체 팀 목록
      */
-    List<TeamListDto> findAllList();
+    List<TeamListDto> findAllTeams();
 
     /**
      * 팀 랭킹을 구한다
@@ -38,7 +38,7 @@ public interface TeamService {
      * @param keyword 검색어
      * @return 검색한 팀 목록
      */
-    List<TeamListDto> searchName(String keyword);
+    List<TeamListDto> findSearchList(String keyword);
 
     /**
      * 팀 상세정보를 가져온다.

@@ -28,7 +28,7 @@ public class TeamController {
      * @return 팀 목록 정보 리스트
      */
     @GetMapping
-    public String AllList(Model model) {
+    public String findAllTeams(Model model) {
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;
@@ -39,7 +39,7 @@ public class TeamController {
             model.addAttribute("userlevel", memberService.isUserLevel(user));
         }
 
-        model.addAttribute("teams", teamService.findAllList());
+        model.addAttribute("teams", teamService.findAllTeams());
 
         return "team/teamList";
     }
@@ -50,7 +50,7 @@ public class TeamController {
      * @return 모집중인 팀 목록 정보 리스트
      */
     @GetMapping("/recruit")
-    public String RecruitList(Model model) {
+    public String findAllRecruitTeams(Model model) {
 
         model.addAttribute("teams", teamService.findRecruitList());
 
@@ -73,9 +73,9 @@ public class TeamController {
      * @return 팀명 검색어에 맞는 팀 목록 정보 리스트
      */
     @GetMapping("/search")
-    public String SearchList(@RequestParam String keyword, Model model) {
+    public String findAllSearchTeams(@RequestParam String keyword, Model model) {
 
-        model.addAttribute("teams", teamService.searchName(keyword));
+        model.addAttribute("teams", teamService.findSearchList(keyword));
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;

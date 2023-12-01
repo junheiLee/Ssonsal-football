@@ -36,7 +36,7 @@ public class TeamServiceImpl implements TeamService {
      * @return teamListDto 전체 팀 목록
      */
     @Override
-    public List<TeamListDto> findAllList() {
+    public List<TeamListDto> findAllTeams() {
 
         List<TeamListDto> teams = teamRepository.findAllByOrderByIdDesc();
 
@@ -74,7 +74,7 @@ public class TeamServiceImpl implements TeamService {
      * @return 검색한 팀 목록
      */
     @Override
-    public List<TeamListDto> searchName(String keyword) {
+    public List<TeamListDto> findSearchList(String keyword) {
 
         List<TeamListDto> teams = teamRepository.findByNameContaining(keyword);
 
