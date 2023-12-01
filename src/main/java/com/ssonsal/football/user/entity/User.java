@@ -27,7 +27,6 @@ public class User extends BaseEntity implements UserDetails {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
-    @Setter
     private Team team;
 
     @Column(name = "role", columnDefinition = "0")
