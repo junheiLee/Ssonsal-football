@@ -1,0 +1,325 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SSonsal</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="https://i.imgur.com/QRAUqs9.png">
+    <link rel="shortcut icon" href="https://i.imgur.com/QRAUqs9.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/css/admin/css/lib/datatable/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/style.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a th:href="@{/admin.html}"><i class="menu-icon fa fa-laptop"></i>SSonsal </a>
+                </li>
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>유저 관리
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_user.html}">유저 관리</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>글 관리
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_match.html}">매치 글 관리</a></li>
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_sub.html}">용병 글 관리</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>리뷰 관리
+                    </a>-------
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_review.html}">리뷰 글 관리</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-th"></i>Forms
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-th"></i><a th:href="@{/forms-basic.html}">Basic Form</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-bar-chart"></i>Charts
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-line-chart"></i><a th:href="@{/charts-chartjs.html}">Chart JS</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-area-chart"></i>Maps
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-map-o"></i><a th:href="@{/maps-gmap.html}">Google Maps</a></li>
+                        <li><i class="menu-icon fa fa-street-view"></i><a th:href="@{/maps-vector.html}">Vector Maps</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="menu-title">Extras</li><!-- /.menu-title -->
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-glass"></i>Pages
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-sign-in"></i><a th:href="@{/page-login.html}">Login</a></li>
+                        <li><i class="menu-icon fa fa-paper-plane"></i><a th:href="@{/pages-forget.html}">Forget
+                            Pass</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<
+<div id="right-panel" class="right-panel">
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" th:href="@{/admin.html}"><img th:src="@{/images/logo.svg}" alt="Logo"></a>
+                <a class="navbar-brand hidden" th:href="@{/admin.html}"><img th:src="@{/images/logo2.svg}"
+                                                                             alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/images/admin.jpg" alt="User Avatar">
+                    </a>
+
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="/my-profile"><i class="fa fa-user"></i>My Profile</a>
+
+                        <a class="nav-link" href="notifications"><i class="fa fa-bell"></i>Notifications <span
+                                class="count">13</span></a>
+
+                        <a class="nav-link" href="/settings"><i class="fa fa-cog"></i>Settings</a>
+
+                        <a class="nav-link" href="/logout"><i class="fa fa-power-off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header-->
+
+    <div class="breadcrumbs">
+        <div class="breadcrumbs-inner">
+            <div class="row m-0">
+                <div class="col-sm-4">
+                    <div class="page-header float-left">
+                        <div class="page-title">
+                            <h1>SSonsal</h1>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-8">
+                    <div class="page-header float-right">
+                        <div class="page-title">
+                            <ol class="breadcrumb text-right">
+                                <li>SSonsal</li>
+                                <li>유저</li>
+                                <li class="active">유저 관리</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <strong class="card-title">유저 관리</strong>
+                        </div>
+                        <div class="card-body">
+                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th></th> <!-- 체크박스 열 -->
+                                    <th>이름</th>
+                                    <th>닉네임</th>
+                                    <th>성별</th>
+                                    <th>나이</th>
+                                    <th>가입 날짜</th>
+                                    <th>관리자 여부</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="user : ${userList}">
+                                    <td>
+                                        <input type="checkbox" name="selectedUser" data-user-id="${user.id}" data-user-id-value="${user.id}" th:disabled="${user.role == 1}">
+                                        <span class="user-id" th:text="${user.id}" style="display: none;"></span>
+                                    </td>
+                                    <td th:text="${user.name}"></td>
+                                    <td th:text="${user.nickname}"></td>
+                                    <td th:text="${user.gender == 0 ? '여성' : '남성'}"></td>
+                                    <td th:text="${user.age}"></td>
+                                    <td th:text="${user.createdAt}"></td>
+                                    <td th:text="${user.role == 1 ? '관리자' : '일반유저'}"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="width:100%;">
+                            <button class="grant-permission"
+                                    style="float: right; margin: 0 35px 35px 0; color: #ffffff; background-color:#292b35 "
+                                    onclick="grantPermission()">권한 부여
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+
+    <div class="clearfix"></div>
+
+    <footer class="site-footer">
+        <div class="footer-inner bg-white">
+            <div class="row">
+                <div class="col-sm-6">
+                    Copyright &copy; 2018 Ela Admin
+                </div>
+                <div class="col-sm-6 text-right">
+                    Designed by <a href="https://colorlib.com">Colorlib</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</div><!-- /#right-panel -->
+
+<!-- Right Panel -->
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+<script src="/static/js/main.js"></script>
+
+<script th:src="@{/static/js/lib/lib/data-table/datatables.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/dataTables.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/dataTables.buttons.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/jszip.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/vfs_fonts.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.html5.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.print.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.colVis.min.js}"></script>
+<script th:src="@{/static/js/init/init/datatables-init.js}"></script>
+
+
+<script type="text/javascript">
+    $(document).ready(function() {
+      $('#bootstrap-data-table-export').DataTable();
+  } );
+</script>
+
+<script>
+
+    function grantPermission() {
+        var selectedUserIds = $("[name='selectedUser']:checked").map(function () {
+            return $(this).closest('tr').find('.user-id').text();
+        }).get();
+
+        if (selectedUserIds.length === 0) {
+            alert('선택된 사용자가 없습니다.');
+            console.log('No users selected');
+            return;
+        }
+
+        // 체크박스가 비활성화 된 경우, 체크 안되게 처리
+        $("[name='selectedUser']:checked").prop("checked", false);
+
+        var newRole = confirm("권한을 부여하시겠습니까?");
+
+        var requestData = {
+            userIds: selectedUserIds.map(Number),
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/admin/user/changeRole',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            success: function (response) {
+                console.log('서버 응답:', response);
+                if (response === '권한 부여 성공') {
+                    alert('권한 부여 성공!!');
+                    window.location.href = '/admin/user';
+                } else {
+                    alert('권한 부여 실패');
+                }
+            },
+            error: function (error) {
+                console.error('에러 발생:', error);
+                alert('에러!!');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
