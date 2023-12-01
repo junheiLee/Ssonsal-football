@@ -9,12 +9,12 @@ import org.springframework.http.ResponseEntity;
 
 /**
  * ResponseEntity<> body에 팀 내에서 약속한 포맷으로 기입하기 위한 클래스
- *
+ * <p>
  * put(ResponseCode responseCode) 사용 시
  * {
- *     "httpStatus": int,
- *     "code": "string",
- *     "message": "string"
+ * "httpStatus": int,
+ * "code": "string",
+ * "message": "string"
  * }
  *
  * @Author junheiLee
