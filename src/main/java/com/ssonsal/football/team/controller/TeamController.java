@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpSession;
-
 @Controller
 @RequestMapping("/teams")
 @RequiredArgsConstructor
@@ -97,7 +95,7 @@ public class TeamController {
      * @return 팀 아이디에 맞는 팀 정보
      */
     @GetMapping("/{teamId}")
-    public String showTeamDetail(@PathVariable Long teamId, Model model) {
+    public String showDetail(@PathVariable Long teamId, Model model) {
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;
@@ -114,4 +112,28 @@ public class TeamController {
         return "teamDetail";
     }
 
+    /**
+     * 팀 신청자 목록과 팀 회원목록을 가져온다.
+     *
+     * @param teamId 팀 아이디
+     * @return 팀 아이디에 맞는 회원 정보와 팀 신청자 정보
+     */
+    @GetMapping("/{teamId}/managers")
+    public String showManageList(@PathVariable Long teamId, Model model) {
+
+        // 추후 토큰값으로 교체할 부분임
+        Long user = 1L;
+
+        if (user == null) {
+            return "index";
+        } else {
+            if (!memberService.isTeamLeader(teamId, user)) {
+                return "index";
+            }
+        }
+
+        model.addAttribute("manage", teamService.findManageList(teamId));
+
+        return "teamManage";
+    }
 }

@@ -1,10 +1,12 @@
 package com.ssonsal.football.team.service;
 
+import com.ssonsal.football.team.dto.response.TeamApplyDto;
 import com.ssonsal.football.team.dto.response.TeamDetailDto;
 import com.ssonsal.football.team.dto.response.TeamListDto;
 import com.ssonsal.football.team.dto.response.TeamMemberListDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TeamService {
 
@@ -61,4 +63,21 @@ public interface TeamService {
      * @return 팀장 닉네임
      */
     String findLeader(Long teamId);
+
+    /**
+     * 팀원정보와 팀 신청목록을 가져온다.
+     *
+     * @param teamId 팀 아이디
+     * @return map 관리 대상 목록이 담긴 map
+     */
+    Map<String, Object> findManageList(Long teamId);
+
+    /**
+     * 팀에 신청한 유저 목록을 가져온다.
+     *
+     * @param teamId 팀 id
+     * @return 신청한 유저 정보 목록
+     */
+    List<TeamApplyDto> findApplyList(Long teamId);
+
 }
