@@ -31,11 +31,11 @@ public class TeamDetailDto {
 
     private Integer loseCount;
 
-    private Integer memberCount;
+    private Long memberCount;
 
     public TeamDetailDto(Long id, String name, String preferredArea, String preferredTime, String intro,
                          Integer winCount, Integer drawCount, Integer loseCount,
-                         Float mannerScore, Float skillScore) {
+                         Float mannerScore, Float skillScore, Long memberCount) {
         this.id = id;
         this.name = name;
         this.preferredArea = preferredArea;
@@ -46,6 +46,7 @@ public class TeamDetailDto {
         this.loseCount = loseCount;
         this.mannerScore = mannerScore;
         this.skillScore = skillScore;
+        this.memberCount = memberCount;
     }
 
 }

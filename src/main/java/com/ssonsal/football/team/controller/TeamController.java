@@ -77,7 +77,7 @@ public class TeamController {
         model.addAttribute("teams", teamService.searchName(keyword));
 
         // 추후 토큰값으로 교체할 부분임
-        Long user = 1L;
+        Long user = null;
 
         if (user == null) {
             model.addAttribute("userlevel", Role.GUEST);
@@ -98,7 +98,7 @@ public class TeamController {
     public String showDetail(@PathVariable Long teamId, Model model) {
 
         // 추후 토큰값으로 교체할 부분임
-        Long user = 1L;
+        Long user = 17L;
 
         if (user == null) {
             model.addAttribute("userlevel", Role.GUEST);

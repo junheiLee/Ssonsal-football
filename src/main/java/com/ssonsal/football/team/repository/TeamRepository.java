@@ -2,6 +2,7 @@ package com.ssonsal.football.team.repository;
 
 import com.ssonsal.football.team.dto.response.TeamDetailDto;
 import com.ssonsal.football.team.dto.response.TeamListDto;
+import com.ssonsal.football.team.dto.response.TeamMemberListDto;
 import com.ssonsal.football.team.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -44,10 +45,10 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      * @return 팀 상세정보
      */
     @Query("SELECT new com.ssonsal.football.team.dto.response.TeamDetailDto(t.id, t.name, t.preferredArea, t.preferredTime, t.intro, " +
-            "tr.winCount, tr.drawCount, tr.loseCount, t.mannerScore, t.skillScore) " +
+            "tr.winCount, tr.drawCount, tr.loseCount, t.mannerScore, t.skillScore, COUNT(u)) " +
             "FROM Team t " +
             "JOIN TeamRecord tr ON t.id = tr.team.id " +
-            "WHERE t.id = :teamId")
+            "LEFT JOIN t.users u WHERE t.id = :teamId")
     TeamDetailDto findTeamDtoWithRecord(@Param("teamId") Long teamId);
 
     /**
@@ -57,4 +58,38 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
      * @param userId
      */
     boolean existsByIdAndLeaderId(Long teamId, Long userId);
+
+    /**
+     *팀 평균나이 값을 구한다.
+     * 
+     * @param teamId 팀 아이디
+     * @return 팀 평균 나이
+     */
+    @Query("SELECT AVG(YEAR(CURRENT_DATE) - YEAR(u.birth)) FROM Team t JOIN t.users u WHERE t.id = :teamId")
+    Integer getTeamAgeAverage(@Param("teamId") Long teamId);
+
+    /**
+     * 팀 회원 정보를 가져온다.
+     *
+     * @param teamId
+     * @return 팀 회원 정보 목록
+     */
+    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamMemberListDto(u.id, u.nickname, u.gender, u.position, YEAR(CURRENT_DATE) - YEAR(u.birth)) FROM Team t JOIN t.users u WHERE t.id = :teamId")
+    List<TeamMemberListDto> findTeamMemberDtoById(@Param("teamId") Long teamId);
+
+    /**
+     * 유저가 팀을 가지고 있는지 확인한다.
+     *
+     * @param userId
+     */
+    @Query("SELECT CASE WHEN COUNT(t) > 0 THEN TRUE ELSE FALSE END FROM Team t JOIN t.users u WHERE u.id = :userId")
+    boolean existsByUserId(@Param("userId") Long userId);
+
+    /**
+     * 유저가 특정 팀의 소속인지 확인한다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     */
+    boolean existsUsersByIdAndUsersId(Long teamId,Long userId);
 }

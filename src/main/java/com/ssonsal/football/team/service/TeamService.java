@@ -80,4 +80,21 @@ public interface TeamService {
      */
     List<TeamApplyDto> findApplyList(Long teamId);
 
+    /**
+     * 팀 평균 나이대를 구한다.
+     *
+     * @param teamId 팀 아이디
+     * @return 팀 평균 나이대
+     */
+    String findAgeAverage(Long teamId);
+
+    /**
+     * 팀 평균 나이대를 구한다.
+     *
+     * @param second 나이대 뒷자리
+     * @return 초반/중반/후반 문자열
+     */
+    public String findAgeGroup(char second);
+
+
 }

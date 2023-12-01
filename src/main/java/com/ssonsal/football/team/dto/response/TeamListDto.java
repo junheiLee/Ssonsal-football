@@ -17,7 +17,7 @@ public class TeamListDto {
 
     private Float skillScore;
 
-    private Float ageAverage;
+    private String ageAverage;
 
     public TeamListDto(long id, String name, String preferredArea, float skillScore) {
         this.id = id;

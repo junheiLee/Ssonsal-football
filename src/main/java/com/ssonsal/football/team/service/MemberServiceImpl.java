@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberServiceImpl implements MemberService {
 
     private final TeamRepository teamRepository;
-    private final UserRepository userRepository;
     private final TeamApplyRepository teamApplyRepository;
     private final TeamRejectRepository teamRejectRepository;
 
@@ -32,7 +31,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (isUserOtherApply(userId)) {
             return Role.TEAM_APPLY;
-        } else if (isUserTeamExists(userId)) {
+        } else if (!isUserTeamExists(userId)) {
             return Role.USER;
         }
 
@@ -57,7 +56,7 @@ public class MemberServiceImpl implements MemberService {
             return Role.TEAM_APPLY;
         } else if (isUserOtherApply(userId)) {
             return Role.OTHER_TEAM_APPLY;
-        } else if (isUserTeamExists(userId)) {
+        } else if (!isUserTeamExists(userId)) {
             return Role.USER;
         }
 
@@ -83,7 +82,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean isUserTeamExists(Long userId) {
 
-        return userRepository.existsByIdAndTeamIsNull(userId);
+        return teamRepository.existsByUserId(userId);
     }
 
     /**
@@ -106,8 +105,8 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public boolean isUserTeamMember(Long teamId, Long userId) {
-
-        return userRepository.existsByIdAndTeamId(userId, teamId);
+        System.out.println(teamRepository.existsUsersByIdAndUsersId(teamId, userId));
+        return teamRepository.existsUsersByIdAndUsersId(teamId, userId);
     }
 
     /**

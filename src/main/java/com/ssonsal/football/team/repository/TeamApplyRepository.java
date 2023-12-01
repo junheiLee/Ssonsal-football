@@ -17,8 +17,8 @@ public interface TeamApplyRepository extends JpaRepository<TeamApply, Long> {
      * @param teamId 팀 아이디
      * @return 신청한 유저 정보
      */
-    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamApplyDto(t.id, u.nickname, u.gender, u.position) FROM TeamApply t JOIN User u ON t.user.id = u.id WHERE t.team.id = :teamId")
-    List<TeamApplyDto> findAllByTeamId(@Param("teamId") Long teamId);
+    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamApplyDto(ta.id, u.nickname, u.gender, u.position, YEAR(CURRENT_DATE) - YEAR(u.birth)) FROM TeamApply ta JOIN ta.user u WHERE ta.team.id = :teamId")
+    List<TeamApplyDto> findTeamAppliesWithUserAge(@Param("teamId") Long teamId);
 
     /**
      * 유저가 해당 팀에 가입신청 중 인지 확인한다.

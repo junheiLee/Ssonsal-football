@@ -41,7 +41,7 @@ public class TeamServiceImpl implements TeamService {
 
         for (TeamListDto teamListDto : team) {
             teamListDto.setRanking(findRanking(teamListDto.getId()));
-            teamListDto.setAgeAverage(userRepository.findAverageAgeByTeamId(teamListDto.getId()));
+            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
         return team;
@@ -59,8 +59,9 @@ public class TeamServiceImpl implements TeamService {
 
         for (TeamListDto teamListDto : team) {
             teamListDto.setRanking(findRanking(teamListDto.getId()));
-            teamListDto.setAgeAverage(userRepository.findAverageAgeByTeamId(teamListDto.getId()));
+            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
+
 
         return team;
     }
@@ -78,7 +79,7 @@ public class TeamServiceImpl implements TeamService {
 
         for (TeamListDto teamListDto : team) {
             teamListDto.setRanking(findRanking(teamListDto.getId()));
-            teamListDto.setAgeAverage(userRepository.findAverageAgeByTeamId(teamListDto.getId()));
+            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
         return team;
@@ -96,7 +97,6 @@ public class TeamServiceImpl implements TeamService {
         TeamDetailDto teamDetailDto = teamRepository.findTeamDtoWithRecord(teamId);
 
         teamDetailDto.setRanking(findRanking(teamId));
-        teamDetailDto.setMemberCount(userRepository.countByTeamId(teamId));
         teamDetailDto.setLeaderName(findLeader(teamId));
 
         return teamDetailDto;
@@ -111,11 +111,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamMemberListDto> findMemberList(Long teamId) {
 
-        List<TeamMemberListDto> teamMembers = userRepository.findAllByTeamId(teamId);
-
-        for (TeamMemberListDto teamMember : teamMembers) {
-            teamMember.setBirth(userRepository.calculateAgeByUserId(teamMember.getId()));
-        }
+        List<TeamMemberListDto> teamMembers = teamRepository.findTeamMemberDtoById(teamId);
 
         return teamMembers;
     }
@@ -162,11 +158,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamApplyDto> findApplyList(Long teamId) {
 
-        List<TeamApplyDto> applys = teamApplyRepository.findAllByTeamId(teamId);
-
-        for (TeamApplyDto apply : applys) {
-            apply.setBirth(userRepository.calculateAgeByUserId(apply.getId()));
-        }
+        List<TeamApplyDto> applys = teamApplyRepository.findTeamAppliesWithUserAge(teamId);
 
         return applys;
     }
@@ -183,6 +175,40 @@ public class TeamServiceImpl implements TeamService {
         Integer ranking = teamRecordRepository.findRankById(teamId);
 
         return ranking;
+    }
+
+    /**
+     * 팀 평균 나이대를 구한다.
+     *
+     * @param teamId 팀 아이디
+     * @return 팀 평균 나이대
+     */
+    @Override
+    public String findAgeAverage(Long teamId) {
+        Integer average = teamRepository.getTeamAgeAverage(teamId);
+
+        String numberAsString = Integer.toString(average);
+        char first = numberAsString.charAt(0);
+
+        return first + "0대 " + findAgeGroup(numberAsString.charAt(1));
+    }
+
+    /**
+     * * 팀 평균 나이대를 구한다.
+     *
+     * @param secondNumber 나이대 뒷자리
+     * @return 초반/중반/후반 문자열
+     */
+    @Override
+    public String findAgeGroup(char secondNumber) {
+        int second = Character.getNumericValue(secondNumber);
+        if (second >= 0 && second <= 3) {
+            return "초반";
+        } else if (second >= 4 && second <= 6) {
+            return "중반";
+        } else {
+            return "후반";
+        }
     }
 
 }
