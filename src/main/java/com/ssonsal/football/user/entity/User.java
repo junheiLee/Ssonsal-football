@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-@Table(name = "user")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -45,7 +45,7 @@ public class User extends BaseEntity implements UserDetails {
     private LocalDate birth;
 
     @Column(name = "gender")
-    private int gender;
+    private String gender;
 
     @Column(name = "nickname", length = 14)
     private String nickname;
@@ -75,6 +75,10 @@ public class User extends BaseEntity implements UserDetails {
     public User(String email, String password, String auth) {
         this.email = email;
         this.password = password;
+    }
+
+    public void updateRole(int role) {
+        this.role = role;
     }
 
 

@@ -27,14 +27,14 @@ public class RestGameController {
     public ResponseEntity<String> deleteGames(@RequestBody Map<String, Object> reqeustData) {
         List<Integer> gameIds = (List<Integer>) reqeustData.get("gameIds");
 
-         log.info("게임 아이디"+gameIds);
+        log.info("게임 아이디" + gameIds);
 
-        try{
+        try {
             gameService.deleteGames(gameIds);
 
             return ResponseEntity.ok("삭제 성공");
 
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패");
         }
     }

@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.dto.request;
 
-import com.ssonsal.football.admin.entity.User;
+import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -22,13 +22,13 @@ public class UserDTO {
     private Integer age;
 
     @Builder
-    public UserDTO(Long id, String  name, String  nickname, String gender, LocalDateTime createdAt, Integer role) {
+    public UserDTO(Long id, String name, String nickname, String gender, LocalDateTime createdAt, Integer role) {
         this.id = id;
         this.name = name;
         this.nickname = nickname;
         this.gender = gender;
         this.createdAt = createdAt;
-        this.role =role;
+        this.role = role;
     }
 
 

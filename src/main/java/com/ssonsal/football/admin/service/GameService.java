@@ -1,7 +1,7 @@
 package com.ssonsal.football.admin.service;
 
 import com.ssonsal.football.admin.dto.request.GameDTO;
-import com.ssonsal.football.admin.repository.GameRepository;
+import com.ssonsal.football.admin.repository.GameManagementRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameService {
 
-    private final GameRepository gameRepository;
+    private final GameManagementRepository gameManagementRepository;
 
     // 게임 글 리스트
     @Transactional
     public List<GameDTO> gameList() {
 
-        List<GameDTO> game = gameRepository.findAllGame();
+        List<GameDTO> game = gameManagementRepository.findAllGame();
         for (GameDTO gameDTO : game) {
             gameDTO.setWriter("홍길동");
         }
@@ -33,7 +33,7 @@ public class GameService {
     public void deleteGames(List<Integer> gameIds) {
         for (Integer gameId : gameIds) {
 
-            gameRepository.deleteById(Long.valueOf(gameId));
+            gameManagementRepository.deleteById(Long.valueOf(gameId));
 
             log.info("게임 ID {}가 삭제되었습니다.", gameId);
         }

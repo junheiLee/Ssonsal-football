@@ -1,8 +1,8 @@
 package com.ssonsal.football.admin.service;
 
 import com.ssonsal.football.admin.dto.request.UserDTO;
-import com.ssonsal.football.admin.entity.User;
-import com.ssonsal.football.admin.repository.UserRepository;
+import com.ssonsal.football.admin.repository.UserManagementRepository;
+import com.ssonsal.football.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,14 +15,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserManagementRepository userManagementRepository;
 
     // 유저 리스트
     public List<UserDTO> userList() {
-        List<UserDTO> userList = userRepository.findAllUser();
+        List<UserDTO> userList = userManagementRepository.findAllUser();
 
         for (UserDTO user : userList) {
-            user.setAge(userRepository.calculateAgeByUserId(user.getId()));
+            user.setAge(userManagementRepository.calculateAgeByUserId(user.getId()));
         }
         return userList;
     }
@@ -30,7 +30,7 @@ public class UserService {
     // 유저 권한 변경
     public void updateRoles(List<Integer> userIds) {
         for (Integer userId : userIds) {
-            Optional<User> userOptional = userRepository.findById(Long.valueOf(userId));
+            Optional<User> userOptional = userManagementRepository.findById(Long.valueOf(userId));
 
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
@@ -42,8 +42,8 @@ public class UserService {
                 }
 
                 Integer newRole = (user.getRole() == 0) ? 1 : 0;
-                user.setRole(newRole);
-                userRepository.save(user);
+                user.updateRole(newRole);
+                userManagementRepository.save(user);
             }
         }
     }

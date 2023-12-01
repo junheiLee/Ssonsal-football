@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.dto.request;
 
-import com.ssonsal.football.admin.entity.Game;
+import com.ssonsal.football.game.entity.Game;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ public class GameDTO {
 
     @Builder
     public GameDTO(Long id, LocalDateTime createdAt, Integer matchStatus,
-                   Integer vsFormat, String stadium, LocalDateTime schedule)  {
+                   Integer vsFormat, String stadium, LocalDateTime schedule) {
         this.id = id;
         this.createdAt = createdAt;
         this.matchStatus = matchStatus;
@@ -30,18 +30,19 @@ public class GameDTO {
         this.schedule = schedule;
 
     }
-        public static GameDTO gameFactory(Game game){
-            return GameDTO.builder()
-                    .id(game.getId())
-                    .createdAt(game.getCreatedAt())
-                    .matchStatus(game.getMatchStatus())
-                    .vsFormat(game.getVsFormat())
-                    .stadium(game.getStadium())
-                    .schedule(game.getSchedule())
-                    .build();
-        }
 
+    public static GameDTO gameFactory(Game game) {
+        return GameDTO.builder()
+                .id(game.getId())
+                .createdAt(game.getCreatedAt())
+                .matchStatus(game.getMatchStatus())
+                .vsFormat(game.getVsFormat())
+                .stadium(game.getStadium())
+                .schedule(game.getSchedule())
+                .build();
     }
+
+}
 
 
 
