@@ -41,7 +41,7 @@ public class TeamController {
 
         model.addAttribute("teams", teamService.findList());
 
-        return "teamList";
+        return "team/teamList";
     }
 
     /**
@@ -63,7 +63,7 @@ public class TeamController {
             model.addAttribute("userlevel", memberService.isUserLevel(user));
         }
 
-        return "teamList";
+        return "team/teamList";
     }
 
     /**
@@ -78,7 +78,7 @@ public class TeamController {
         model.addAttribute("teams", teamService.searchName(keyword));
 
         // 추후 토큰값으로 교체할 부분임
-        Long user = null;
+        Long user = 1L;
 
         if (user == null) {
             model.addAttribute("userlevel", Role.GUEST);
@@ -86,7 +86,7 @@ public class TeamController {
             model.addAttribute("userlevel", memberService.isUserLevel(user));
         }
 
-        return "teamList";
+        return "team/teamList";
     }
 
     /**
@@ -99,7 +99,7 @@ public class TeamController {
     public String showDetail(@PathVariable Long teamId, Model model) {
 
         // 추후 토큰값으로 교체할 부분임
-        Long user = 17L;
+        Long user = 1L;
 
         if (user == null) {
             model.addAttribute("userlevel", Role.GUEST);
@@ -110,7 +110,7 @@ public class TeamController {
         model.addAttribute("detail", teamService.findDetail(teamId));
         model.addAttribute("members", teamService.findMemberList(teamId));
 
-        return "teamDetail";
+        return "team/teamDetail";
     }
 
     /**
@@ -135,7 +135,7 @@ public class TeamController {
 
         model.addAttribute("manage", teamService.findManageList(teamId));
 
-        return "teamManage";
+        return "team/teamManage";
     }
 
 }
