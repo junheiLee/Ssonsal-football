@@ -39,7 +39,7 @@ public class TeamRecord extends BaseEntity {
     @ColumnDefault("0")
     private Integer totalGameCount;
 
-    public TeamRecord(Team team){
-        this.team= team;
+    public TeamRecord(Team team) {
+        this.team = team;
     }
 }

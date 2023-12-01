@@ -33,7 +33,7 @@ public class TeamApply {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public TeamApply(User user,Team team){
+    public TeamApply(User user, Team team) {
         this.user = user;
         this.team = team;
     }
