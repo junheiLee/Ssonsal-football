@@ -1,6 +1,7 @@
 package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.team.entity.Role;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -140,10 +141,21 @@ public class MemberServiceImpl implements MemberService {
         return teamRepository.findById(teamId).get().getName();
     }
 
+    /**
+     * 팀장을 변경합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 위임받을 사람 아이디
+     * @return 위임받은 사람 닉네임
+     */
     @Override
     @Transactional
     public String leaderDelegate(Long teamId, Long userId) {
-        return null;
+
+        Team team = teamRepository.findById(teamId).get();
+        team.setLeaderId(userId);
+
+        return userRepository.findById(userId).get().getNickname();
     }
 
 }
