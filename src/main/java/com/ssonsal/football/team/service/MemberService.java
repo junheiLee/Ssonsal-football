@@ -77,4 +77,14 @@ public interface MemberService {
      */
     String leaderDelegate(Long teamId, Long userId);
 
+
+    /**
+     * 팀에서 회원을 퇴출시킨다.
+     *
+     * @param userId 퇴출자 아이디
+     * @param teamId 팀 아이디
+     * @return 퇴출당한 회원 닉네임
+     */
+    String userBan(Long userId, Long teamId);
+
 }

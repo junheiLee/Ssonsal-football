@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -164,10 +162,39 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
         } else if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
-        } else if (!memberService.isUserTeamMember(teamId,userId)){
+        } else if (!memberService.isUserTeamMember(teamId, userId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_MEMBER);
         }
 
         return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_DELEGATE_SUCCESS, memberService.leaderDelegate(teamId, userId));
+    }
+
+    /**
+     * 팀장 권한으로 팀에서 회원을 퇴출합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 퇴출할 회원의 아이디
+     * @return 퇴출당한 회원의 닉네임
+     */
+    @DeleteMapping("/{teamId}/managers/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> userBan(@PathVariable Long teamId, @PathVariable Long userId) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (!memberService.isTeamLeader(teamId, user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
+        } else if (memberService.isTeamLeader(teamId, userId)) {
+            throw new CustomException(TeamErrorCode.CANNOT_REMOVE_LEADER);
+        } else if (!memberService.isUserHasTeam(userId)) {
+            throw new CustomException(TeamErrorCode.USER_NOT_TEAM);
+        } else if (memberService.isUserHasTeam(userId)) {
+            if (!memberService.isUserTeamMember(teamId, userId)) {
+                throw new CustomException(TeamErrorCode.USER_OTHER_TEAM);
+            }
+        }
+
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, memberService.userBan(userId, teamId));
     }
 }

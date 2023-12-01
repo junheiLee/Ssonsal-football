@@ -1,7 +1,9 @@
 package com.ssonsal.football.team.service;
 
+import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.entity.Team;
+import com.ssonsal.football.team.entity.TeamReject;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -156,6 +158,29 @@ public class MemberServiceImpl implements MemberService {
         team.setLeaderId(userId);
 
         return userRepository.findById(userId).get().getNickname();
+    }
+
+    /**
+     * 팀에서 회원을 퇴출시킨다.
+     *
+     * @param userId 퇴출자 아이디
+     * @param teamId 팀 아이디
+     * @return 퇴출당한 회원 닉네임
+     */
+    @Override
+    @Transactional
+    public String userBan(Long userId, Long teamId) {
+
+        User user = userRepository.findById(userId).get();
+        user.setTeam(null);
+
+        RejectId rejectId = new RejectId(userId, teamId);
+
+        TeamReject teamReject = new TeamReject(rejectId);
+
+        teamRejectRepository.save(teamReject);
+
+        return user.getNickname();
     }
 
 }
