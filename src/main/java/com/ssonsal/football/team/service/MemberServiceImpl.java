@@ -4,7 +4,6 @@ import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
-import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,10 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberServiceImpl implements MemberService {
 
     private final TeamRepository teamRepository;
-<<<<<<< HEAD
-=======
-    private final UserRepository userRepository;
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
     private final TeamApplyRepository teamApplyRepository;
     private final TeamRejectRepository teamRejectRepository;
 
@@ -35,11 +30,7 @@ public class MemberServiceImpl implements MemberService {
 
         if (isUserOtherApply(userId)) {
             return Role.TEAM_APPLY;
-<<<<<<< HEAD
-        } else if (!isUserTeamExists(userId)) {
-=======
         } else if (isUserTeamExists(userId)) {
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
             return Role.USER;
         }
 
@@ -47,7 +38,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-<<<<<<< HEAD
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
      *
      * @param userId 유저 아이디
@@ -73,8 +63,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-=======
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
      * 유저가 특정 팀에 신청 중 인지 확인합니다.
      *
      * @param userId 유저 아이디
@@ -86,14 +74,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     /**
-     * 유저가 팀을 가지고 있는지 확인합니다. -> null 일때 true
+     * 유저가 팀을 가지고 있는지 확인합니다.
      *
      * @param userId 유저 아이디
      */
     @Override
     public boolean isUserTeamExists(Long userId) {
 
-<<<<<<< HEAD
         return teamRepository.existsByUserId(userId);
     }
 
@@ -117,7 +104,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     public boolean isUserTeamMember(Long teamId, Long userId) {
-        System.out.println(teamRepository.existsUsersByIdAndUsersId(teamId, userId));
+
         return teamRepository.existsUsersByIdAndUsersId(teamId, userId);
     }
 
@@ -131,9 +118,6 @@ public class MemberServiceImpl implements MemberService {
     public boolean isUserApply(Long userId, Long teamId) {
 
         return teamApplyRepository.existsByIdAndTeamId(userId, teamId);
-=======
-        return userRepository.existsByIdAndTeamIsNull(userId);
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
     }
 
 }

@@ -8,13 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-<<<<<<< HEAD
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-=======
-import org.springframework.web.bind.annotation.RequestMapping;
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
+
 
 @Controller
 @RequestMapping("/teams")
@@ -46,7 +43,6 @@ public class TeamController {
 
         return "teamList";
     }
-<<<<<<< HEAD
 
     /**
      * 모집중인 팀 리스트를 가져온다.
@@ -141,6 +137,5 @@ public class TeamController {
 
         return "teamManage";
     }
-=======
->>>>>>> 6f7de8312aa9059d359f72e01b9c134dc1e16bf4
+
 }
