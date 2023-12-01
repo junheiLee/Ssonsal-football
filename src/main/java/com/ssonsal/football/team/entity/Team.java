@@ -3,11 +3,7 @@ package com.ssonsal.football.team.entity;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.DynamicInsert;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -19,7 +15,6 @@ import java.util.List;
 @Getter
 @Table(name = "team")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicInsert
 public class Team extends BaseEntity {
 
     @Id
@@ -56,4 +51,17 @@ public class Team extends BaseEntity {
 
     @OneToMany(mappedBy = "team")
     List<User> users = new ArrayList<>();
+
+    @Builder
+    public Team(String name, String logo, String preferredArea, String preferredTime, Integer recruit, String intro, Float mannerScore, Float skillScore, Long leaderId) {
+        this.name = name;
+        this.logo = logo;
+        this.preferredArea = preferredArea;
+        this.preferredTime = preferredTime;
+        this.recruit = recruit;
+        this.intro = intro;
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
+        this.leaderId = leaderId;
+    }
 }
