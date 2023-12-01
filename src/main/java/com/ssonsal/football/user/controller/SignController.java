@@ -58,7 +58,7 @@ public class SignController {
         @Parameter(description = "Email", required = true) @RequestParam String email,
         @Parameter(description = "비밀번호", required = true) @RequestParam String password,
         @Parameter(description = "이름", required = true) @RequestParam String name,
-        @Parameter(description = "생년월일", required = true) @RequestParam String birth,
+        @Parameter(description = "생년월일", required = true) @RequestParam LocalDate birth,
         @Parameter(description = "성별", required = true) @RequestParam int gender,
         @Parameter(description = "별명", required = true) @RequestParam String nickname,
         @Parameter(description = "포지션", required = true) @RequestParam String position,

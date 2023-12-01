@@ -45,7 +45,7 @@ public class User implements UserDetails {
     private String name;
 
     @Column(name = "birth")
-    private String birth;
+    private LocalDate birth;
 
     @Column(name = "gender")
     private int gender;
