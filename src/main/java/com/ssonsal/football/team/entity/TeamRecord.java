@@ -1,0 +1,42 @@
+package com.ssonsal.football.team.entity;
+
+import com.ssonsal.football.global.entity.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+
+import javax.persistence.*;
+
+@Entity
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "team_record")
+public class TeamRecord extends BaseEntity {
+
+    @Id
+    private Long id;
+
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ColumnDefault("0")
+    private Integer point;
+
+    @ColumnDefault("0")
+    private Integer winCount;
+
+    @ColumnDefault("0")
+    private Integer drawCount;
+
+    @ColumnDefault("0")
+    private Integer loseCount;
+
+    @ColumnDefault("0")
+    private Integer totalGameCount;
+
+
+}
