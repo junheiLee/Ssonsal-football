@@ -27,4 +27,12 @@ public interface TeamService {
      * @return 모집 중인 팀 목록
      */
     List<TeamListDto> findRecruitList();
+
+    /**
+     * 검색한 팀명에 맞는 팀을 가져온다.
+     *
+     * @param keyword
+     * @return 검색한 팀 목록
+     */
+    List<TeamListDto> searchName(String keyword);
 }

@@ -70,4 +70,24 @@ public class TeamServiceImpl implements TeamService {
 
         return team;
     }
+
+    /**
+     * 검색한 팀명에 맞는 팀을 가져온다.
+     *
+     * @param keyword
+     * @return 검색한 팀 목록
+     */
+    @Override
+    public List<TeamListDto> searchName(String keyword) {
+
+        List<TeamListDto> team = teamRepository.findByNameContaining(keyword);
+
+        for (TeamListDto teamListDto : team) {
+            teamListDto.setRanking(findTeamRanking(teamListDto.getId()));
+            teamListDto.setAgeAverage(userRepository.findAverageAgeByTeamId(teamListDto.getId()));
+        }
+
+        return team;
+    }
+
 }
