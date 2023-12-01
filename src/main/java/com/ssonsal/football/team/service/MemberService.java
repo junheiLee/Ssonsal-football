@@ -59,4 +59,22 @@ public interface MemberService {
      */
     boolean isUserApply(Long userId, Long teamId);
 
+    /**
+     * 유저의 팀 정보를 삭제합니다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     * @return 탈퇴하는 팀명
+     */
+    String userLeaveTeam(Long teamId, Long userId);
+
+    /**
+     * 팀장을 변경합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 위임받을 사람 아이디
+     * @return 위임받은 사람 닉네임
+     */
+    String leaderDelegate(Long teamId, Long userId);
+
 }

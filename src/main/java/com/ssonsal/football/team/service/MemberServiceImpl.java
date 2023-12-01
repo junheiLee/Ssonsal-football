@@ -4,6 +4,8 @@ import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
+import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class MemberServiceImpl implements MemberService {
     private final TeamRepository teamRepository;
     private final TeamApplyRepository teamApplyRepository;
     private final TeamRejectRepository teamRejectRepository;
+    private final UserRepository userRepository;
 
     /**
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
@@ -118,6 +121,29 @@ public class MemberServiceImpl implements MemberService {
     public boolean isUserApply(Long userId, Long teamId) {
 
         return teamApplyRepository.existsByIdAndTeamId(userId, teamId);
+    }
+
+    /**
+     * 유저의 팀 정보를 삭제합니다.
+     *
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
+     * @return 탈퇴하는 팀명
+     */
+    @Override
+    @Transactional
+    public String userLeaveTeam(Long teamId, Long userId) {
+
+        User user = userRepository.findById(userId).get();
+        user.setTeam(null);
+
+        return teamRepository.findById(teamId).get().getName();
+    }
+
+    @Override
+    @Transactional
+    public String leaderDelegate(Long teamId, Long userId) {
+        return null;
     }
 
 }

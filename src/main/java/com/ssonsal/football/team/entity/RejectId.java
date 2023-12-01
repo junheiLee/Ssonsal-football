@@ -18,5 +18,8 @@ public class RejectId implements Serializable {
     @Column
     private Long teamId;
 
-
+    public RejectId(Long userId, Long teamId) {
+        this.userId = userId;
+        this.teamId = teamId;
+    }
 }
