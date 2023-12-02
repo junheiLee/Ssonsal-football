@@ -13,11 +13,11 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/review")
+@RequestMapping("/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ReviewResponseDto> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto) {
         ReviewResponseDto createdReview = reviewService.createReview(reviewRequestDto);

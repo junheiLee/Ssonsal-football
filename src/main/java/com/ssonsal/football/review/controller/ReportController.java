@@ -13,7 +13,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/report")
+@RequestMapping("/reports")
 public class ReportController {
 
     private final ReportService reportService;
@@ -24,7 +24,7 @@ public class ReportController {
         return ResponseEntity.ok(reports);
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<ReportResponseDto> createReport(
             @RequestBody ReportRequestDto reportRequestDto) {
         ReportResponseDto createdReport = reportService.createReport(reportRequestDto);
