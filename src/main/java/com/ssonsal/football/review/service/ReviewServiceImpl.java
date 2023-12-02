@@ -1,10 +1,13 @@
 package com.ssonsal.football.review.service;
 
 import com.ssonsal.football.game.entity.Game;
+import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.review.dto.request.ReviewRequestDto;
 import com.ssonsal.football.review.dto.response.ReviewResponseDto;
 import com.ssonsal.football.review.etity.Review;
+import com.ssonsal.football.review.exception.ReviewErrorCode;
 import com.ssonsal.football.review.repository.ReviewRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
@@ -29,13 +32,13 @@ public class ReviewServiceImpl implements ReviewService{
     @Transactional
     public ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto) {
         // 해당하는 게임ID와 유저ID 가져오기
-        Game game = gameRepository.findById(reviewRequestDto.getGameId()).get();
-        User user = userRepository.findById(reviewRequestDto.getWriterId()).get();
+        Game game = gameRepository.findById(reviewRequestDto.getGameId())
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.GAME_NOT_FOUND));
 
-        // 가져온 ID가 null값인지 확인
-        if (game == null || user == null) {
-            throw new RuntimeException("게임ID 혹은 유저ID가 없습니다. Game ID: " + reviewRequestDto.getGameId() + " User ID: " + reviewRequestDto.getWriterId());
-        }
+        User user = userRepository.findById(reviewRequestDto.getWriterId())
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.USER_NOT_FOUND));
+
+        qualificationToWrite(game, user);
 
         Review review = Review.builder()
                 .game(game)
@@ -76,4 +79,10 @@ public class ReviewServiceImpl implements ReviewService{
         return userReviews;
     }
 
+    private void qualificationToWrite(Game game, User user) {
+        if (game == null || user == null) {
+            log.error("리뷰를 작성할 수 있는 조건이 아닙니다.");
+            throw new CustomException(ReviewErrorCode.NO_QUALIFICATION);
+        }
+    }
 }
