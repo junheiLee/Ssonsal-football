@@ -9,4 +9,5 @@ public interface TeamApplyService {
     String userApplyAccept(Long userId, Long teamId);
 
     String userApplyReject(Long userId, Long teamId);
+
 }
