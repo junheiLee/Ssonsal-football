@@ -43,7 +43,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
         } else if (teamRejectService.isUserRejected(user, teamId)) {
             throw new CustomException(TeamErrorCode.USER_TEAM_BANNED);
-        } else if (memberService.isUserHasTeam(user)) {
+        } else if (memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.MEMBER_ALREADY_TEAM);
         }
 
@@ -91,7 +91,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
         } else if (memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.LEADER_IN_GROUP);
-        } else if (!memberService.isUserHasTeam(user)) {
+        } else if (!memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.USER_NOT_TEAM);
         } else if (!memberService.isUserTeamMember(teamId, user)) {
             throw new CustomException(TeamErrorCode.USER_OTHER_TEAM);
@@ -187,9 +187,9 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (memberService.isTeamLeader(teamId, userId)) {
             throw new CustomException(TeamErrorCode.CANNOT_REMOVE_LEADER);
-        } else if (!memberService.isUserHasTeam(userId)) {
+        } else if (!memberService.hasAnyTeam(userId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_TEAM);
-        } else if (memberService.isUserHasTeam(userId)) {
+        } else if (memberService.hasAnyTeam(userId)) {
             if (!memberService.isUserTeamMember(teamId, userId)) {
                 throw new CustomException(TeamErrorCode.USER_OTHER_TEAM);
             }

@@ -10,7 +10,7 @@ public interface MemberService {
 
     boolean isUserOtherApply(Long userId);
 
-    boolean isUserHasTeam(Long userId);
+    boolean hasAnyTeam(Long userId);
 
     boolean isTeamLeader(Long teamId, Long userId);
 
