@@ -37,7 +37,7 @@ public class UserService {
 
                 // 이미 관리자를 선택한 경우
                 if (user.getRole() == 1) {
-                    log.info("User {} is already an administrator. Skipping role update.", user.getId());
+                    log.info("유저가 이미 관리자인 경우", user.getId());
                     continue;
                 }
 

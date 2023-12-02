@@ -55,9 +55,8 @@ public class StatsService {
         int month = currentDate.getMonthValue();
 
         LocalDate startDate = LocalDate.of(year, month, 1);
-        log.info("서비스의 첫날" + startDate);
+
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
-        log.info("서비스의 마지막날" + endDate);
 
         List<Game> monthlyGames = gameManagementRepository.findByScheduleBetween(
                 startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
