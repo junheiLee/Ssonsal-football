@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+
 @Entity
 @Getter
 @Setter
@@ -48,7 +49,7 @@ public class User implements UserDetails {
     private LocalDate birth;
 
     @Column(name = "gender")
-    private int gender;
+    private String gender;
 
     @Column(name = "nickname")
     private String nickname;
@@ -77,6 +78,16 @@ public class User implements UserDetails {
 
     @Column(name = "manner_score")
     private Float mannerScore;
+
+    @Builder
+    public User(String email, String password, String auth) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public void updateRole(int role) {
+        this.role = role;
+    }
 
 
     @Override
