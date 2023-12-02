@@ -1,20 +1,22 @@
 package com.ssonsal.football.team.entity;
 
-import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.user.entity.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "team_apply")
-public class TeamApply extends BaseEntity {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class TeamApply {
 
     @Id
     private Long id;
@@ -26,12 +28,17 @@ public class TeamApply extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
+    @NotNull
     private Team team;
 
-    @Builder
-    protected TeamApply(User user, Team team) {
+    @Column(name = "created_at")
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    public TeamApply(User user, Team team) {
         this.user = user;
         this.team = team;
     }
+
 
 }
