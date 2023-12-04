@@ -10,8 +10,8 @@ import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchTeamRepository;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
-import com.ssonsal.football.team.repository.TeamRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -32,16 +31,15 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final MatchTeamRepository matchTeamRepository;
     private final UserRepository userRepository;
-    private final TeamRepository teamRepository;
-
 
     @Transactional
-    public Long createGame(Long userId, GameRequestDto gameRequestDto, MatchTeamRequestDto homeTeamRequestDto) throws ParseException {
+    public Long createGame(Long userId, GameRequestDto gameRequestDto, MatchTeamRequestDto homeTeamRequestDto) {
 
         checkTargetIsExist(gameRequestDto.isFindAway(), homeTeamRequestDto.getSubCount());
-        User user = userRepository.findById(userId).get();
-        checkWriterIsInTeam(user);
-        Team team = teamRepository.findById(gameRequestDto.getHometeamId()).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Team team = user.getTeam();
+        checkWriterInTeam(team);
 
         Game game = gameRepository.save(
                 Game.builder()
@@ -62,9 +60,8 @@ public class GameServiceImpl implements GameService {
         return game.getId();
     }
 
-    private void checkWriterIsInTeam(User user) {
-        if (user.getTeam() == null) {
-            log.error("팀만 게임 글 작성이 가능함.");
+    private void checkWriterInTeam(Team team) {
+        if (team == null) {
             throw new CustomException(GameErrorCode.WRITER_NOT_IN_TEAM);
         }
     }
@@ -76,8 +73,7 @@ public class GameServiceImpl implements GameService {
         }
     }
 
-
-    private LocalDateTime stringToLocalDateTime(String dateTime) throws ParseException {
+    private LocalDateTime stringToLocalDateTime(String dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         log.info("stringToLocalDateTime = {}", dateTime);
         return LocalDateTime.parse(dateTime, formatter);
