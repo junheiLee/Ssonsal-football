@@ -1,0 +1,311 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>SSonsal</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="https://i.imgur.com/QRAUqs9.png">
+    <link rel="shortcut icon" href="https://i.imgur.com/QRAUqs9.png">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.0/normalize.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lykmapipo/themify-icons@0.1.2/css/themify-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/css/admin/css/lib/datatable/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/style.css">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a th:href="@{/admin.html}"><i class="menu-icon fa fa-laptop"></i>SSonsal </a>
+                </li>
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>유저 관리
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_user.html}">유저 관리</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>글 관리
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_match.html}">매치 글 관리</a></li>
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_sub.html}">용병 글 관리</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-table"></i>리뷰 관리
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="fa fa-table"></i><a th:href="@{/admin_review.html}">리뷰 글 관리</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-th"></i>Forms
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-th"></i><a th:href="@{/forms-basic.html}">Basic Form</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-bar-chart"></i>Charts
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-line-chart"></i><a th:href="@{/charts-chartjs.html}">Chart JS</a></li>
+                    </ul>
+                </li>
+
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-area-chart"></i>Maps
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-map-o"></i><a th:href="@{/maps-gmap.html}">Google Maps</a></li>
+                        <li><i class="menu-icon fa fa-street-view"></i><a th:href="@{/maps-vector.html}">Vector Maps</a></li>
+                    </ul>
+                </li>
+                <li class="menu-title">Extras</li><!-- /.menu-title -->
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="menu-icon fa fa-glass"></i>Pages
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-sign-in"></i><a th:href="@{/page-login.html}">Login</a></li>
+                        <li><i class="menu-icon fa fa-paper-plane"></i><a th:href="@{/pages-forget.html}">Forget Pass</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<<div id="right-panel" class="right-panel">
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" th:href="@{/admin.html}"><img th:src="@{/images/logo.svg}" alt="Logo"></a>
+                <a class="navbar-brand hidden" th:href="@{/admin.html}"><img th:src="@{/images/logo2.svg}" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img class="user-avatar rounded-circle" th:src="@{/images/admin.jpg}" alt="User Avatar">
+                    </a>
+
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" th:href="@{/my-profile}"><i class="fa fa-user"></i>My Profile</a>
+
+                        <a class="nav-link" th:href="@{/notifications}"><i class="fa fa-bell"></i>Notifications <span class="count">13</span></a>
+
+                        <a class="nav-link" th:href="@{/settings}"><i class="fa fa-cog"></i>Settings</a>
+
+                        <a class="nav-link" th:href="@{/logout}"><i class="fa fa-power-off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Header-->
+
+
+        <div class="breadcrumbs">
+            <div class="breadcrumbs-inner">
+                <div class="row m-0">
+                    <div class="col-sm-4">
+                        <div class="page-header float-left">
+                            <div class="page-title">
+                                <h1>SSonsal</h1>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="page-header float-right">
+                            <div class="page-title">
+                                <ol class="breadcrumb text-right">
+                                    <li>SSonsal</li>
+                                    <li>글 관리</li>
+                                    <li class="active">매치 글 관리</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="animated fadeIn">
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">Data Table</strong>
+                            </div>
+                            <div class="card-body">
+                                <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th></th> <!-- 체크박스 열 -->
+                                        <th>등록 일자</th>
+                                        <th>등록자</th>
+                                        <th>경기장</th>
+                                        <th>매치 시간</th>
+                                        <th>필요 인원</th>
+                                        <th>상태</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="game : ${gameList}">
+                                        <td>
+                                            <input type="checkbox" name="selectedGame" data-user-id="${game.id}" data-user-id-value="${game.id}">
+                                            <span class="game-id" th:text="${game.id}" style="display: none;"></span>
+                                        </td>
+                                        <td th:text="${#temporals.format(game.createdAt, 'yyyy-MM-dd')}"></td>
+                                        <td th:text="${game.writer}"></td>
+                                        <td th:text="${game.stadium}"></td>
+                                        <td th:text="${#temporals.format(game.schedule, 'MM월 dd일 HH시 mm분')}"></td>
+                                        <td th:text="${game.vsFormat}+' 명'"></td>
+                                        <td th:text="${game.matchStatus == 0 ? '매치 완료' : '매치 대기중'}"></td>
+
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div style="width:100%;">
+                                    <button class="delete-Games"
+                                            style="float: right; margin: 30px 35px 35px 0; color: #ffffff; background-color:#292b35 "
+                                            onclick="deleteGames()">글 삭제
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div><!-- .animated -->
+        </div><!-- .content -->
+
+
+        <div class="clearfix"></div>
+
+        <footer class="site-footer">
+            <div class="footer-inner bg-white">
+                <div class="row">
+                    <div class="col-sm-6">
+                        Copyright &copy; 2018 Ela Admin
+                    </div>
+                    <div class="col-sm-6 text-right">
+                        Designed by <a href="https://colorlib.com">Colorlib</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div><!-- /#right-panel -->
+
+    <!-- Right Panel -->
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+    <script src="../../static/js/main.js"></script>
+
+
+    <script src="../../static/js/lib/lib/data-table/datatables.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/dataTables.bootstrap.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/dataTables.buttons.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/buttons.bootstrap.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/jszip.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/vfs_fonts.js"></script>
+    <script src="../../static/js/lib/lib/data-table/buttons.html5.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/buttons.print.min.js"></script>
+    <script src="../../static/js/lib/lib/data-table/buttons.colVis.min.js"></script>
+    <script src="../../static/js/init/init/datatables-init.js"></script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#bootstrap-data-table-export').DataTable();
+      } );
+  </script>
+
+<script>
+    function deleteGames() {
+        var selectedGameIds = $("[name='selectedGame']:checked").map(function () {
+            return $(this).closest('tr').find('.game-id').text();
+        }).get();
+
+        if (selectedGameIds.length === 0) {
+            alert('선택된 게임이 없습니다');
+            console.log('No games selected');
+            return;
+        }
+
+        var shouldDelete = confirm("삭제 하시겠습니까?");
+
+        if (shouldDelete) {
+            var requestData = {
+                gameIds: selectedGameIds.map(Number)
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/game/management',
+                data: JSON.stringify(requestData),
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log('서버 응답:', response);
+                    if (response === '삭제 성공') {
+                        alert('삭제 성공');
+                        window.location.href = '/admin/game';
+                    } else {
+                        alert('삭제 실패');
+                    }
+                },
+                error: function (error) {
+                    console.error('에러 발생:', error);
+                    alert('에러!!');
+                }
+            });
+        }
+    }
+</script>
+
+</body>
+</html>

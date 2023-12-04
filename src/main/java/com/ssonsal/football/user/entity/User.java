@@ -2,6 +2,7 @@ package com.ssonsal.football.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
+
 @Entity
 @Getter
 @Setter
@@ -23,7 +25,7 @@ import java.util.List;
 @ToString
 @Table
 @DynamicInsert
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,7 +50,7 @@ public class User implements UserDetails {
     private LocalDate birth;
 
     @Column(name = "gender")
-    private int gender;
+    private String gender;
 
     @Column(name = "nickname")
     private String nickname;
@@ -77,6 +79,16 @@ public class User implements UserDetails {
 
     @Column(name = "manner_score")
     private Float mannerScore;
+
+    @Builder
+    public User(String email, String password, String auth) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public void updateRole(int role) {
+        this.role = role;
+    }
 
 
     @Override
