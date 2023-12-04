@@ -30,31 +30,32 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.httpBasic().disable() // REST API는 UI를 사용하지 않으므로 기본설정을 비활성화
 
-            .csrf().disable() // REST API는 csrf 보안이 필요 없으므로 비활성화
+                .csrf().disable() // REST API는 csrf 보안이 필요 없으므로 비활성화
 
-            .sessionManagement()
-            .sessionCreationPolicy(
-                SessionCreationPolicy.STATELESS) // JWT Token 인증방식으로 세션은 필요 없으므로 비활성화
+                .sessionManagement()
+                .sessionCreationPolicy(
+                        SessionCreationPolicy.STATELESS) // JWT Token 인증방식으로 세션은 필요 없으므로 비활성화
 
-            .and()
-            .authorizeRequests() // 리퀘스트에 대한 사용권한 체크
-            .antMatchers("/user/sign-in", "/user/sign-up",
-                "/user/exception").permitAll() // 가입 및 로그인 주소는 허용
-            .antMatchers(HttpMethod.PATCH, "/user/profile").permitAll() // profile 이 포함되어있는 PATCH요청은 허용
+                .and()
+                .authorizeRequests() // 리퀘스트에 대한 사용권한 체크
+                .antMatchers("/user/sign-in", "/user/sign-up",
+                        "/user/exception").permitAll() // 가입 및 로그인 주소는 허용
+                .antMatchers(HttpMethod.PATCH, "/user/profile").permitAll() // profile 이 포함되어있는 PATCH요청은 허용
+                .antMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**").permitAll()
+                .antMatchers("**exception**").permitAll()
 
-            .antMatchers("**exception**").permitAll()
+                .anyRequest().hasRole("ADMIN") // 나머지 요청은 인증된 ADMIN만 접근 가능
 
-            .anyRequest().hasRole("ADMIN") // 나머지 요청은 인증된 ADMIN만 접근 가능
+                .and()
+                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                .and()
+                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 
-            .and()
-            .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
-            .and()
-            .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-
-            .and()
-            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                UsernamePasswordAuthenticationFilter.class); // JWT Token 필터를 id/password 인증 필터 이전에 추가
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
+                        UsernamePasswordAuthenticationFilter.class); // JWT Token 필터를 id/password 인증 필터 이전에 추가
     }
+
 
     /**
      * Swagger 페이지 접근에 대한 예외 처리
@@ -63,7 +64,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity webSecurity) {
-        webSecurity.ignoring().antMatchers("/v3/api-docs", "/swagger-resources/**",
-            "/swagger-ui.html", "/webjars/**", "/swagger/**", "/sign-api/exception");
+        webSecurity.ignoring().antMatchers("/v3/api-docs/**","/v2/api-docs/**", "/swagger-resources/**",
+                "/swagger-ui/**", "/webjars/**", "/swagger/**", "/sign-api/exception");
     }
 }
