@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  * controller 패키지의 전역 예외 처리
  */
 @Slf4j
-@RestControllerAdvice(basePackages = "com.ssonsal.football.controller")
+@RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

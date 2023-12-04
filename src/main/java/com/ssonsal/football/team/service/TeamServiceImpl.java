@@ -41,7 +41,7 @@ public class TeamServiceImpl implements TeamService {
         List<TeamListDto> teams = teamRepository.findAllByOrderByIdDesc();
 
         for (TeamListDto teamListDto : teams) {
-            teamListDto.setRanking(findRank(teamListDto.getId()));
+            teamListDto.setRank(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
@@ -59,7 +59,7 @@ public class TeamServiceImpl implements TeamService {
         List<TeamListDto> teams = teamRepository.findAllByRecruitOrderByIdDesc(1);
 
         for (TeamListDto teamListDto : teams) {
-            teamListDto.setRanking(findRank(teamListDto.getId()));
+            teamListDto.setRank(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 
@@ -79,7 +79,7 @@ public class TeamServiceImpl implements TeamService {
         List<TeamListDto> teams = teamRepository.findByNameContaining(keyword);
 
         for (TeamListDto teamListDto : teams) {
-            teamListDto.setRanking(findRank(teamListDto.getId()));
+            teamListDto.setRank(findRank(teamListDto.getId()));
             teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
         }
 

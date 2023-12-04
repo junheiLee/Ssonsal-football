@@ -59,7 +59,7 @@ public class SignController {
         @Parameter(description = "비밀번호", required = true) @RequestParam String password,
         @Parameter(description = "이름", required = true) @RequestParam String name,
         @Parameter(description = "생년월일", required = true) @RequestParam LocalDate birth,
-        @Parameter(description = "성별", required = true) @RequestParam int gender,
+        @Parameter(description = "성별", required = true) @RequestParam String gender,
         @Parameter(description = "별명", required = true) @RequestParam String nickname,
         @Parameter(description = "포지션", required = true) @RequestParam String position,
         @Parameter(description = "핸드폰 번호", required = true) @RequestParam String phone,
@@ -70,7 +70,8 @@ public class SignController {
     {
         log.info("[signUp] 회원가입을 수행합니다 입값 확인용. email : {}, password : ****, name : {},birth : {}, gender : {}, nickname : {}, position : {}, phone : {}, intro : {}, time : {}. area : {}, role : {}",
                 email, name, birth, gender, nickname, position, phone, intro, preffered_time, preffered_area, role);
-        SignUpResultDto signUpResultDto = signService.signUp(email, password, name, birth, gender, nickname, position, phone, intro, preffered_time,preffered_area, role);
+        SignUpResultDto signUpResultDto = signService.signUp(email, password, name, birth, gender, nickname,
+                position, phone, intro, preffered_time,preffered_area, role);
 
         log.info("[signUp] 회원가입을 완료했습니다. Email : {}", email);
         return signUpResultDto;
