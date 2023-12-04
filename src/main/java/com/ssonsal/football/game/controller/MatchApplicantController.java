@@ -1,7 +1,7 @@
 package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
-import com.ssonsal.football.game.service.MatchTeamService;
+import com.ssonsal.football.game.service.MatchApplicantService;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -21,7 +21,7 @@ import java.util.Map;
 @Tag(name = "MatchApplicant", description = "MatchApplicant API")
 public class MatchApplicantController {
 
-    private final MatchTeamService matchTeamService;
+    private final MatchApplicantService matchApplicantService;
 
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
@@ -36,7 +36,7 @@ public class MatchApplicantController {
             @PathVariable Long gameId) {
 
         Long userId = 4L;
-        Long matchTeamId = matchTeamService.applyForGameAsAway(gameId, userId, awayTeamRequestDto);
+        Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, awayTeamRequestDto);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("matchTeamId", matchTeamId));
     }

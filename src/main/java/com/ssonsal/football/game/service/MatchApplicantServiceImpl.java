@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.entity.MatchTeam;
@@ -24,14 +24,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class MatchTeamServiceImpl implements MatchTeamService{
+public class MatchApplicantServiceImpl implements MatchApplicantService {
 
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
     private final MatchTeamRepository matchTeamRepository;
 
     @Transactional
-    public Long applyForGameAsAway(Long gameId, Long userId, MatchTeamRequestDto awayteamRequestDto){
+    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto){
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)
@@ -48,7 +48,7 @@ public class MatchTeamServiceImpl implements MatchTeamService{
                         .team(team)
                         .game(game)
                         .matchApplicantStatus(MatchStatus.WAITING.getDescription())
-                        .matchTeamRequestDto(awayteamRequestDto)
+                        .matchTeamDto(awayteamDto)
                         .build()
         );
 
