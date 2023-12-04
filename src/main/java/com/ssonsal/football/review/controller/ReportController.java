@@ -21,16 +21,27 @@ public class ReportController {
 
     private final ReportService reportService;
 
+    // 신고목록 조회
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> getAllReports() {
         List<ReportResponseDto> reports = reportService.getAllReports();
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reports);
     }
 
+    // 신고 생성
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReport(
             @RequestBody ReportRequestDto reportRequestDto) {
         ReportResponseDto createdReport = reportService.createReport(reportRequestDto);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, createdReport);
+    }
+
+    // 신고코드 변경
+    @PutMapping("/{reportId}/update")
+    public ResponseEntity<ResponseBodyFormatter> updateReportCode(
+            @PathVariable Long reportId,
+            @RequestParam(name = "reportCode", required = false) Integer reportCode) {
+        reportService.updateDeleteCode(reportId, reportCode);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
 }

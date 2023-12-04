@@ -20,6 +20,8 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    // 리뷰 생성
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto) {
@@ -41,5 +43,14 @@ public class ReviewController {
         log.info(String.valueOf(userId));
         List<ReviewResponseDto> result = reviewService.userReviewList(userId);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, result);
+    }
+
+    // 삭제코드 변경
+    @PutMapping("/{reviewId}/update")
+    public ResponseEntity<ResponseBodyFormatter> updateDeleteCode(
+            @PathVariable Long reviewId,
+            @RequestParam(name = "deleteCode", required = false) Integer deleteCode) {
+        reviewService.updateDeleteCode(reviewId, deleteCode);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
 }

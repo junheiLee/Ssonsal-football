@@ -20,7 +20,6 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
 public class ReviewServiceImpl implements ReviewService{
 
@@ -36,8 +35,6 @@ public class ReviewServiceImpl implements ReviewService{
 
         User user = userRepository.findById(reviewRequestDto.getWriterId())
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.USER_NOT_FOUND));
-
-        qualificationToWrite(game, user);
 
         Review review = Review.builder()
                 .game(game)
@@ -55,6 +52,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewResponseDto> teamReviewList(Long teamId) {
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
 
@@ -72,6 +70,7 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewResponseDto> userReviewList(Long userId) {
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
 
@@ -88,10 +87,14 @@ public class ReviewServiceImpl implements ReviewService{
         return userReviews;
     }
 
-    private void qualificationToWrite(Game game, User user) {
-        if (game == null || user == null) {
-            log.error("리뷰를 작성할 수 있는 조건이 아닙니다.");
-            throw new CustomException(ReviewErrorCode.NO_QUALIFICATION);
+    @Transactional
+    public void updateDeleteCode(Long reviewId, Integer deleteCode) {
+        reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+        if (!(deleteCode == 0 || deleteCode == 1)) {
+            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
         }
+
+        reviewRepository.updateDeleteCode(reviewId, deleteCode);
     }
 }

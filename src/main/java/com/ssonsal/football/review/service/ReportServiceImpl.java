@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class ReportServiceImpl implements ReportService{
 
@@ -26,6 +25,7 @@ public class ReportServiceImpl implements ReportService{
     private final ReviewRepository reviewRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReportResponseDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
 
@@ -53,5 +53,16 @@ public class ReportServiceImpl implements ReportService{
         reportRepository.save(report);
 
         return ReportResponseDto.fromEntity(report);
+    }
+
+    @Transactional
+    public void updateDeleteCode(Long reportId, Integer reportCode) {
+        reportRepository.findById(reportId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.ID_NOT_FOUND));
+        if (!(reportCode == 0 || reportCode == 1)) {
+            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
+        }
+
+        reportRepository.updateReportCode(reportId, reportCode);
     }
 }
