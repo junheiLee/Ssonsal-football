@@ -9,6 +9,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -49,6 +50,9 @@ public class Game extends BaseEntity {
     private int deleteCode;
     private int hometeamResult;
     private int awayteamResult;
+
+    @OneToMany(mappedBy = "game")
+    private List<MatchTeam> matchTeams;
 
     @Builder
     public Game(User writer, Team hometeam,
