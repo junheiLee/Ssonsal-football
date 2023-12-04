@@ -1,7 +1,6 @@
 package com.ssonsal.football.review.service;
 
 import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.review.dto.request.ReviewRequestDto;
@@ -59,6 +58,11 @@ public class ReviewServiceImpl implements ReviewService{
     public List<ReviewResponseDto> teamReviewList(Long teamId) {
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
 
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
         List<ReviewResponseDto> teamReviews = new ArrayList<>();
         for (Review review : reviews) {
             teamReviews.add(ReviewResponseDto.fromEntity(review));
@@ -70,6 +74,11 @@ public class ReviewServiceImpl implements ReviewService{
     @Override
     public List<ReviewResponseDto> userReviewList(Long userId) {
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
+
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
 
         List<ReviewResponseDto> userReviews = new ArrayList<>();
         for (Review review : reviews) {

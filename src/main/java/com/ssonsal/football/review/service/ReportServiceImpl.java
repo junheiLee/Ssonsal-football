@@ -29,6 +29,11 @@ public class ReportServiceImpl implements ReportService{
     public List<ReportResponseDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
 
+        if(reports.isEmpty()){
+            log.error("신고된 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REPORT_NOT_FOUND);
+        }
+
         return reports.stream()
                 .map(ReportResponseDto::fromEntity)
                 .collect(Collectors.toList());
@@ -37,8 +42,8 @@ public class ReportServiceImpl implements ReportService{
     @Override
     public ReportResponseDto createReport(ReportRequestDto reportRequestDto) {
 
-        Review review = reviewRepository.findById(reportRequestDto.getReviewId()).get();
-        checkReviewIsExist(review);
+        Review review = reviewRepository.findById(reportRequestDto.getReviewId())
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
         Report report = Report.builder()
                 .review(review)
@@ -48,12 +53,5 @@ public class ReportServiceImpl implements ReportService{
         reportRepository.save(report);
 
         return ReportResponseDto.fromEntity(report);
-    }
-
-    private void checkReviewIsExist(Review review) {
-        if (review.getId() == null) {
-            log.error("해당 리뷰를 찾을 수 없습니다.");
-            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
-        }
     }
 }

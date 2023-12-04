@@ -1,5 +1,8 @@
 package com.ssonsal.football.review.controller;
 
+import com.ssonsal.football.global.util.SuccessCode;
+import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.review.dto.request.ReviewRequestDto;
 import com.ssonsal.football.review.dto.response.ReviewResponseDto;
 import com.ssonsal.football.review.service.ReviewService;
@@ -18,25 +21,25 @@ public class ReviewController {
 
     private final ReviewService reviewService;
     @PostMapping
-    public ResponseEntity<ReviewResponseDto> createReview(
+    public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto) {
         ReviewResponseDto createdReview = reviewService.createReview(reviewRequestDto);
-        return ResponseEntity.ok(createdReview);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, createdReview);
     }
 
     // 검색한 팀아이디에 대한 리뷰들 조회
     @GetMapping("/team/{teamId}")
-    public ResponseEntity<List<ReviewResponseDto>> getTeamReview(@PathVariable("teamId") Long teamId){
+    public ResponseEntity<ResponseBodyFormatter> getTeamReview(@PathVariable("teamId") Long teamId){
         log.info(String.valueOf(teamId));
         List<ReviewResponseDto> result = reviewService.teamReviewList(teamId);
-        return ResponseEntity.ok(result);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, result);
     }
 
     // 검색한 용병아이디에 대한 리뷰들 조회
     @GetMapping("/sub/{userId}")
-    public ResponseEntity<List<ReviewResponseDto>> getUserReview(@PathVariable("userId") Long userId){
+    public ResponseEntity<ResponseBodyFormatter> getUserReview(@PathVariable("userId") Long userId){
         log.info(String.valueOf(userId));
         List<ReviewResponseDto> result = reviewService.userReviewList(userId);
-        return ResponseEntity.ok(result);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, result);
     }
 }
