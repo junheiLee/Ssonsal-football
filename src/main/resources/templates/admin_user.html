@@ -26,12 +26,64 @@
           href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
     <!-- <link rel="stylesheet" href="/static/css/admin/css/cs-skin-elastic.css"> -->
-    <link rel="stylesheet" href="/static/css/admin/css/lib/datatable/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/datatable/dataTables.bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/admin/css/style.css">
 
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
     <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#bootstrap-data-table-export').DataTable();
+      } );
+    </script>
+
+    <script>
+
+        function grantPermission() {
+            var selectedUserIds = $("[name='selectedUser']:checked").map(function () {
+                return $(this).closest('tr').find('.user-id').text();
+            }).get();
+
+            if (selectedUserIds.length === 0) {
+                alert('선택된 사용자가 없습니다.');
+                console.log('No users selected');
+                return;
+            }
+
+            // 체크박스가 비활성화 된 경우, 체크 안되게 처리
+            $("[name='selectedUser']:checked").prop("checked", false);
+
+            var newRole = confirm("권한을 부여하시겠습니까?");
+
+            var requestData = {
+                userIds: selectedUserIds.map(Number),
+            };
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/user/changeRole',
+                data: JSON.stringify(requestData),
+                contentType: 'application/json',
+                success: function (response) {
+                    console.log('서버 응답:', response);
+                    if (response === '권한 부여 성공') {
+                        alert('권한 부여 성공!!');
+                        window.location.href = '/admin/user';
+                    } else {
+                        alert('권한 부여 실패');
+                    }
+                },
+                error: function (error) {
+                    console.error('에러 발생:', error);
+                    alert('에러!!');
+                }
+            });
+        }
+    </script>
+
+
 
 </head>
 <body>
@@ -238,67 +290,17 @@
 <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
 <script src="/static/js/main.js"></script>
 
-<script th:src="@{/static/js/lib/lib/data-table/datatables.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/dataTables.bootstrap.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/dataTables.buttons.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/buttons.bootstrap.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/jszip.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/vfs_fonts.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/buttons.html5.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/buttons.print.min.js}"></script>
-<script th:src="@{/static/js/lib/lib/data-table/buttons.colVis.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/datatables.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/dataTables.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/dataTables.buttons.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/buttons.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/jszip.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/vfs_fonts.js}"></script>
+<script th:src="@{/static/js/lib/data-table/buttons.html5.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/buttons.print.min.js}"></script>
+<script th:src="@{/static/js/lib/data-table/buttons.colVis.min.js}"></script>
 <script th:src="@{/static/js/init/init/datatables-init.js}"></script>
 
-
-<script type="text/javascript">
-    $(document).ready(function() {
-      $('#bootstrap-data-table-export').DataTable();
-  } );
-</script>
-
-<script>
-
-    function grantPermission() {
-        var selectedUserIds = $("[name='selectedUser']:checked").map(function () {
-            return $(this).closest('tr').find('.user-id').text();
-        }).get();
-
-        if (selectedUserIds.length === 0) {
-            alert('선택된 사용자가 없습니다.');
-            console.log('No users selected');
-            return;
-        }
-
-        // 체크박스가 비활성화 된 경우, 체크 안되게 처리
-        $("[name='selectedUser']:checked").prop("checked", false);
-
-        var newRole = confirm("권한을 부여하시겠습니까?");
-
-        var requestData = {
-            userIds: selectedUserIds.map(Number),
-        };
-
-        $.ajax({
-            type: 'POST',
-            url: '/admin/user/changeRole',
-            data: JSON.stringify(requestData),
-            contentType: 'application/json',
-            success: function (response) {
-                console.log('서버 응답:', response);
-                if (response === '권한 부여 성공') {
-                    alert('권한 부여 성공!!');
-                    window.location.href = '/admin/user';
-                } else {
-                    alert('권한 부여 실패');
-                }
-            },
-            error: function (error) {
-                console.error('에러 발생:', error);
-                alert('에러!!');
-            }
-        });
-    }
-</script>
 
 </body>
 </html>

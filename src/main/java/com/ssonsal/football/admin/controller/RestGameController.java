@@ -21,7 +21,6 @@ public class RestGameController {
 
     private final GameService gameService;
 
-
     // 게임 삭제
     @PostMapping("/management")
     public ResponseEntity<String> deleteGames(@RequestBody Map<String, Object> reqeustData) {

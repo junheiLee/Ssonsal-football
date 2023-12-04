@@ -8,9 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +19,6 @@ import java.util.Map;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StatsService {
-
 
     private final GameManagementRepository gameManagementRepository;
 
@@ -83,13 +80,6 @@ public class StatsService {
         return statsDTO;
     }
 
-    // 날짜 데이터(하루 구하는 로직)
-    private List<Game> getDailyStatsForDate(LocalDate date) {
-        LocalDateTime startOfDay = date.atStartOfDay(); // 해당 일의 00:00:00
-        LocalDateTime endOfDay = date.atTime(23, 59, 59); // 해당 일 마지막 시간 23:59:59.99999
-
-        return gameManagementRepository.findByScheduleBetween(startOfDay, endOfDay);
-    }
 
     // 스캐줄이 지나면 딜리트코드 2로 바뀜
     @Transactional
@@ -97,6 +87,20 @@ public class StatsService {
         LocalDateTime currentDate = LocalDateTime.now();
         gameManagementRepository.updateDeleteCode(currentDate);
     }
+
+    // 날짜 데이터(하루 구하는 로직)
+    private List<Game> getDailyStatsForDate(LocalDate currentDate) {
+        int year = currentDate.getYear();
+        int month = currentDate.getMonthValue();
+
+        LocalDate startDate = LocalDate.of(year, month, 1);
+
+        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+
+        return gameManagementRepository.findByScheduleBetween(
+                startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+    }
+
 
     // 현재 달 계산
     @Transactional
@@ -109,13 +113,15 @@ public class StatsService {
 
         updateDeleteCodeForPastGames();
         // 시작 날짜부터 종료 날짜까지 루프
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+        for (LocalDate date = startDate; !date.isAfter(endDate); ) {
             // 해당 날짜의 게임을 가져옴
             List<Game> dailyGames = getDailyStatsForDate(date);
 
-
             StatsDTO dailyStats = dayStats(date, dailyGames);
             monthDayStats.put(date, dailyStats);
+
+            // 날짜를 다음 날짜로 증가시킴
+            date = date.plusDays(1);
         }
 
         return monthDayStats;
@@ -124,6 +130,8 @@ public class StatsService {
     // calculateGameCountForDateRange 데이터 값 생성
     @Transactional
     private long calculateGameCountForDateRange(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus) {
+
+
         return dailyGames.stream()
                 .filter(game -> game.getDeleteCode() == 2 && game.getModifiedAt() != null &&
                         game.getModifiedAt().isAfter(startDate.atStartOfDay()) &&
