@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +59,7 @@ public class SignController {
         @Parameter(description = "Email", required = true) @RequestParam String email,
         @Parameter(description = "비밀번호", required = true) @RequestParam String password,
         @Parameter(description = "이름", required = true) @RequestParam String name,
-        @Parameter(description = "생년월일", required = true) @RequestParam LocalDate birth,
+        @Parameter(description = "생년월일", required = true) @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birth,
         @Parameter(description = "성별", required = true) @RequestParam String gender,
         @Parameter(description = "별명", required = true) @RequestParam String nickname,
         @Parameter(description = "포지션", required = true) @RequestParam String position,
