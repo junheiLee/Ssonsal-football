@@ -33,7 +33,9 @@ public class SignServiceImpl implements SignService {
     }
 
     @Override
-    public SignUpResultDto signUp(String email, String password, String name, LocalDate birth, int gender, String nickname, String position, String phone, String intro, String preffered_time, String preffered_area, int role) {
+    public SignUpResultDto signUp(String email, String password, String name, LocalDate birth,
+                                  String gender, String nickname, String position, String phone,
+                                  String intro, String preffered_time, String preffered_area, int role) {
         log.info("[getSignUpResult] 회원 가입 정보 전달");
         User user;
         if (role == 1) {

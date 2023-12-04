@@ -2,6 +2,7 @@ package com.ssonsal.football.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -24,7 +25,7 @@ import java.util.List;
 @ToString
 @Table
 @DynamicInsert
-public class User implements UserDetails {
+public class User extends BaseEntity implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

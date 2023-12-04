@@ -19,7 +19,7 @@ public class SignUpRequestDto {
 
     private LocalDate birth;
 
-    private int gender;
+    private String gender;
 
     private String nickname;
 
