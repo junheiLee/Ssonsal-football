@@ -1,0 +1,153 @@
+
+
+.listsheader{
+    margin-top: 20px;
+    width:100%;
+    height: 50px;
+    float:left;
+    border: 1px solid #ddd;
+    border-right: none;
+    background-color: #eee;
+    border-radius: 10px;
+}
+
+.applyexists{
+    display:inline-block;
+    width:100px;
+    padding:10px;
+    border-radius: 10px;
+    float: right;
+    box-shadow: 0px 2px 5px 0px rgb(225, 216, 216);
+    color: #2A8757;
+    background-color: #eee;
+}
+
+.listsheader p:first-child{
+    float:left;
+    width:40px;
+    height: 48px;
+    background-color: green;
+    border-radius: 10px;
+}
+
+.listsheader p:first-child img{
+    width: 50%;
+    margin-top: 14.5px;
+    margin-left: 10px;
+}
+
+.listsheader p:nth-child(2){
+    text-align: center;
+    width:calc(100% - 40px);
+    height: 100%;
+    line-height: 50px;
+    float:left;
+}
+.listsheader span{
+    width:22%;
+    display: block;
+    float:left;
+    text-align: center;
+}
+
+
+
+.form-control{
+    outline: none;
+}
+.listsearch{
+    width:100%;
+
+}
+.searchbtn{
+    border:1px solid green;
+    color: green;
+}
+.searchbtn:hover{
+    border:1px solid green;
+    background-color: green;
+    color:#fff;
+}
+.gobtn{
+    width:100px;
+    padding:10px;
+    background-color: green;
+    color:#fff;
+    display: inline-block;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 2px 5px 0px rgb(225, 216, 216);
+}
+.gobtn:hover{
+    background-color: rgba(42, 135, 87, 0.6);
+    color:#fff;
+}
+.createTeam{
+    width:100px;
+    padding:10px;
+    background-color: #eee;
+    border-radius: 10px;
+    float: right;
+    box-shadow: 0px 2px 5px 0px rgb(225, 216, 216);
+    color: green;
+}
+.createTeam:hover{
+background-color: #2A8757;
+color:#fff;
+}
+.Sbar{
+    border: 1px solid green;
+    border-right: none;
+}
+.Sbar:focus{
+    border: 1px solid green;
+    outline: 2px solid green;
+    box-shadow: none;
+}
+.teamlist{
+    padding-left: 0;
+    width:100%;
+   height: 100%;
+}
+.lists{
+    margin-top: 10px;
+    width:100%;
+    height: 50px;
+    float:left;
+    border: 1px solid #ddd;
+    background-color: #eee;
+}
+
+
+.lists p:first-child{
+    float:left;
+    width:15px;
+    height: 48px;
+    background-color: green;
+}
+.lists p{
+    float:left;
+    width:15px;
+    height: 48px;
+}
+.lists a{
+    text-align: center;
+    width:calc(100% - 40px);
+    height: 100%;
+    line-height: 50px;
+    float:left;
+}
+.lists a span{
+    width:22%;
+    display: block;
+    float:left;
+}
+.dlatltntwk{
+    text-align: center;
+}
+
+.teaminfo{
+    border:1px solid black;
+    text-align: center;
+}

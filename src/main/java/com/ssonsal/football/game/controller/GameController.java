@@ -42,7 +42,7 @@ public class GameController {
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) throws JsonProcessingException, ParseException {
 
-        Long userId = 7L;
+        Long userId = 3L;
         ObjectMapper mapper = new ObjectMapper();
         GameRequestDto gameRequestDto = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
         MatchTeamRequestDto homeTeamRequestDto = mapper.treeToValue(obj.get("hometeam"), MatchTeamRequestDto.class);
