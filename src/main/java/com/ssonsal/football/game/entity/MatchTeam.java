@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.entity;
 
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import lombok.*;
@@ -38,12 +38,12 @@ public class MatchTeam extends BaseEntity {
     private String matchApplicantStatus;
 
     @Builder
-    public MatchTeam(Team team, Game game, String matchApplicantStatus, MatchTeamRequestDto matchTeamRequestDto) {
+    public MatchTeam(Team team, Game game, String matchApplicantStatus, MatchApplicantRequestDto matchTeamDto) {
         this.team = team;
         this.game = game;
         this.matchApplicantStatus = matchApplicantStatus;
-        this.uniform = matchTeamRequestDto.getUniform();
-        this.subCount = matchTeamRequestDto.getSubCount();
+        this.uniform = matchTeamDto.getUniform();
+        this.subCount = matchTeamDto.getSubCount();
     }
 
 }

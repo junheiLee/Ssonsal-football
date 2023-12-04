@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class MatchTeamRequestDto {
+public class MatchApplicantRequestDto {
 
     private String uniform;
     private int subCount;

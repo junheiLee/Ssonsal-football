@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.controller;
 
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
 import com.ssonsal.football.game.service.MatchTeamService;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -32,7 +32,7 @@ public class MatchApplicantController {
      */
     @PostMapping("/{gameId}/match-applicants")
     public ResponseEntity<ResponseBodyFormatter> applyForGameAsAway(
-            @RequestBody MatchTeamRequestDto awayTeamRequestDto,
+            @RequestBody MatchApplicantRequestDto awayTeamRequestDto,
             @PathVariable Long gameId) {
 
         Long userId = 4L;

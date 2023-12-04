@@ -1,7 +1,7 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchStatus;
@@ -33,9 +33,9 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createGame(Long userId, GameRequestDto gameRequestDto, MatchTeamRequestDto homeTeamRequestDto) {
+    public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicantRequestDto homeTeamDto) {
 
-        checkTargetIsExist(gameRequestDto.isFindAway(), homeTeamRequestDto.getSubCount());
+        checkTargetIsExist(gameDto.isFindAway(), homeTeamDto.getSubCount());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Team team = user.getTeam();
@@ -45,16 +45,16 @@ public class GameServiceImpl implements GameService {
                 Game.builder()
                         .writer(user)
                         .hometeam(team)
-                        .matchStatus(isRequireAway(gameRequestDto.isFindAway()))
-                        .schedule(stringToLocalDateTime(gameRequestDto.getSchedule()))
-                        .gameRequestDto(gameRequestDto)
+                        .matchStatus(isRequireAway(gameDto.isFindAway()))
+                        .schedule(stringToLocalDateTime(gameDto.getSchedule()))
+                        .gameRequestDto(gameDto)
                         .build());
         matchTeamRepository.save(
                 MatchTeam.builder()
                         .team(team)
                         .game(game)
                         .matchApplicantStatus(ApplicantStatus.APPROVAL.getDescription())
-                        .matchTeamRequestDto(homeTeamRequestDto)
+                        .matchTeamDto(homeTeamDto)
                         .build());
 
         return game.getId();
