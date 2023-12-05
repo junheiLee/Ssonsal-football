@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.GameService;
+import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -49,14 +50,7 @@ public class GameController {
 
         Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("gameId", gameId));
-    }
-
-    private Map<String, Long> dataToMap(String key, Long value) {
-
-        Map<String, Long> dataDto = new HashMap<>();
-        dataDto.put(key, value);
-        return dataDto;
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("gameId", gameId));
     }
 
 

@@ -2,6 +2,7 @@ package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
+import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -38,14 +39,8 @@ public class MatchApplicantController {
         Long userId = 7L;
         Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, applicationTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("matchTeamId", matchTeamId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("matchTeamId", matchTeamId));
     }
 
-    private Map<String, Long> dataToMap(String key, Long value) {
-
-        Map<String, Long> dataDto = new HashMap<>();
-        dataDto.put(key, value);
-        return dataDto;
-    }
 
 }
