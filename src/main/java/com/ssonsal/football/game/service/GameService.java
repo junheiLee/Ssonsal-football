@@ -11,5 +11,6 @@ import java.text.ParseException;
 public interface GameService {
 
     Long createGame(Long userId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto) throws ParseException;
+
     GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto);
 }

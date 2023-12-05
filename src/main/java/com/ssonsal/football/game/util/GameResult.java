@@ -1,7 +1,5 @@
 package com.ssonsal.football.game.util;
 
-import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.global.exception.CustomException;
 import lombok.Getter;

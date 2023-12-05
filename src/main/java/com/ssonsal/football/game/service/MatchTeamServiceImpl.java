@@ -134,7 +134,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     private void checkUserInHomeTeam(Game game, User user) {
         if (!user.getTeam().equals(game.getHome())) {
-            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER, Transfer.dataToMap("userId",user.getId()));
+            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER, Transfer.dataToMap("userId", user.getId()));
         }
     }
 
