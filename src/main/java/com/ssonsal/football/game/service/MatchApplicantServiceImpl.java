@@ -58,7 +58,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
     private void checkDuplicateApplication(Team team, Game game) {
 
-        if (Objects.equals(team, game.getHometeam())) {
+        if (Objects.equals(team, game.getHome())) {
             log.info("해당 게임에 이미 확정된 팀입니다.");
             throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
         }
