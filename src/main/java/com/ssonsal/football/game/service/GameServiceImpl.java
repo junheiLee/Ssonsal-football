@@ -83,6 +83,6 @@ public class GameServiceImpl implements GameService {
         if (isNeedAway) {
             return MatchStatus.WAITING;
         }
-        return MatchStatus.MATCHING;
+        return MatchStatus.CONFIRMED;
     }
 }

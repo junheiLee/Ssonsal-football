@@ -26,8 +26,8 @@ public class MatchApplicantController {
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
      *
-     * @param awayTeamRequestDto    게임 신청에 필요한 정보
-     * @param gameId                url에서 가져오는 해당 게임의 식별자
+     * @param awayTeamRequestDto 게임 신청에 필요한 정보
+     * @param gameId             url에서 가져오는 해당 게임의 식별자
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-applicants")
@@ -35,7 +35,7 @@ public class MatchApplicantController {
             @RequestBody MatchApplicantRequestDto awayTeamRequestDto,
             @PathVariable Long gameId) {
 
-        Long userId = 4L;
+        Long userId = 7L;
         Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, awayTeamRequestDto);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("matchTeamId", matchTeamId));

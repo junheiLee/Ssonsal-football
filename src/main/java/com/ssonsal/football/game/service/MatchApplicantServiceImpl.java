@@ -5,7 +5,7 @@ import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.entity.MatchTeam;
 import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.exception.MatchTeamErrorCode;
+import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchTeamRepository;
 import com.ssonsal.football.global.exception.CustomException;
@@ -31,7 +31,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchTeamRepository matchTeamRepository;
 
     @Transactional
-    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto){
+    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto) {
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)
@@ -56,16 +56,18 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     }
 
     private void checkDuplicateApplicant(Team team, Game game) {
+
+        if (team.getId() == game.getHometeam().getId()) {
+            log.info("해당 게임에 이미 확정된 팀입니다.");
+            throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
+        }
+
         List<MatchTeam> matchTeams = game.getMatchTeams();
         long count = matchTeams.stream().filter(matchTeam -> matchTeam.getTeam().equals(team)).count();
 
-        if(team.getId() == game.getHometeam().getId()) {
-            log.info("해당 게임에 이미 확정된 팀입니다.");
-            throw new CustomException(MatchTeamErrorCode.ALREADY_CONFIRMED);
-        }
         if (count != 0) {
             log.info("해당 게임에 이미 신청한 팀입니다.");
-            throw new CustomException(MatchTeamErrorCode.ALREADY_APPLICANT);
+            throw new CustomException(MatchErrorCode.ALREADY_APPLICANT_TEAM);
         }
     }
 
