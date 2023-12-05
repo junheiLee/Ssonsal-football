@@ -75,4 +75,12 @@ public class Game extends BaseEntity {
         this.away = awayTeam;
         this.matchStatus = MatchStatus.CONFIRMED.getCodeNumber();
     }
+
+    public void enterHomeTeamResult(Integer score) {
+        this.hometeamResult = score;
+    }
+
+    public void enterAwayTeamResult(Integer score) {
+        this.awayteamResult = score;
+    }
 }
