@@ -70,4 +70,9 @@ public class Game extends BaseEntity {
         this.rule = gameRequestDto.getRule();
         this.account = gameRequestDto.getAccount();
     }
+
+    public void approvalTeamApplicant(Team awayTeam) {
+        this.awayteam = awayTeam;
+        this.matchStatus = MatchStatus.CONFIRMED.getCodeNumber();
+    }
 }

@@ -44,6 +44,16 @@ public class MatchTeam extends BaseEntity {
         this.matchApplicantStatus = matchApplicantStatus;
         this.uniform = matchTeamDto.getUniform();
         this.subCount = matchTeamDto.getSubCount();
+        // game.getMatchTeams().add(this);
+    }
+
+    public void approval() {
+        this.matchApplicantStatus = ApplicantStatus.APPROVAL.getDescription();
+        game.approvalTeamApplicant(this.team);
+    }
+
+    public void changeStatusToWaiting() {
+        this.matchApplicantStatus = ApplicantStatus.WAITING.getDescription();
     }
 
 }

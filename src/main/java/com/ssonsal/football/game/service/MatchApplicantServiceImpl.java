@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchTeamRepository matchTeamRepository;
 
     @Transactional
-    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto) {
+    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto){
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)
@@ -57,7 +58,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
     private void checkDuplicateApplicant(Team team, Game game) {
 
-        if (team.getId() == game.getHometeam().getId()) {
+        if(Objects.equals(team, game.getHometeam())) {
             log.info("해당 게임에 이미 확정된 팀입니다.");
             throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
         }
