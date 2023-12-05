@@ -1,5 +1,6 @@
 package com.ssonsal.football.user.controller;
 
+import com.ssonsal.football.user.dto.LogOutResultDto;
 import com.ssonsal.football.user.dto.SignInResultDto;
 import com.ssonsal.football.user.dto.SignUpResultDto;
 import com.ssonsal.football.user.service.SignService;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +51,7 @@ public class SignController {
         if (signInResultDto.getCode() == 0) {
             log.info("[signIn] 정상적으로 로그인되었습니다. email : {}, token : {}", email,
                 signInResultDto.getToken());
+            log.info("[signIn] signResultDto가 가지고 있는 정보 : {} ",signInResultDto);
         }
         return signInResultDto;
     }
@@ -78,6 +81,23 @@ public class SignController {
         return signUpResultDto;
     }
 
+    @DeleteMapping(value = "/logout")
+    @Operation(summary = "로그아웃", description = "redis 에서 해당 유저의 refreshToken을 삭제합니다.")
+    public LogOutResultDto logOut(@Parameter(description = "Email", required = true) @RequestParam String email
+    )throws RuntimeException {
+        // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
+
+        log.info("[logOut] 로그아웃을 시도하고 있습니다. email : {}",email);
+        LogOutResultDto logOutResultDto = signService.logOut(email);
+
+        if (logOutResultDto.getCode() == 0) {
+            log.info("[logOut] 정상적으로 로그아웃 되었습니다. email : {}", email);
+            log.info("[logOut] logOutResultDto가 가지고 있는 정보 : {} ",logOutResultDto);
+        }
+        return logOutResultDto;
+    }
+
+
     @GetMapping(value = "/exception")
     public void exceptionTest() throws RuntimeException {
         throw new RuntimeException("접근이 금지되었습니다.");
@@ -86,7 +106,7 @@ public class SignController {
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
         HttpHeaders responseHeaders = new HttpHeaders();
-        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json") ;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         log.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
