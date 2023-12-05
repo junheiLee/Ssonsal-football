@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -45,7 +45,7 @@ public class GameController {
         Long userId = 3L;
         ObjectMapper mapper = new ObjectMapper();
         GameRequestDto gameDto = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
-        MatchApplicantRequestDto homeTeamDto = mapper.treeToValue(obj.get("hometeam"), MatchApplicantRequestDto.class);
+        MatchApplicationRequestDto homeTeamDto = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
 
         Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
 

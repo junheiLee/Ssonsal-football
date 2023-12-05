@@ -1,11 +1,11 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
+import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.MatchStatus;
-import com.ssonsal.football.game.entity.MatchTeam;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchTeamRepository;
@@ -33,7 +33,7 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicantRequestDto homeTeamDto) {
+    public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicationRequestDto homeTeamDto) {
 
         checkTargetIsExist(gameDto.isFindAway(), homeTeamDto.getSubCount());
         User user = userRepository.findById(userId)
@@ -50,10 +50,10 @@ public class GameServiceImpl implements GameService {
                         .gameRequestDto(gameDto)
                         .build());
         matchTeamRepository.save(
-                MatchTeam.builder()
+                MatchApplication.builder()
                         .team(team)
                         .game(game)
-                        .matchApplicantStatus(ApplicantStatus.APPROVAL.getDescription())
+                        .applicationStatus(ApplicantStatus.APPROVAL.getDescription())
                         .matchTeamDto(homeTeamDto)
                         .build());
 

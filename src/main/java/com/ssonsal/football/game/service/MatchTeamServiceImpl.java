@@ -1,10 +1,10 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.approvalAwayTeamRequestDto;
+import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
+import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.MatchStatus;
-import com.ssonsal.football.game.entity.MatchTeam;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
@@ -32,7 +32,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     @Transactional
     public Long approvalAwayTeam(Long userId, Long gameId,
-                                 approvalAwayTeamRequestDto approvalAwayTeamDto) {
+                                 ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         // 해당 게임
         Game game = gameRepository.findById(gameId)
@@ -44,14 +44,14 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         checkUserInHomeTeam(game, user);
 
         // Applicant Status 대기 -> 보류로 변경
-        List<MatchTeam> applicantsTeams = game.getMatchTeams();
+        List<MatchApplication> applicantsTeams = game.getMatchApplications();
         applicantsTeams.stream()
-                .filter(team -> team.getMatchApplicantStatus().equals(ApplicantStatus.WAITING.getDescription()))
-                .forEach(MatchTeam::changeStatusToWaiting);
+                .filter(team -> team.getApplicationStatus().equals(ApplicantStatus.WAITING.getDescription()))
+                .forEach(MatchApplication::changeStatusToWaiting);
 
         // 승인할 팀 신청
         Long teamId = approvalAwayTeamDto.getTeamId();
-        MatchTeam applicantTeam = applicantsTeams.stream().filter(target -> Objects.equals(target.getTeam().getId(), teamId))
+        MatchApplication applicantTeam = applicantsTeams.stream().filter(target -> Objects.equals(target.getTeam().getId(), teamId))
                 .findAny()
                 .orElseThrow(() -> new CustomException(MatchErrorCode.NOT_APPLICANT_TEAM));
 
@@ -62,7 +62,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     }
 
     private void checkUserInHomeTeam(Game game, User user) {
-        if(!user.getTeam().equals(game.getHometeam())) {
+        if (!user.getTeam().equals(game.getHometeam())) {
             throw new CustomException(GameErrorCode.NOT_HOMETEAM_MEMBER);
         }
     }

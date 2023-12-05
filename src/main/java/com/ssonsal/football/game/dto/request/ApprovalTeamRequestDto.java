@@ -5,9 +5,8 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class MatchApplicantRequestDto {
+public class ApprovalTeamRequestDto {
 
-    private String uniform;
-    private int subCount;
+    private Long teamId;
 
 }

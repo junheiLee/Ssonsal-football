@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.entity;
 
-import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import lombok.*;
@@ -18,7 +18,7 @@ import javax.persistence.*;
                         columnNames = {"team_id", "game_id"}
                 )
         })
-public class MatchTeam extends BaseEntity {
+public class MatchApplication extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,25 +35,26 @@ public class MatchTeam extends BaseEntity {
     private String uniform;
     private int subCount;
 
-    private String matchApplicantStatus;
+    @Column(name = "match_applicant_status")
+    private String applicationStatus;
 
     @Builder
-    public MatchTeam(Team team, Game game, String matchApplicantStatus, MatchApplicantRequestDto matchTeamDto) {
+    public MatchApplication(Team team, Game game, String applicationStatus, MatchApplicationRequestDto matchTeamDto) {
         this.team = team;
         this.game = game;
-        this.matchApplicantStatus = matchApplicantStatus;
+        this.applicationStatus = applicationStatus;
         this.uniform = matchTeamDto.getUniform();
         this.subCount = matchTeamDto.getSubCount();
         // game.getMatchTeams().add(this);
     }
 
     public void approval() {
-        this.matchApplicantStatus = ApplicantStatus.APPROVAL.getDescription();
+        this.applicationStatus = ApplicantStatus.APPROVAL.getDescription();
         game.approvalTeamApplicant(this.team);
     }
 
     public void changeStatusToWaiting() {
-        this.matchApplicantStatus = ApplicantStatus.WAITING.getDescription();
+        this.applicationStatus = ApplicantStatus.WAITING.getDescription();
     }
 
 }

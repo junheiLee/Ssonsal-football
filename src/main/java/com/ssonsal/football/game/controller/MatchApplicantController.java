@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.controller;
 
-import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -26,17 +26,17 @@ public class MatchApplicantController {
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
      *
-     * @param awayTeamRequestDto    게임 신청에 필요한 정보
-     * @param gameId                url에서 가져오는 해당 게임의 식별자
+     * @param applicationTeamDto 게임 신청에 필요한 정보
+     * @param gameId             url에서 가져오는 해당 게임의 식별자
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-applicants")
     public ResponseEntity<ResponseBodyFormatter> applyForGameAsAway(
-            @RequestBody MatchApplicantRequestDto awayTeamRequestDto,
+            @RequestBody MatchApplicationRequestDto applicationTeamDto,
             @PathVariable Long gameId) {
 
         Long userId = 7L;
-        Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, awayTeamRequestDto);
+        Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, applicationTeamDto);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("matchTeamId", matchTeamId));
     }

@@ -52,7 +52,7 @@ public class Game extends BaseEntity {
     private int awayteamResult;
 
     @OneToMany(mappedBy = "game")
-    private List<MatchTeam> matchTeams;
+    private List<MatchApplication> matchApplications;
 
     @Builder
     public Game(User writer, Team hometeam,

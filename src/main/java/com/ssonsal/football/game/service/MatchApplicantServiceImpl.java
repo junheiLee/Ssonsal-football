@@ -1,9 +1,9 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.MatchApplicantRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.game.entity.MatchStatus;
-import com.ssonsal.football.game.entity.MatchTeam;
+import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
@@ -32,7 +32,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchTeamRepository matchTeamRepository;
 
     @Transactional
-    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicantRequestDto awayteamDto){
+    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto) {
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)
@@ -42,29 +42,29 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
         checkWriterInTeam(team);
-        checkDuplicateApplicant(team, game);
+        checkDuplicateApplication(team, game);
 
-        MatchTeam matchTeam = matchTeamRepository.save(
-                MatchTeam.builder()
+        MatchApplication matchApplication = matchTeamRepository.save(
+                MatchApplication.builder()
                         .team(team)
                         .game(game)
-                        .matchApplicantStatus(MatchStatus.WAITING.getDescription())
-                        .matchTeamDto(awayteamDto)
+                        .applicationStatus(ApplicantStatus.WAITING.getDescription())
+                        .matchTeamDto(applicationTeamDto)
                         .build()
         );
 
-        return matchTeam.getId();
+        return matchApplication.getId();
     }
 
-    private void checkDuplicateApplicant(Team team, Game game) {
+    private void checkDuplicateApplication(Team team, Game game) {
 
-        if(Objects.equals(team, game.getHometeam())) {
+        if (Objects.equals(team, game.getHometeam())) {
             log.info("해당 게임에 이미 확정된 팀입니다.");
             throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
         }
 
-        List<MatchTeam> matchTeams = game.getMatchTeams();
-        long count = matchTeams.stream().filter(matchTeam -> matchTeam.getTeam().equals(team)).count();
+        List<MatchApplication> matchApplications = game.getMatchApplications();
+        long count = matchApplications.stream().filter(matchTeam -> matchTeam.getTeam().equals(team)).count();
 
         if (count != 0) {
             log.info("해당 게임에 이미 신청한 팀입니다.");
