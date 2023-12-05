@@ -3,10 +3,12 @@ package com.ssonsal.football.game.entity;
 
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.user.entity.User;
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @Table(name = "sub", uniqueConstraints = {
         @UniqueConstraint(
                 name = "uniqueUserAndGame",
