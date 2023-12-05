@@ -13,7 +13,7 @@ public class TeamListDto {
 
     private String preferredArea;
 
-    private Integer ranking;
+    private Integer rank;
 
     private Float skillScore;
 

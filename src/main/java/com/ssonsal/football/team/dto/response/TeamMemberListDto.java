@@ -13,13 +13,13 @@ public class TeamMemberListDto {
 
     private Integer birth;
 
-    private Integer gender;
+    private String gender;
 
     private String position;
 
     private Integer age;
 
-    public TeamMemberListDto(Long id, String nickname, Integer gender, String position, Integer age) {
+    public TeamMemberListDto(Long id, String nickname, String gender, String position, Integer age) {
         this.id = id;
         this.nickname = nickname;
         this.gender = gender;
