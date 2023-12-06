@@ -4,7 +4,6 @@ import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
-import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;

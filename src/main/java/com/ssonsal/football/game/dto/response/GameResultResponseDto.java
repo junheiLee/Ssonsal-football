@@ -20,7 +20,7 @@ public class GameResultResponseDto {
         this.awayResult = awayResult;
     }
 
-    public void setTotalScore(Integer totalScore){
+    public void setTotalScore(Integer totalScore) {
         this.totalScore = totalScore;
     }
 }

@@ -84,7 +84,7 @@ public class Game extends BaseEntity {
         this.awayteamResult = awayResult;
     }
 
-    public void end(){
+    public void end() {
         this.matchStatus = MatchStatus.END.getCodeNumber();
     }
 }

@@ -35,7 +35,7 @@ public enum GameResultSet {
     }
 
     public static TeamRecord getAwayRecordEntity(TeamRecord target, TeamResult home, TeamResult away) {
-        TeamRecord updateRecord =  Arrays.stream(values())
+        TeamRecord updateRecord = Arrays.stream(values())
                 .filter(resultSet -> resultSet.home.equals(home) && resultSet.away.equals(away))
                 .findAny()
                 .get()
