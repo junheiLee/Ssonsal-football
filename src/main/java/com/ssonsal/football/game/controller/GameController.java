@@ -4,8 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.GameService;
+import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,19 +43,12 @@ public class GameController {
 
         Long userId = 3L;
         ObjectMapper mapper = new ObjectMapper();
-        GameRequestDto gameRequestDto = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
-        MatchTeamRequestDto homeTeamRequestDto = mapper.treeToValue(obj.get("hometeam"), MatchTeamRequestDto.class);
+        GameRequestDto gameDto = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
+        MatchApplicationRequestDto homeTeamDto = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
 
-        Long gameId = gameService.createGame(userId, gameRequestDto, homeTeamRequestDto);
+        Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, dataToMap("gameId", gameId));
-    }
-
-    private Map<String, Long> dataToMap(String key, Long value) {
-
-        Map<String, Long> dataDto = new HashMap<>();
-        dataDto.put(key, value);
-        return dataDto;
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("gameId", gameId));
     }
 
 
