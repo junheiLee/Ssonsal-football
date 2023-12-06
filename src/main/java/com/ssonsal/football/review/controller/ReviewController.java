@@ -53,4 +53,12 @@ public class ReviewController {
         reviewService.updateDeleteCode(reviewId, deleteCode);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
+
+    // 리뷰 조회
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<ResponseBodyFormatter> getReview(@PathVariable("reviewId") Long reviewId){
+        log.info(String.valueOf(reviewId));
+        ReviewResponseDto result = reviewService.getReview(reviewId);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, result);
+    }
 }

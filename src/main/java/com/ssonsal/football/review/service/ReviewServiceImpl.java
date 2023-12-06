@@ -91,10 +91,21 @@ public class ReviewServiceImpl implements ReviewService{
     public void updateDeleteCode(Long reviewId, Integer deleteCode) {
         reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
         if (!(deleteCode == 0 || deleteCode == 1)) {
             throw new CustomException(ReviewErrorCode.STATUS_ERROR);
         }
 
         reviewRepository.updateDeleteCode(reviewId, deleteCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReviewResponseDto getReview(Long reviewId) {
+        reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        ReviewResponseDto review = ReviewResponseDto.fromEntity(reviewRepository.findReviewById(reviewId));
+        return review;
     }
 }
