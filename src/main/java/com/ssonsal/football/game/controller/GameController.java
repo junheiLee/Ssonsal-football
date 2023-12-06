@@ -7,6 +7,8 @@ import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.util.Transfer;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.text.ParseException;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,20 +37,29 @@ public class GameController {
      *
      * @param obj 게임 생성에 필요한 정보
      * @return 성공 코드와 생성된 게임 아이디를 ResponseBody에 담아 반환
-     * @throws JsonProcessingException: ObjectMapper를 사용해서 생김
-     * @throws ParseException:          Service 계층에서 String을 LocalDateTime으로 변환할 때 생김
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) throws JsonProcessingException, ParseException {
+    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) {
 
         Long userId = 3L;
+        Map<String, Long> createGameResponseDto;
+
         ObjectMapper mapper = new ObjectMapper();
-        GameRequestDto gameDto = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
-        MatchApplicationRequestDto homeTeamDto = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
+        try {
+            GameRequestDto gameDto
+                    = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
+            MatchApplicationRequestDto homeTeamDto
+                    = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
 
-        Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
+            Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
+            createGameResponseDto = Transfer.dataToMap("gameId", gameId);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("gameId", gameId));
+        } catch (JsonProcessingException e) {
+            log.error("Request Body의 형식이 다릅니다.");
+            throw new CustomException(e, ErrorCode.WRONG_FORMAT);
+        }
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, createGameResponseDto);
     }
 
 

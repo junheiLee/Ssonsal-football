@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode implements ResponseCode {
 
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용 불가한 유저입니다."),
+    WRONG_FORMAT(HttpStatus.BAD_REQUEST, "올바르지 않는 형식입니다."),
     NOT_EXIST(HttpStatus.BAD_REQUEST, "존재하지 않는 내역입니다.");
 
 
