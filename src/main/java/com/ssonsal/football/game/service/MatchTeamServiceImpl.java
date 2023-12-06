@@ -7,12 +7,10 @@ import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.util.GameResultSet;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.TeamRecord;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.user.entity.User;
@@ -25,9 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-import static com.ssonsal.football.game.util.GameConstant.TEAM_RECORD_ID;
-import static com.ssonsal.football.game.util.GameConstant.USER_ID;
+import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_APPLICANT_TEAM;
+import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_TEAM_MEMBER;
+import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.ErrorCode.NOT_EXIST;
+import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
 
 
 @Slf4j
@@ -47,12 +48,12 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
         // 해당 게임
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+                .orElseThrow(() -> new CustomException(NOT_EXIST));
         checkGameIsWaiting(game.getMatchStatus());
 
         // 요청을 보낸 user 가 게임을 생성한 팀의 팀원인지 확인
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         checkUserInHomeTeam(game, user);
 
         // Applicant Status 대기 -> 보류로 변경
@@ -64,9 +65,10 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         // 승인할 팀 신청
         Long teamId = approvalAwayTeamDto.getTeamId();
         checkIsAwayTeam(game, teamId);
-        MatchApplication applicantTeam = applicantsTeams.stream().filter(target -> Objects.equals(target.getTeam().getId(), teamId))
+        MatchApplication applicantTeam = applicantsTeams.stream()
+                .filter(target -> Objects.equals(target.getTeam().getId(), teamId))
                 .findAny()
-                .orElseThrow(() -> new CustomException(MatchErrorCode.NOT_APPLICANT_TEAM, longIdToMap("teamId", teamId)));
+                .orElseThrow(() -> new CustomException(NOT_APPLICANT_TEAM, longIdToMap(TEAM_ID, teamId)));
 
         // 승인 로직
         applicantTeam.approval();
@@ -102,11 +104,11 @@ public class MatchTeamServiceImpl implements MatchTeamService {
             Long awayId = game.getAway().getId();
 
             TeamRecord homeRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
+                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
             TeamRecord awayRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
+                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
             game.end();
@@ -149,11 +151,11 @@ public class MatchTeamServiceImpl implements MatchTeamService {
             Long awayId = game.getAway().getId();
 
             TeamRecord homeRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
+                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
             TeamRecord awayRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
+                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
             game.end();
@@ -169,13 +171,13 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     private void checkIsAwayTeam(Game game, Long teamId) {
         if (game.getHome().getId().equals(teamId)) {
-            throw new CustomException(MatchErrorCode.NOT_APPLICANT_TEAM);
+            throw new CustomException(NOT_APPLICANT_TEAM);
         }
     }
 
     private void checkUserInHomeTeam(Game game, User user) {
         if (!user.getTeam().equals(game.getHome())) {
-            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER, longIdToMap("userId", user.getId()));
+            throw new CustomException(NOT_TEAM_MEMBER, longIdToMap("userId", user.getId()));
         }
     }
 

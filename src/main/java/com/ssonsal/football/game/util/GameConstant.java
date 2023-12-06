@@ -10,6 +10,7 @@ public final class GameConstant {
 
     public static final String USER_ID = "userId";
     public static final String GAME_ID = "gameId";
+    public static final String TEAM_ID = "teamId";
     public static final String TEAM_RECORD_ID = "teamRecordId";
 
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
