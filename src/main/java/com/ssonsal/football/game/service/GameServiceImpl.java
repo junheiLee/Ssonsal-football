@@ -3,6 +3,7 @@ package com.ssonsal.football.game.service;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
@@ -25,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
@@ -93,6 +96,12 @@ public class GameServiceImpl implements GameService {
         }
 
         throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT);
+    }
+
+    public List<GameListResponseDto> findAllGamesForTeam() {
+
+        return gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
+                .stream().map(GameListResponseDto::new).collect(Collectors.toList());
     }
 
     private void checkAbleToEnterResult(Game game) {

@@ -9,19 +9,17 @@ import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
-import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -59,7 +57,13 @@ public class GameController {
             throw new CustomException(e, ErrorCode.WRONG_FORMAT);
         }
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, createGameResponseDto);
+        return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
+    }
+
+    @GetMapping("/for-team")
+    public ResponseEntity<ResponseBodyFormatter> gamesForTeam() {
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForTeam());
     }
 
 
