@@ -6,8 +6,8 @@ import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
-import com.ssonsal.football.game.util.GameResult;
 import com.ssonsal.football.game.util.GameSuccessCode;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
@@ -61,7 +61,7 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
                                                              @RequestBody GameResultRequestDto gameResultDto) {
 
-        Long userId = 7L;
+        Long userId = 1L;
         GameResultResponseDto gameResult = gameService.enterResult(userId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);
@@ -69,10 +69,10 @@ public class MatchTeamController {
 
     private ResponseEntity<ResponseBodyFormatter> setHttpStatus(GameResultResponseDto gameResult) {
 
-        if (gameResult.getTotalResult() == null) {
+        if (gameResult.getTotalScore() == null) {
             throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT, gameResult);
         }
-        if (gameResult.getTotalResult() < GameResult.END.getScore()) {
+        if (gameResult.getTotalScore() < TeamResult.END.getScore()) {
             return DataResponseBodyFormatter.put(GameSuccessCode.WAIT_FOR_ANOTHER_TEAM, gameResult);
         }
 

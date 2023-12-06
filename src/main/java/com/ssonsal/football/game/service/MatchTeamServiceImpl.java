@@ -9,10 +9,13 @@ import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
-import com.ssonsal.football.game.util.GameResult;
+import com.ssonsal.football.game.util.GameResultSet;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.team.entity.TeamRecord;
+import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final TeamRecordRepository teamRecordRepository;
 
 
     @Transactional
@@ -67,61 +71,84 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     }
 
     @Transactional
-    public GameResultResponseDto enterAwayTeamResult(Game game, Integer resultScore) {
-        Integer homeTeamResult = game.getHometeamResult();
+    public GameResultResponseDto enterAwayTeamResult(Game game, TeamResult awayResult) {
+        String homeResultInKo = game.getHometeamResult();
+        Integer awayScore = awayResult.getScore();
 
-        if (homeTeamResult == null) {
-            game.enterAwayTeamResult(resultScore);
-            return GameResultResponseDto.builder()
-                    .homeTeamResult(homeTeamResult)
-                    .awayTeamResult(resultScore)
-                    .totalResult(resultScore)
-                    .build();
+        game.enterAwayTeamResult(awayResult.getKo());
+        GameResultResponseDto gameResultResponseDto = GameResultResponseDto.builder()
+                .homeResult(homeResultInKo)
+                .awayResult(awayResult.getKo())
+                .build();
+
+        // 한 팀만 승패를 입력한 경우
+        log.info("어웨이 팀 입력 시 homeResultInKo={}", homeResultInKo);
+        if (homeResultInKo == null) {
+            gameResultResponseDto.setTotalScore(awayScore);
+            return gameResultResponseDto;
         }
 
-        Integer totalResult = homeTeamResult + resultScore;
+        TeamResult homeResult = TeamResult.peekResult(homeResultInKo);
+        Integer totalScore = homeResult.getScore() + awayScore;
 
-        if (totalResult.equals(GameResult.END.getScore())) {
-            game.enterAwayTeamResult(resultScore);
-            return GameResultResponseDto.builder()
-                    .homeTeamResult(homeTeamResult)
-                    .awayTeamResult(resultScore)
-                    .totalResult(totalResult)
-                    .build();
+        // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입 후,
+        if (totalScore.equals(TeamResult.END.getScore())) {
+
+            TeamRecord homeRecord = teamRecordRepository.findById(game.getHome().getId()).get();
+            GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
+
+            TeamRecord awayRecord = teamRecordRepository.findById(game.getAway().getId()).get();
+            GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
+
+            game.end();
+            gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto;
         }
 
-        // 홈팀에서 입력한 결과도 초기화 시킨다.
+        // 옳은 입력이나 한팀만 입력 외에는 양팀에서 입력한 결과를 초기화 시킨다.
         game.enterHomeTeamResult(null);
+        game.enterAwayTeamResult(null);
         return GameResultResponseDto.builder().build();
     }
 
     @Transactional
-    public GameResultResponseDto enterHomeTeamResult(Game game, Integer resultScore) {
+    public GameResultResponseDto enterHomeTeamResult(Game game, TeamResult homeResult) {
 
-        Integer awayTeamResult = game.getAwayteamResult();
+        String awayResultInKo = game.getAwayteamResult();
+        Integer homeScore = homeResult.getScore();
 
-        if (awayTeamResult == null) {
+        game.enterHomeTeamResult(homeResult.getKo());
+        GameResultResponseDto gameResultResponseDto = GameResultResponseDto.builder()
+                .homeResult(homeResult.getKo())
+                .awayResult(awayResultInKo)
+                .build();
 
-            game.enterHomeTeamResult(resultScore);
-            return GameResultResponseDto.builder()
-                    .homeTeamResult(resultScore)
-                    .awayTeamResult(awayTeamResult)
-                    .totalResult(resultScore)
-                    .build();
+        // 한 팀만 승패를 입력한 경우
+        log.info("홈 팀 입력 시 awayResultInKo={}", awayResultInKo);
+        if (awayResultInKo == null) {
+            gameResultResponseDto.setTotalScore(homeScore);
+            return gameResultResponseDto;
         }
 
-        Integer totalResult = awayTeamResult + resultScore;
+        TeamResult awayResult = TeamResult.peekResult(awayResultInKo);
+        Integer totalScore = homeScore + awayResult.getScore();
 
-        if (totalResult.equals(GameResult.END.getScore())) {
-            game.enterHomeTeamResult(resultScore);
-            return GameResultResponseDto.builder()
-                    .homeTeamResult(resultScore)
-                    .awayTeamResult(awayTeamResult)
-                    .totalResult(totalResult)
-                    .build();
+        // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입
+        if (totalScore.equals(TeamResult.END.getScore())) {
+
+            TeamRecord homeRecord = teamRecordRepository.findById(game.getHome().getId()).get();
+            GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
+
+            TeamRecord awayRecord = teamRecordRepository.findById(game.getAway().getId()).get();
+            GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
+
+            game.end();
+            gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto;
         }
 
-        // awayTeam 에서 입력한 결과도 초기화 시킨다.
+        // 옳은 입력이나 한팀만 입력 외에는 양팀에서 입력한 결과를 초기화 시킨다.
+        game.enterHomeTeamResult(null);
         game.enterAwayTeamResult(null);
         return GameResultResponseDto.builder().build();
     }

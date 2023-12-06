@@ -11,8 +11,8 @@ import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
-import com.ssonsal.football.game.repository.MatchTeamRepository;
-import com.ssonsal.football.game.util.GameResult;
+import com.ssonsal.football.game.repository.MatchApplicationRepository;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
@@ -37,7 +37,7 @@ public class GameServiceImpl implements GameService {
 
     private final MatchTeamService matchTeamService;
     private final GameRepository gameRepository;
-    private final MatchTeamRepository matchTeamRepository;
+    private final MatchApplicationRepository matchApplicationRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -58,7 +58,7 @@ public class GameServiceImpl implements GameService {
                         .gameRequestDto(gameDto)
                         .build());
 
-        matchTeamRepository.save(
+        matchApplicationRepository.save(
                 MatchApplication.builder()
                         .team(homeTeam)
                         .game(game)
@@ -83,12 +83,12 @@ public class GameServiceImpl implements GameService {
         if (gameResultDto.getTarget().equals(AWAY)) {
 
             checkUserInTeam(game.getAway(), user.getTeam());
-            return matchTeamService.enterAwayTeamResult(game, GameResult.peekScore(result));
+            return matchTeamService.enterAwayTeamResult(game, TeamResult.peekResult(result));
         }
         if (gameResultDto.getTarget().equals(HOME)) {
 
             checkUserInTeam(game.getHome(), user.getTeam());
-            return matchTeamService.enterHomeTeamResult(game, GameResult.peekScore(result));
+            return matchTeamService.enterHomeTeamResult(game, TeamResult.peekResult(result));
         }
 
         throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT);

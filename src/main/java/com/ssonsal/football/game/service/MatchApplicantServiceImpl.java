@@ -4,10 +4,11 @@ import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
+import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
-import com.ssonsal.football.game.repository.MatchTeamRepository;
+import com.ssonsal.football.game.repository.MatchApplicationRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
@@ -29,7 +30,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
     private final UserRepository userRepository;
     private final GameRepository gameRepository;
-    private final MatchTeamRepository matchTeamRepository;
+    private final MatchApplicationRepository matchApplicationRepository;
 
     @Transactional
     public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto) {
@@ -44,7 +45,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         checkWriterInTeam(team);
         checkDuplicateApplication(team, game);
 
-        MatchApplication matchApplication = matchTeamRepository.save(
+        MatchApplication matchApplication = matchApplicationRepository.save(
                 MatchApplication.builder()
                         .team(team)
                         .game(game)
