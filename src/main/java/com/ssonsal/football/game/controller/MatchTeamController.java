@@ -47,7 +47,7 @@ public class MatchTeamController {
         Long userId = 6L;
         Long confirmedGameId = matchTeamService.approvalAwayTeam(userId, gameId, approvalAwayTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("gameId", confirmedGameId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap("gameId", confirmedGameId));
     }
 
     /**

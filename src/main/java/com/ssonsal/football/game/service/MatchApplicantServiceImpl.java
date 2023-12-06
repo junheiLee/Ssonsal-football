@@ -21,6 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ssonsal.football.game.util.GameConstant.GAME_ID;
+import static com.ssonsal.football.game.util.GameConstant.USER_ID;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,10 +40,10 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         Team team = user.getTeam();
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
 
         checkWriterInTeam(team);
         checkDuplicateApplication(team, game);

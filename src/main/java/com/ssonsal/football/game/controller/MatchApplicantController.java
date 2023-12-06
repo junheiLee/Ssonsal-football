@@ -36,7 +36,7 @@ public class MatchApplicantController {
         Long userId = 7L;
         Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, applicationTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("matchTeamId", matchTeamId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap("matchTeamId", matchTeamId));
     }
 
 

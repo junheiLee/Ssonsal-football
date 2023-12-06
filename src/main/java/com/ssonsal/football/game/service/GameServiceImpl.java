@@ -26,8 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static com.ssonsal.football.game.util.GameConstant.AWAY;
-import static com.ssonsal.football.game.util.GameConstant.HOME;
+import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class GameServiceImpl implements GameService {
 
         checkTargetIsExist(gameDto.isFindAway(), homeTeamDto.getSubCount());
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         Team homeTeam = user.getTeam();
         checkWriterInTeam(homeTeam);
 
@@ -73,13 +73,14 @@ public class GameServiceImpl implements GameService {
     public GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto) {
 
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
         checkAbleToEnterResult(game);
 
         String result = gameResultDto.getResult();
 
         // 해당 팀의 팀원이 한 요청인지 확인 후 matchTeamService 호출
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         if (gameResultDto.getTarget().equals(AWAY)) {
 
             checkUserInTeam(game.getAway(), user.getTeam());
@@ -126,7 +127,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private LocalDateTime stringToLocalDateTime(String dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         log.info("stringToLocalDateTime = {}", dateTime);
         return LocalDateTime.parse(dateTime, formatter);
     }

@@ -11,7 +11,6 @@ import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.util.GameResultSet;
 import com.ssonsal.football.game.util.TeamResult;
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.TeamRecord;
@@ -25,6 +24,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+
+import static com.ssonsal.football.game.util.GameConstant.TEAM_RECORD_ID;
+import static com.ssonsal.football.game.util.GameConstant.USER_ID;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 
 
 @Slf4j
@@ -48,7 +51,8 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         checkGameIsWaiting(game.getMatchStatus());
 
         // 요청을 보낸 user 가 게임을 생성한 팀의 팀원인지 확인
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         checkUserInHomeTeam(game, user);
 
         // Applicant Status 대기 -> 보류로 변경
@@ -62,7 +66,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         checkIsAwayTeam(game, teamId);
         MatchApplication applicantTeam = applicantsTeams.stream().filter(target -> Objects.equals(target.getTeam().getId(), teamId))
                 .findAny()
-                .orElseThrow(() -> new CustomException(MatchErrorCode.NOT_APPLICANT_TEAM, Transfer.dataToMap("teamId", teamId)));
+                .orElseThrow(() -> new CustomException(MatchErrorCode.NOT_APPLICANT_TEAM, longIdToMap("teamId", teamId)));
 
         // 승인 로직
         applicantTeam.approval();
@@ -94,10 +98,15 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입 후,
         if (totalScore.equals(TeamResult.END.getScore())) {
 
-            TeamRecord homeRecord = teamRecordRepository.findById(game.getHome().getId()).get();
+            Long homeId = game.getHome().getId();
+            Long awayId = game.getAway().getId();
+
+            TeamRecord homeRecord = teamRecordRepository.findById(homeId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
-            TeamRecord awayRecord = teamRecordRepository.findById(game.getAway().getId()).get();
+            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
             game.end();
@@ -136,10 +145,15 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입
         if (totalScore.equals(TeamResult.END.getScore())) {
 
-            TeamRecord homeRecord = teamRecordRepository.findById(game.getHome().getId()).get();
+            Long homeId = game.getHome().getId();
+            Long awayId = game.getAway().getId();
+
+            TeamRecord homeRecord = teamRecordRepository.findById(homeId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
-            TeamRecord awayRecord = teamRecordRepository.findById(game.getAway().getId()).get();
+            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
             game.end();
@@ -161,7 +175,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     private void checkUserInHomeTeam(Game game, User user) {
         if (!user.getTeam().equals(game.getHome())) {
-            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER, Transfer.dataToMap("userId", user.getId()));
+            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER, longIdToMap("userId", user.getId()));
         }
     }
 
