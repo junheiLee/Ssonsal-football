@@ -50,6 +50,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
         MatchApplication matchApplication = matchApplicationRepository.save(
                 MatchApplication.builder()
+                        .applicant(user)
                         .team(team)
                         .game(game)
                         .applicationStatus(ApplicantStatus.WAITING.getDescription())

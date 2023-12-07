@@ -75,7 +75,8 @@ public class Game extends BaseEntity {
         this.account = gameRequestDto.getAccount();
     }
 
-    public void approvalTeamApplicant(Team awayTeam) {
+    public void approvalTeamApplicant(User applicant, Team awayTeam) {
+        this.awayApplicant = applicant;
         this.away = awayTeam;
         this.matchStatus = MatchStatus.CONFIRMED.getCodeNumber();
     }

@@ -64,6 +64,7 @@ public class GameServiceImpl implements GameService {
 
         matchApplicationRepository.save(
                 MatchApplication.builder()
+                        .applicant(user)
                         .team(homeTeam)
                         .game(game)
                         .applicationStatus(ApplicantStatus.APPROVAL.getDescription())

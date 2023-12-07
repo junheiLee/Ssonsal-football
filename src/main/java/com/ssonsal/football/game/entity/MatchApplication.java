@@ -43,7 +43,9 @@ public class MatchApplication extends BaseEntity {
     private String applicationStatus;
 
     @Builder
-    public MatchApplication(Team team, Game game, String applicationStatus, MatchApplicationRequestDto matchTeamDto) {
+    public MatchApplication(User applicant, Team team, Game game,
+                            String applicationStatus, MatchApplicationRequestDto matchTeamDto) {
+        this.applicant = applicant;
         this.team = team;
         this.game = game;
         this.applicationStatus = applicationStatus;
@@ -54,7 +56,7 @@ public class MatchApplication extends BaseEntity {
 
     public void approval() {
         this.applicationStatus = ApplicantStatus.APPROVAL.getDescription();
-        game.approvalTeamApplicant(this.team);
+        game.approvalTeamApplicant(this.applicant, this.team);
     }
 
     public void changeStatusToWaiting() {
