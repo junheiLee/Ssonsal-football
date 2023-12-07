@@ -12,4 +12,6 @@ public interface SubService {
 
     //용병으로 참여한 기록
     List<SubRecordDto> getSubRecordsByUserId(Long userId);
+
+    String subAccept(Long userId, Long gameId, Long teamId);
 }

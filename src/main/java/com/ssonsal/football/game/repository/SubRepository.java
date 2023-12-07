@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface SubRepository extends JpaRepository<Sub, Long> {
-
     List<Sub> findByUser_Id(Long userId);
 
 }

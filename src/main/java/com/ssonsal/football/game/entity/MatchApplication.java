@@ -57,4 +57,7 @@ public class MatchApplication extends BaseEntity {
         this.applicationStatus = ApplicantStatus.WAITING.getDescription();
     }
 
+    public void decreaseSubCount() {
+        this.subCount -= 1;
+    }
 }

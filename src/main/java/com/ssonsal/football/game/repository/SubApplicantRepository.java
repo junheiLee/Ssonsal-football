@@ -17,10 +17,9 @@ public interface SubApplicantRepository extends JpaRepository<SubApplicant, Long
     List<SubApplicant> findByMatchTeamId(@Param("teamId") Long teamId);
 
     @Transactional
-    @Modifying
+    @Modifying // 용병 승인 후 (subCount - 1)
     @Query("UPDATE MatchApplication mt SET mt.subCount = mt.subCount - 1 WHERE mt.game.id = :gameId AND mt.team.id = :teamId")
     void decreaseSubCount(@Param("gameId") Long gameId, @Param("teamId") Long teamId);
 
-
-
+    SubApplicant findByUserId(Long teamId);
 }

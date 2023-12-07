@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum SubErrorCode implements ResponseCode {
 
-    CLOSED(HttpStatus.BAD_REQUEST, "용병 신청이 마감 되었습니다.");
+    CLOSED(HttpStatus.BAD_REQUEST, "용병 신청에 실패했습니다");
 
 
     private final HttpStatus httpStatus;
