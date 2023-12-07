@@ -30,6 +30,10 @@ public class Game extends BaseEntity {
     private Team home;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "away_applicant_id")
+    private User awayApplicant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "awayteam_id")
     private Team away;
 

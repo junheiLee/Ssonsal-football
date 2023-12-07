@@ -3,6 +3,7 @@ package com.ssonsal.football.game.entity;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
+import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Getter
 @ToString(exclude = {"team", "game"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "match_team",
+@Table(name = "match_application",
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "unique_team_and_game",
@@ -25,6 +26,10 @@ public class MatchApplication extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "applicant_id", nullable = false)
+    private User applicant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
@@ -35,7 +40,6 @@ public class MatchApplication extends BaseEntity {
     private String uniform;
     private int subCount;
 
-    @Column(name = "match_applicant_status")
     private String applicationStatus;
 
     @Builder
