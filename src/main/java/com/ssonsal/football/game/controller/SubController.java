@@ -17,12 +17,5 @@ public class SubController {
     @Autowired
     private SubService subService;
 
-    @GetMapping("/{gameId}/teams/{teamId}/sub-applicants")
-    public String SubApplyList(@PathVariable Long gameId, @PathVariable Long teamId,Model model){
-
-        model.addAttribute("list",subService.list(gameId, teamId));
-        return "gameDetail";
-    }
-
 
 }
