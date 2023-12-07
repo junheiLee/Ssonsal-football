@@ -42,7 +42,7 @@ public class MatchTeamController {
      */
     @PostMapping("/{gameId}/match-teams")
     public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@PathVariable Long gameId,
-                                                                  @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
+                                                                 @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         Long userId = 6L;
         Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalAwayTeamDto);

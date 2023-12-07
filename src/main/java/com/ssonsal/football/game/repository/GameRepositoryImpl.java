@@ -12,7 +12,7 @@ import static com.ssonsal.football.game.entity.QGame.game;
 import static com.ssonsal.football.game.entity.QMatchApplication.matchApplication;
 import static com.ssonsal.football.game.entity.QSub.sub;
 
-public class GameRepositoryImpl implements GameRepositoryCustom{
+public class GameRepositoryImpl implements GameRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
