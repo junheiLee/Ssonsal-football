@@ -10,6 +10,7 @@ import java.util.List;
 
 import static com.ssonsal.football.game.entity.QGame.game;
 import static com.ssonsal.football.game.entity.QMatchApplication.matchApplication;
+import static com.ssonsal.football.game.entity.QSub.sub;
 
 public class GameRepositoryImpl implements GameRepositoryCustom{
 
@@ -25,8 +26,22 @@ public class GameRepositoryImpl implements GameRepositoryCustom{
                 .select(new QGameListResponseDto(game.id, game.schedule.stringValue(), game.region,
                         game.stadium, game.vsFormat, game.gender, game.rule, game.account))
                 .from(game)
-                .where(JPAExpressions.selectFrom(matchApplication).where(matchApplication.game.eq(game),
-                        matchApplication.subCount.gt(0)).exists())
+                .where(JPAExpressions.selectFrom(matchApplication)
+                        .where(matchApplication.game.eq(game),
+                                matchApplication.subCount.gt(0))
+                        .exists())
+                .fetch();
+    }
+
+    public List<GameListResponseDto> searchMyGameAsSub(Long userId) {
+
+        //select * from game as g join sub as s where g.id = s.game_id and s.user_id = 11; 이거 어케할지 모르겟음
+
+        return queryFactory
+                .select(new QGameListResponseDto(game.id, game.schedule.stringValue(), game.region,
+                        game.stadium, game.vsFormat, game.gender, game.rule, game.account))
+                .from(game, sub)
+                .where(sub.game.eq(game), sub.user.id.eq(userId))
                 .fetch();
     }
 

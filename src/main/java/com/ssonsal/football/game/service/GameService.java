@@ -19,4 +19,6 @@ public interface GameService {
 
     List<GameListResponseDto> findAllGamesForSub();
 
+    List<GameListResponseDto> findMyGamesAsSub(Long userId);
+
 }

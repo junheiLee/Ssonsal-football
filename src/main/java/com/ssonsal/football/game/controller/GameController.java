@@ -72,4 +72,10 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForSub());
     }
 
+    @GetMapping("/subs/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
+    }
+
 }

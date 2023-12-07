@@ -43,6 +43,7 @@ public class GameServiceImpl implements GameService {
     private final MatchApplicationRepository matchApplicationRepository;
     private final UserRepository userRepository;
 
+    @Override
     @Transactional
     public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicationRequestDto homeTeamDto) {
 
@@ -72,6 +73,7 @@ public class GameServiceImpl implements GameService {
         return game.getId();
     }
 
+    @Override
     @Transactional
     public GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto) {
 
@@ -98,15 +100,23 @@ public class GameServiceImpl implements GameService {
         throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT);
     }
 
+    @Override
     public List<GameListResponseDto> findAllGamesForTeam() {
 
         return gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
                 .stream().map(GameListResponseDto::new).collect(Collectors.toList());
     }
 
+    @Override
     public List<GameListResponseDto> findAllGamesForSub() {
 
         return gameRepository.searchAllGameForSub();
+    }
+
+    @Override
+    public List<GameListResponseDto> findMyGamesAsSub(Long userId) {
+
+        return gameRepository.searchMyGameAsSub(userId);
     }
 
     private void checkAbleToEnterResult(Game game) {
