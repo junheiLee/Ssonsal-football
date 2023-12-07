@@ -43,6 +43,13 @@ public class MatchApplicantController {
                 .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
     }
 
+    /**
+     * 해당 게임에 대한 신청을 거절하는 api
+     *
+     * @param matchApplicationId   해당 신청 식별자
+     * @param gameId                해당 게임
+     * @return 거절된 신청 아이디 반환
+     */
     @DeleteMapping("/{gameId}/match-applications/{matchApplicationId}")
     public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
                                                                          @PathVariable Long gameId) {
