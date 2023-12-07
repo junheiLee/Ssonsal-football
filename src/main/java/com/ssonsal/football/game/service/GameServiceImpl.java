@@ -84,7 +84,7 @@ public class GameServiceImpl implements GameService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
 
         // 요청한 사람이 해당 게임 작성자인지 확인
-        if(!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
             throw new CustomException(FORBIDDEN_USER);
         }
 
