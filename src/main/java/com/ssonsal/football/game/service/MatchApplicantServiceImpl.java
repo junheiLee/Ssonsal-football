@@ -67,7 +67,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
 
-        if(!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
             throw new CustomException(FORBIDDEN_USER);
         }
 

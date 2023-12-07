@@ -94,4 +94,16 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
     }
 
+    /**
+     * 해당 팀이 참여한 게임 글 목록 반환 api
+     *
+     * @param teamId 해당 팀 아이디
+     * @return 해당 팀이 참여한 게임 타이틀 정보 list 반환
+     */
+    @GetMapping("/teams/{teamId}")
+    public ResponseEntity<ResponseBodyFormatter> ourGamesAsTeam(@PathVariable Long teamId) {
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameService.findOurGamesAsTeam(teamId));
+    }
+
 }

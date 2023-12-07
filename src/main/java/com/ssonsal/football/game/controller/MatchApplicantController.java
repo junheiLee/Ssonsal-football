@@ -2,8 +2,6 @@ package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
-import com.ssonsal.football.game.util.Transfer;
-import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,8 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.game.util.GameConstant.MATCH_APPLICATION_ID;
 import static com.ssonsal.football.game.util.GameConstant.REJECTED_MATCH_APPLICATION_ID;
-import static com.ssonsal.football.game.util.Transfer.*;
-import static com.ssonsal.football.global.util.SuccessCode.*;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +53,6 @@ public class MatchApplicantController {
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));
     }
-
 
 
 }

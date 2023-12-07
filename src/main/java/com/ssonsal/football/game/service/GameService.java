@@ -21,4 +21,6 @@ public interface GameService {
 
     List<GameListResponseDto> findMyGamesAsSub(Long userId);
 
+    List<GameListResponseDto> findOurGamesAsTeam(Long teamId);
+
 }

@@ -45,4 +45,16 @@ public class GameRepositoryImpl implements GameRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<GameListResponseDto> searchOurGameAsTeam(Long teamId) {
+
+        return queryFactory
+                .select(new QGameListResponseDto(game.id, game.schedule.stringValue(), game.region,
+                        game.stadium, game.vsFormat, game.gender, game.rule, game.account))
+                .from(game)
+                .where(game.home.id.eq(teamId)
+                        .or(game.away.id.eq(teamId)))
+                .fetch();
+    }
+
 }

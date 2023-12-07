@@ -120,6 +120,12 @@ public class GameServiceImpl implements GameService {
         return gameRepository.searchMyGameAsSub(userId);
     }
 
+    @Override
+    public List<GameListResponseDto> findOurGamesAsTeam(Long teamId) {
+
+        return gameRepository.searchOurGameAsTeam(teamId);
+    }
+
     private void checkAbleToEnterResult(Game game) {
         if (game.getMatchStatus() != MatchStatus.CONFIRMED.getCodeNumber()) {
             log.error("대기 중이거나 종료된 게임은 결과를 기입할 수 없음.");
