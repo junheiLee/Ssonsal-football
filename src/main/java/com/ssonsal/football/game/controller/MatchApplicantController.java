@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.game.util.GameConstant.MATCH_APPLICATION_ID;
+import static com.ssonsal.football.game.util.GameConstant.REJECTED_MATCH_APPLICATION_ID;
+import static com.ssonsal.football.game.util.Transfer.*;
+import static com.ssonsal.football.global.util.SuccessCode.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,8 +41,21 @@ public class MatchApplicantController {
         Long userId = 7L;
         Long matchApplicantId = matchApplicantService.applyToGameAsAway(gameId, userId, applicationTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
+        return DataResponseBodyFormatter
+                .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
     }
+
+    @DeleteMapping("/{gameId}/match-applications/{matchApplicationId}")
+    public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
+                                                                         @PathVariable Long gameId) {
+
+        Long userId = 3L;
+        Long rejectedMatchApplicationId = matchApplicantService.rejectApplicationAsAway(userId, gameId, matchApplicationId);
+
+        return DataResponseBodyFormatter
+                .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));
+    }
+
 
 
 }

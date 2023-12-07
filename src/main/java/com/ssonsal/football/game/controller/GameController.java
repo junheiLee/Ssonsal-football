@@ -50,7 +50,7 @@ public class GameController {
                     = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
 
             Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
-            createGameResponseDto = Transfer.longIdToMap("gameId", gameId);
+            createGameResponseDto = Transfer.longIdToMap("createdGameId", gameId);
 
         } catch (JsonProcessingException e) {
             log.error("Request Body의 형식이 다릅니다.");

@@ -19,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -47,7 +49,7 @@ public class MatchTeamController {
         Long userId = 6L;
         Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalAwayTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap("gameId", confirmedGameId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
     }
 
     /**

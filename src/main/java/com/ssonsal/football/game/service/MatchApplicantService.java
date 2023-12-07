@@ -5,4 +5,6 @@ import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 public interface MatchApplicantService {
 
     Long applyToGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto);
+
+    Long rejectApplicationAsAway(Long userId, Long gameId, Long matchApplicationId);
 }

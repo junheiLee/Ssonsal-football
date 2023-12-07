@@ -24,6 +24,7 @@ import java.util.Objects;
 import static com.ssonsal.football.game.util.GameConstant.GAME_ID;
 import static com.ssonsal.football.game.util.GameConstant.USER_ID;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -60,6 +61,23 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
         return matchApplication.getId();
     }
+
+    @Transactional
+    public Long rejectApplicationAsAway(Long userId, Long gameId, Long matchApplicationId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+
+        if(!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+            throw new CustomException(FORBIDDEN_USER);
+        }
+
+        MatchApplication matchApplication = matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+        matchApplication.reject();
+
+        return matchApplication.getId();
+    }
+
 
     private void checkDuplicateApplication(Team team, Game game) {
 

@@ -56,7 +56,11 @@ public class MatchApplication extends BaseEntity {
 
     public void approve() {
         this.applicationStatus = ApplicantStatus.APPROVAL.getDescription();
-        game.approvalTeamApplicant(this.applicant, this.team);
+        game.approveTeamApplicant(this.applicant, this.team);
+    }
+
+    public void reject() {
+        this.applicationStatus = ApplicantStatus.REFUSAL.getDescription();
     }
 
     public void changeStatusToWaiting() {
