@@ -104,6 +104,11 @@ public class GameServiceImpl implements GameService {
                 .stream().map(GameListResponseDto::new).collect(Collectors.toList());
     }
 
+    public List<GameListResponseDto> findAllGamesForSub() {
+
+        return gameRepository.searchAllGameForSub();
+    }
+
     private void checkAbleToEnterResult(Game game) {
         if (game.getMatchStatus() != MatchStatus.CONFIRMED.getCodeNumber()) {
             log.error("대기 중이거나 종료된 게임은 결과를 기입할 수 없음.");

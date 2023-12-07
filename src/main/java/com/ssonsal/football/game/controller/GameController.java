@@ -66,5 +66,10 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForTeam());
     }
 
+    @GetMapping("/for-sub")
+    public ResponseEntity<ResponseBodyFormatter> gamesForSub() {
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForSub());
+    }
 
 }

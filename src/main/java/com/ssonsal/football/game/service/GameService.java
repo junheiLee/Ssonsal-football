@@ -16,4 +16,7 @@ public interface GameService {
     GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto);
 
     List<GameListResponseDto> findAllGamesForTeam();
+
+    List<GameListResponseDto> findAllGamesForSub();
+
 }
