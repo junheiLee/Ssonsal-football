@@ -21,7 +21,14 @@ public enum TeamErrorCode implements ResponseCode {
     USER_OTHER_TEAM(HttpStatus.NOT_FOUND, "다른 팀 소속입니다."),
     USER_TEAM_BANNED(HttpStatus.FORBIDDEN, "밴 또는 거절된 팀입니다"),
     USER_NOT_MEMBER(HttpStatus.NOT_FOUND, "팀원이 아닙니다."),
-    DUPLICATE_TEAM_NAME(HttpStatus.CONFLICT, "팀 이름이 중복입니다.");
+    DUPLICATE_TEAM_NAME(HttpStatus.CONFLICT, "팀 이름이 중복입니다."),
+    USER_NOT_REJECT(HttpStatus.NOT_FOUND, "거절 정보가 없습니다."),
+
+    TEAM_NOT_FOUND(HttpStatus.NOT_FOUND, "팀이 존재하지 않습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "유저가 존재하지 않습니다."),
+
+    AMAZONS3_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Amazon S3 이미지 업로드에 실패하였습니다.")
+    ;
 
 
     private final HttpStatus httpStatus;
