@@ -2,6 +2,7 @@ package com.ssonsal.football.game.entity;
 
 
 import com.ssonsal.football.global.entity.BaseEntity;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
 import lombok.Getter;
 
@@ -28,5 +29,9 @@ public class Sub extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
     private Game game;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
 }
