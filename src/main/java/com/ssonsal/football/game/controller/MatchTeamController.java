@@ -41,11 +41,11 @@ public class MatchTeamController {
      * @return 성공 코드와 해당 게임 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-teams")
-    public ResponseEntity<ResponseBodyFormatter> approvalAwayTeam(@PathVariable Long gameId,
+    public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@PathVariable Long gameId,
                                                                   @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         Long userId = 6L;
-        Long confirmedGameId = matchTeamService.approvalAwayTeam(userId, gameId, approvalAwayTeamDto);
+        Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalAwayTeamDto);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap("gameId", confirmedGameId));
     }

@@ -36,7 +36,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchApplicationRepository matchApplicationRepository;
 
     @Transactional
-    public Long applyForGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto) {
 
         // 공통 처리 고안 필수
         User user = userRepository.findById(userId)

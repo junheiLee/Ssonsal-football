@@ -7,7 +7,7 @@ import com.ssonsal.football.game.util.TeamResult;
 
 public interface MatchTeamService {
 
-    Long approvalAwayTeam(Long userId, Long gameId, ApprovalTeamRequestDto approvalAwayTeamDto);
+    Long approveAwayTeam(Long userId, Long gameId, ApprovalTeamRequestDto approvalAwayTeamDto);
 
     GameResultResponseDto enterAwayTeamResult(Game game, TeamResult awayResult);
 

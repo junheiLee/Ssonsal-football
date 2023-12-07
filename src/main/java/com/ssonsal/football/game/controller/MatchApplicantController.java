@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.ssonsal.football.game.util.GameConstant.MATCH_APPLICATION_ID;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -28,15 +30,15 @@ public class MatchApplicantController {
      * @param gameId             url에서 가져오는 해당 게임의 식별자
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
-    @PostMapping("/{gameId}/match-applicants")
-    public ResponseEntity<ResponseBodyFormatter> applyForGameAsAway(
+    @PostMapping("/{gameId}/match-applications")
+    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(
             @RequestBody MatchApplicationRequestDto applicationTeamDto,
             @PathVariable Long gameId) {
 
         Long userId = 7L;
-        Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, applicationTeamDto);
+        Long matchApplicantId = matchApplicantService.applyToGameAsAway(gameId, userId, applicationTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap("matchTeamId", matchTeamId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
     }
 
 

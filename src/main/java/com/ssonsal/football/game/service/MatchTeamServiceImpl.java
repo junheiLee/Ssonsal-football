@@ -43,8 +43,8 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
 
     @Transactional
-    public Long approvalAwayTeam(Long userId, Long gameId,
-                                 ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public Long approveAwayTeam(Long userId, Long gameId,
+                                ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         // 해당 게임
         Game game = gameRepository.findById(gameId)
@@ -71,7 +71,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                 .orElseThrow(() -> new CustomException(NOT_APPLICANT_TEAM, longIdToMap(TEAM_ID, teamId)));
 
         // 승인 로직
-        applicantTeam.approval();
+        applicantTeam.approve();
 
         return game.getId();
     }
