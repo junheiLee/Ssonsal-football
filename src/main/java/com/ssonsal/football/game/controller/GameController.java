@@ -60,18 +60,34 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
     }
 
+    /**
+     * 팀을 구하고 있는 게임 글 목록을 반환하는 api
+     *
+     * @return 상대 팀을 구하고 있는 게임 타이틀 정보 list 반환
+     */
     @GetMapping("/for-team")
     public ResponseEntity<ResponseBodyFormatter> gamesForTeam() {
 
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForTeam());
     }
 
+    /**
+     * 용병을 구하고 있는 게임 글 목록을 반환하는 api
+     *
+     * @return 용병을 구하고 있는 게임 타이틀 정보 list 반환
+     */
     @GetMapping("/for-sub")
     public ResponseEntity<ResponseBodyFormatter> gamesForSub() {
 
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForSub());
     }
 
+    /**
+     * 해당 유저가 용병으로 참여한 게임 글 목록 반환 api
+     *
+     * @param userId    유저 아이디
+     * @return          해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
+     */
     @GetMapping("/subs/{userId}")
     public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
 
