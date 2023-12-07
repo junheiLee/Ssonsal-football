@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -72,6 +73,30 @@ public class GameServiceImpl implements GameService {
                         .build());
 
         return game.getId();
+    }
+
+    @Override
+    @Transactional
+    public Long updateGame(Long userId, Long gameId,
+                           GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+
+        // 요청한 사람이 해당 게임 작성자인지 확인
+        if(!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+            throw new CustomException(FORBIDDEN_USER);
+        }
+
+        // 게임 정보 변경
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
+        game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
+
+        MatchApplication homeTeam = matchApplicationRepository.findByGameAndTeam(game, game.getHome());
+        homeTeam.update(updateHomeTeamDto);
+
+        return gameId;
     }
 
     @Override

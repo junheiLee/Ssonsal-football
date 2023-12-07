@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.GameService;
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
@@ -50,7 +50,7 @@ public class GameController {
                     = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
 
             Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
-            createGameResponseDto = Transfer.longIdToMap("createdGameId", gameId);
+            createGameResponseDto = longIdToMap("createdGameId", gameId);
 
         } catch (JsonProcessingException e) {
             log.error("Request Body의 형식이 다릅니다.");
@@ -59,6 +59,34 @@ public class GameController {
 
         return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
     }
+
+    /*
+    수정 로직은 match status에 따라 수정/삭제 가능 여부가 정해진 후 확정할 수 있음.
+     */
+    //@PutMapping("{gameId}")
+    public ResponseEntity<ResponseBodyFormatter> updateGame(@PathVariable Long gameId, @RequestBody ObjectNode obj) {
+
+        Long userId = 3L;
+        Map<String, Long> updateGameResponseDto;
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            GameRequestDto updateGameDto
+                    = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
+            MatchApplicationRequestDto updateHomeTeamDto
+                    = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
+
+            Long updatedGameId = gameService.updateGame(userId, gameId, updateGameDto, updateHomeTeamDto);
+            updateGameResponseDto = longIdToMap("updatedGameId", updatedGameId);
+
+        } catch (JsonProcessingException e) {
+            log.error("Request Body의 형식이 다릅니다.");
+            throw new CustomException(e, ErrorCode.WRONG_FORMAT);
+        }
+
+        return DataResponseBodyFormatter.put(SUCCESS, updateGameResponseDto);
+    }
+
 
     /**
      * 팀을 구하고 있는 게임 글 목록을 반환하는 api

@@ -75,6 +75,20 @@ public class Game extends BaseEntity {
         this.account = gameRequestDto.getAccount();
     }
 
+    public Game update(LocalDateTime schedule, GameRequestDto gameRequestDto) {
+
+        this.schedule = schedule;
+        this.gameTime = gameRequestDto.getGameTime();
+        this.region = gameRequestDto.getRegion();
+        this.stadium = gameRequestDto.getStadium();
+        this.vsFormat = gameRequestDto.getVsFormat();
+        this.gender = gameRequestDto.getGender();
+        this.rule = gameRequestDto.getRule();
+        this.account = gameRequestDto.getAccount();
+
+        return this;
+    }
+
     public void approveTeamApplicant(User applicant, Team awayTeam) {
         this.awayApplicant = applicant;
         this.away = awayTeam;

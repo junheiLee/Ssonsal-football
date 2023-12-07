@@ -10,5 +10,5 @@ public interface GameRepository extends JpaRepository<Game, Long>, GameRepositor
 
     List<Game> findAllByMatchStatus(int matchStatusCode);
 
-    boolean existsByIdAndWriterEquals(Long id, User writer);
+    boolean existsByIdAndWriterEquals(Long gameId, User writer);
 }
