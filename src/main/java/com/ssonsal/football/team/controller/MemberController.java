@@ -39,6 +39,8 @@ public class MemberController {
 
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (!memberService.isTeamRecruit(teamId)) {
+            throw new CustomException(TeamErrorCode.TEAM_NOT_RECRUIT);
         } else if (memberService.isUserOtherApply(user)) {
             throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
         } else if (teamRejectService.isUserRejected(user, teamId)) {
