@@ -24,5 +24,7 @@ public interface MemberService {
 
     String userBan(Long userId, Long teamId);
 
-    String userBanCancel(Long teamId,Long userId);
+    String userBanCancel(Long teamId, Long userId);
+
+    boolean isTeamRecruit(Long teamId);
 }

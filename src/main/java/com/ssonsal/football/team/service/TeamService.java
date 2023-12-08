@@ -40,5 +40,4 @@ public interface TeamService {
 
     TeamEditFormDto findTeamInfo(Long teamId);
 
-    boolean isTeamRecruit(Long teamId);
 }

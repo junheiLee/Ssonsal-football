@@ -214,4 +214,14 @@ public class MemberServiceImpl implements MemberService {
         return user.getNickname();
     }
 
+    /**
+     * 팀이 모집중인지 확인한다.
+     *
+     * @param teamId 팀 아이디
+     */
+    @Override
+    public boolean isTeamRecruit(Long teamId) {
+
+        return teamRepository.existsByIdAndRecruit(teamId, 1);
+    }
 }
