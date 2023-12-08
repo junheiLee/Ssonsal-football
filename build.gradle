@@ -1,7 +1,16 @@
+/* querydsl */
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.7.17'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	/* querydsl */
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'com.ssonsal'
@@ -33,7 +42,11 @@ dependencies {
 	implementation 'software.amazon.awssdk:sns' // We only need to get SNS SDK in our case
 	implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.1.RELEASE'
 	implementation 'org.springframework.cloud:spring-cloud-aws-autoconfigure:2.2.1.RELEASE'
-	//implementation 'com.querydsl:querydsl-jpa'
+
+
+	/* querydsl */
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -51,4 +64,25 @@ tasks.named('bootBuildImage') {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+/* querydsl */
+/* querydsl 파일 저장할 경로를 String 으로 저장 */
+def querydslDir = "$buildDir/generated/querydsl"
+/* jpa 사용, querydsl 경로 설정 */
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
+/* main.java.src 폴더 내에서 사용 */
+sourceSets {
+	main.java.srcDir querydslDir
+}
+/* querydsl 컴파일 경로 */
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+/* 컴파일 */
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
 }
