@@ -3,6 +3,7 @@ package com.ssonsal.football.game.entity;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
+import lombok.Getter;
 
 import javax.persistence.*;
 
