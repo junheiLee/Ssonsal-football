@@ -17,7 +17,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 
@@ -150,7 +149,7 @@ public class TeamController {
      * 신규 팀을 생성하는 페이지로 이동한다.
      */
     @GetMapping("/form")
-    public String createForm(HttpSession session) {
+    public String createForm() {
 
         Long user = 1L;
 
@@ -171,7 +170,7 @@ public class TeamController {
      */
     @PostMapping
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, HttpSession session) {
+    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto) {
 
         Long user = 1L;
 
@@ -195,7 +194,7 @@ public class TeamController {
      * @return teamEditFormDto 팀 정보 DTO
      */
     @GetMapping("/{teamId}/edit")
-    public String editForm(HttpSession session, Model model, @PathVariable Long teamId) {
+    public String editForm(Model model, @PathVariable Long teamId) {
 
         Long user = 1L;
 
@@ -218,7 +217,7 @@ public class TeamController {
      */
     @PatchMapping
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, HttpSession session) {
+    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto) {
 
         Long user = 1L;
 
