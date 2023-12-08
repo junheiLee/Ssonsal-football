@@ -96,7 +96,7 @@ public class TeamController {
      * @return 팀 아이디에 맞는 팀 정보
      */
     @GetMapping("/{teamId}")
-    public String showDetail(@PathVariable Long teamId, Model model) {
+    public String findDetailOfTeam(@PathVariable Long teamId, Model model) {
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;
@@ -107,7 +107,7 @@ public class TeamController {
             model.addAttribute("userlevel", memberService.isUserLevel(teamId, user));
         }
 
-        model.addAttribute("detail", teamService.findDetail(teamId));
+        model.addAttribute("detail", teamService.findTeamDetail(teamId));
         model.addAttribute("members", teamService.findMemberList(teamId));
 
         return "team/teamDetail";
@@ -120,7 +120,7 @@ public class TeamController {
      * @return 팀 아이디에 맞는 회원 정보와 팀 신청자 정보
      */
     @GetMapping("/{teamId}/managers")
-    public String showManageList(@PathVariable Long teamId, Model model) {
+    public String findManageListOfTeam(@PathVariable Long teamId, Model model) {
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;

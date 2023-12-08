@@ -13,17 +13,15 @@ public interface TeamService {
 
     List<TeamListDto> findAllTeams();
 
-    Integer findRank(Long teamId);
-
     List<TeamListDto> findRecruitList();
 
     List<TeamListDto> findSearchList(String keyword);
 
-    TeamDetailDto findDetail(Long teamId);
+    TeamDetailDto findTeamDetail(Long teamId);
 
     List<TeamMemberListDto> findMemberList(Long teamId);
 
-    String findLeader(Long teamId);
+    String findLeaderName(Long teamId);
 
     Map<String, Object> findManageList(Long teamId);
 
@@ -32,5 +30,6 @@ public interface TeamService {
     String findAgeAverage(Long teamId);
 
     public String findAgeGroup(char second);
+
 
 }
