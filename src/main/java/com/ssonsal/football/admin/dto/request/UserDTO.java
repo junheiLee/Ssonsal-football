@@ -31,7 +31,7 @@ public class UserDTO {
         this.role = role;
     }
 
-
+    //엔티티에 없는 변수들
     public UserDTO build() {
         UserDTO userDTO = new UserDTO();
         userDTO.setAge(age);

@@ -1,11 +1,14 @@
 package com.ssonsal.football.admin.service;
 
+import com.ssonsal.football.admin.dto.request.EmailDTO;
+import com.ssonsal.football.admin.dto.request.MessageDTO;
 import com.ssonsal.football.admin.dto.request.UserDTO;
 import com.ssonsal.football.admin.repository.UserManagementRepository;
 import com.ssonsal.football.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +20,19 @@ public class UserService {
 
     private final UserManagementRepository userManagementRepository;
 
+    @Transactional
+    public  EmailDTO emailService(String emailText) {
+        EmailDTO emailDTO = new EmailDTO();
+
+        emailDTO.setText("안녕하세요, 사용자님! " + emailText);
+
+        log.info("이메일 내용"+emailDTO.getText());
+        log.info("DTO 는 "+emailDTO);
+
+        return emailDTO;
+    }
+
+
     // 유저 리스트
     public List<UserDTO> userList() {
         List<UserDTO> userList = userManagementRepository.findAllUser();
@@ -27,6 +43,7 @@ public class UserService {
         return userList;
     }
 
+    @Transactional
     // 유저 권한 변경
     public void updateRoles(List<Integer> userIds) {
         for (Integer userId : userIds) {
@@ -43,8 +60,14 @@ public class UserService {
 
                 Integer newRole = (user.getRole() == 0) ? 1 : 0;
                 user.updateRole(newRole);
-                userManagementRepository.save(user);
             }
         }
     }
+@Transactional
+    public List<EmailDTO> memberList() {
+        List<EmailDTO> memberList = userManagementRepository.findAllMember();
+
+        return memberList;
+    }
+
 }

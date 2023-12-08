@@ -23,8 +23,8 @@ public class RestGameController {
 
     // 게임 삭제
     @PostMapping("/management")
-    public ResponseEntity<String> deleteGames(@RequestBody Map<String, Object> reqeustData) {
-        List<Integer> gameIds = (List<Integer>) reqeustData.get("gameIds");
+    public ResponseEntity<String> deleteGames(@RequestBody Map<String, Object> requestData) {
+        List<Integer> gameIds = (List<Integer>) requestData.get("gameIds");
 
         log.info("게임 아이디" + gameIds);
 
