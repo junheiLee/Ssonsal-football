@@ -39,4 +39,6 @@ public interface TeamService {
     boolean checkNameDuplicate(String name);
 
     TeamEditFormDto findTeamInfo(Long teamId);
+
+    boolean isTeamRecruit(Long teamId);
 }

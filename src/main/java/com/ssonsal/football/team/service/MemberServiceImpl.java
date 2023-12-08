@@ -193,6 +193,25 @@ public class MemberServiceImpl implements MemberService {
         return user.getNickname();
     }
 
+    /**
+     * 특정 유저의 밴을 해제한다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 대상 유저 아이디
+     * @return 해제된 유저 닉네임
+     */
+    @Override
+    @Transactional
+    public String userBanCancel(Long teamId, Long userId) {
 
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+
+        RejectId rejectId = new RejectId(user, teamId);
+        TeamReject teamReject = new TeamReject(rejectId);
+        teamRejectRepository.delete(teamReject);
+
+        return user.getNickname();
+    }
 
 }
