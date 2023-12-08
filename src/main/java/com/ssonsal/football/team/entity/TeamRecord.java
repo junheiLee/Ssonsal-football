@@ -21,18 +21,17 @@ public class TeamRecord extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    private Integer point;
+    private int point;
 
-    private Integer winCount;
+    private int winCount;
 
-    private Integer drawCount;
+    private int drawCount;
 
-    private Integer loseCount;
+    private int loseCount;
 
-    private Integer totalGameCount;
+    private int totalGameCount;
 
-    @Column(name="team_rank")
-    private Integer rank;
+    private int rank;
 
     public TeamRecord(Team team) {
         this.team = team;

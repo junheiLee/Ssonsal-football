@@ -1,9 +1,11 @@
 package com.ssonsal.football.team.service;
 
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamReject;
+import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -87,7 +89,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean hasAnyTeam(Long userId) {
 
-        return teamRepository.existsByUserId(userId);
+        return teamRepository.existsByUsers_IdAndUsers_TeamIsNotNull(userId);
     }
 
     /**
@@ -137,10 +139,15 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public String userLeaveTeam(Long teamId, Long userId) {
 
-        User user = userRepository.findById(userId).get();
-        user.setTeam(null);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        return teamRepository.findById(teamId).get().getName();
+        user.deleteTeam(user);
+
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        return team.getName();
     }
 
     /**
@@ -154,8 +161,10 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public String leaderDelegate(Long teamId, Long userId) {
 
-        Team team = teamRepository.findById(teamId).get();
-        team.setLeaderId(userId);
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        team.delegateLeader(userId);
 
         return userRepository.findById(userId).get().getNickname();
     }
@@ -171,16 +180,19 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public String userBan(Long userId, Long teamId) {
 
-        User user = userRepository.findById(userId).get();
-        user.setTeam(null);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        RejectId rejectId = new RejectId(userId, teamId);
+        user.deleteTeam(user);
 
+        RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);
 
         teamRejectRepository.save(teamReject);
 
         return user.getNickname();
     }
+
+
 
 }
