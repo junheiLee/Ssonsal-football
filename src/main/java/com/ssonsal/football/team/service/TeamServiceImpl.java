@@ -1,23 +1,29 @@
 package com.ssonsal.football.team.service;
 
-import com.ssonsal.football.team.dto.response.TeamApplyDto;
-import com.ssonsal.football.team.dto.response.TeamDetailDto;
-import com.ssonsal.football.team.dto.response.TeamListDto;
-import com.ssonsal.football.team.dto.response.TeamMemberListDto;
-import com.ssonsal.football.team.entity.AgeFormatter;
-import com.ssonsal.football.team.entity.Team;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.AmazonS3Util;
+import com.ssonsal.football.team.dto.response.*;
+import com.ssonsal.football.team.entity.*;
+import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
+import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
+import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,6 +35,12 @@ public class TeamServiceImpl implements TeamService {
     private final UserRepository userRepository;
     private final TeamRecordRepository teamRecordRepository;
     private final TeamApplyRepository teamApplyRepository;
+    private final TeamRejectRepository teamRejectRepository;
+
+    private final AmazonS3Util amazonS3Util;
+
+    private final String defaultImg = "https://clclt-s3-1.s3.ap-northeast-2.amazonaws.com/normalTeam.png";
+
 
     /**
      * 모든 팀을 내림차순으로 정렬해서 가져온다.
@@ -38,12 +50,10 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> findAllTeams() {
 
-        List<TeamListDto> teams = teamRepository.findAllByOrderByIdDesc();
-
-        for (TeamListDto teamListDto : teams) {
-            teamListDto.setRank(findRank(teamListDto.getId()));
-            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
-        }
+        List<Team> teamList = teamRepository.findAllByOrderByIdDesc();
+        List<TeamListDto> teams = teamList.stream()
+                .map(team -> new TeamListDto(team, findRank(team.getId()), findAgeAverage(team.getId())))
+                .collect(Collectors.toList());
 
         return teams;
     }
@@ -56,13 +66,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> findRecruitList() {
 
-        List<TeamListDto> teams = teamRepository.findAllByRecruitOrderByIdDesc(1);
+        List<Team> teamList = teamRepository.findAllByRecruitOrderByIdDesc(1);
 
-        for (TeamListDto teamListDto : teams) {
-            teamListDto.setRank(findRank(teamListDto.getId()));
-            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
-        }
-
+        List<TeamListDto> teams = teamList.stream()
+                .map(team -> new TeamListDto(team, findRank(team.getId()), findAgeAverage(team.getId())))
+                .collect(Collectors.toList());
 
         return teams;
     }
@@ -76,12 +84,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> findSearchList(String keyword) {
 
-        List<TeamListDto> teams = teamRepository.findByNameContaining(keyword);
+        List<Team> teamList = teamRepository.findAllByNameContaining(keyword);
 
-        for (TeamListDto teamListDto : teams) {
-            teamListDto.setRank(findRank(teamListDto.getId()));
-            teamListDto.setAgeAverage(findAgeAverage(teamListDto.getId()));
-        }
+        List<TeamListDto> teams = teamList.stream()
+                .map(team -> new TeamListDto(team, findRank(team.getId()), findAgeAverage(team.getId())))
+                .collect(Collectors.toList());
 
         return teams;
     }
@@ -93,12 +100,15 @@ public class TeamServiceImpl implements TeamService {
      * @return 팀 상세정보
      */
     @Override
-    public TeamDetailDto findDetail(Long teamId) {
+    public TeamDetailDto findTeamDetail(Long teamId) {
 
-        TeamDetailDto teamDetailDto = teamRepository.findTeamDtoWithRecord(teamId);
+        TeamRecord teamRecord = teamRecordRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        teamDetailDto.setRanking(findRank(teamId));
-        teamDetailDto.setLeaderName(findLeader(teamId));
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        TeamDetailDto teamDetailDto = new TeamDetailDto(team, teamRecord, team.getUsers().size());
 
         return teamDetailDto;
     }
@@ -112,9 +122,15 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamMemberListDto> findMemberList(Long teamId) {
 
-        List<TeamMemberListDto> teamMembers = teamRepository.findTeamMemberDtoById(teamId);
+        List<User> users = teamRepository.findById(teamId)
+                .map(Team::getUsers)
+                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        return teamMembers;
+        List<TeamMemberListDto> memberList = users.stream()
+                .map(member -> new TeamMemberListDto(member, calculateAge(member.getBirth())))
+                .collect(Collectors.toList());
+
+        return memberList;
     }
 
     /**
@@ -124,11 +140,15 @@ public class TeamServiceImpl implements TeamService {
      * @return 팀장 닉네임
      */
     @Override
-    public String findLeader(Long teamId) {
+    public String findLeaderName(Long teamId) {
 
-        Team leaderId = teamRepository.findById(teamId).get();
+        Team leaderId = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        return userRepository.findById(leaderId.getLeaderId()).get().getNickname();
+        User user = userRepository.findById(leaderId.getLeaderId()).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+
+        return user.getNickname();
     }
 
     /**
@@ -142,10 +162,11 @@ public class TeamServiceImpl implements TeamService {
 
         Map<String, Object> manage = new HashMap<>();
 
-        manage.put("teamLeader", findLeader(teamId));
+        manage.put("teamLeader", findLeaderName(teamId));
         manage.put("teamId", teamId);
         manage.put("members", findMemberList(teamId));
         manage.put("applys", findApplyList(teamId));
+        manage.put("rejects", findRejectList(teamId));
 
         return manage;
     }
@@ -159,23 +180,30 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamApplyDto> findApplyList(Long teamId) {
 
-        List<TeamApplyDto> applys = teamApplyRepository.findTeamAppliesWithUserAge(teamId);
+        List<TeamApply> applys = teamApplyRepository.findAllByTeamId(teamId);
 
-        return applys;
+        List<TeamApplyDto> applyList = applys.stream()
+                .map(apply -> new TeamApplyDto(apply, calculateAge(apply.getUser().getBirth())))
+                .collect(Collectors.toList());
+
+        return applyList;
     }
 
     /**
-     * 팀 랭킹을 구한다
+     * 팀의 거절 또는 밴 유저 목록을 가져온다.
      *
-     * @param teamId 팀 아이디
-     * @return 팀 랭킹값
+     * @param teamId
+     * @return
      */
-    @Override
-    public Integer findRank(Long teamId) {
+    public List<TeamRejectDto> findRejectList(Long teamId) {
 
-        Integer ranking = teamRecordRepository.findRankById(teamId);
+        List<TeamReject> rejects = teamRejectRepository.findAllByRejectId_TeamId(teamId);
 
-        return ranking;
+        List<TeamRejectDto> rejectList = rejects.stream()
+                .map(reject -> new TeamRejectDto(reject, calculateAge(reject.getRejectId().getUser().getBirth())))
+                .collect(Collectors.toList());
+
+        return rejectList;
     }
 
     /**
@@ -186,30 +214,77 @@ public class TeamServiceImpl implements TeamService {
      */
     @Override
     public String findAgeAverage(Long teamId) {
-        Integer average = teamRepository.getTeamAgeAverage(teamId);
 
-        String numberAsString = Integer.toString(average);
-        int firstNumber = (average / 10) * 10;
+        List<User> users = teamRepository.findById(teamId)
+                .map(Team::getUsers)
+                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        return firstNumber + findAgeGroup(numberAsString.charAt(1));
+        OptionalDouble averageValue = users.stream()
+                .map(user -> calculateAge(user.getBirth()))
+                .mapToDouble(Integer::doubleValue)
+                .average();
+
+        double average = averageValue.orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        String numberAsString = Double.toString(average);
+        int frontOfAge = (int) Math.floor(average / 10) * 10;
+
+        return frontOfAge + findAgeGroup(numberAsString.charAt(1));
     }
 
     /**
-     * * 팀 평균 나이대를 구한다.
+     * 팀 평균 나이대를 구한다.
      *
      * @param secondNumber 나이대 뒷자리
      * @return 초반/중반/후반 문자열
      */
     @Override
     public String findAgeGroup(char secondNumber) {
-        int second = Character.getNumericValue(secondNumber);
-        if (second >= 0 && second <= 3) {
+        int backOfAge = Character.getNumericValue(secondNumber);
+
+        if (backOfAge >= 0 && backOfAge <= 3) {
             return AgeFormatter.EARLY.getAgeGroup();
-        } else if (second >= 4 && second <= 6) {
+        } else if (backOfAge >= 4 && backOfAge <= 6) {
             return AgeFormatter.MID.getAgeGroup();
-        } else {
-            return AgeFormatter.LATE.getAgeGroup();
         }
+
+        return AgeFormatter.LATE.getAgeGroup();
     }
+
+    /**
+     * 유저의 현재 나이를 구한다.
+     *
+     * @param birth 유저의 생일
+     * @return 현재 나이
+     */
+    private int calculateAge(LocalDate birth) {
+
+        LocalDate currentDate = LocalDate.now();
+        LocalDateTime birthDateTime = birth.atStartOfDay();
+
+        long age = ChronoUnit.YEARS.between(birthDateTime, LocalDateTime.now());
+
+        if (birthDateTime.plusYears(age).isAfter(LocalDateTime.now())) {
+            age--;
+        }
+
+        return (int) age;
+    }
+
+    /**
+     * 팀의 랭킹을 가져온다.
+     *
+     * @param teamId 팀 아이디
+     * @return 팀 랭킹
+     */
+    public Integer findRank(Long teamId) {
+
+        TeamRecord teamRecord = teamRecordRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        return teamRecord.getRank();
+    }
+
 
 }
