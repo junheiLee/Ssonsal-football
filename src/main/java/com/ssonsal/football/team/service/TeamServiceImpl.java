@@ -2,6 +2,8 @@ package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.AmazonS3Util;
+import com.ssonsal.football.team.dto.request.TeamCreateDto;
+import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.team.dto.response.*;
 import com.ssonsal.football.team.entity.*;
 import com.ssonsal.football.team.exception.TeamErrorCode;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -111,6 +114,139 @@ public class TeamServiceImpl implements TeamService {
         TeamDetailDto teamDetailDto = new TeamDetailDto(team, teamRecord, team.getUsers().size());
 
         return teamDetailDto;
+    }
+
+    /**
+     * 팀을 생성한다.
+     *
+     * @param teamCreateDto 팀 생성 정보 DTO
+     * @param user          생성자 아이디
+     * @return map 생성된 팀 번호,팀 명
+     */
+    @Override
+    @Transactional
+    public Map<String, String> createTeam(TeamCreateDto teamCreateDto, Long user) {
+
+        String key = "";
+        String url = "";
+
+        if (!teamCreateDto.getLogo().isEmpty()) {
+            try {
+                key = amazonS3Util.upload(teamCreateDto.getLogo(), "teamLogo");
+            } catch (IOException e) {
+                log.error("S3에 이미지 저장 실패");
+                throw new CustomException(TeamErrorCode.AMAZONS3_ERROR);
+            }
+
+            url = amazonS3Util.getFileUrl(key);
+
+        } else {
+            url = defaultImg;
+        }
+
+        User userInfo = userRepository.findById(user).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+
+        teamCreateDto.setLeaderId(user);
+        Team team = teamCreateDto.toEntity(teamCreateDto, url, key);
+
+        Team newTeam = teamRepository.save(team);
+
+        TeamRecord teamRecord = new TeamRecord(newTeam);
+        teamRecordRepository.save(teamRecord);
+
+        userInfo.joinTeam(newTeam);
+
+        Map map = new HashMap<>();
+        map.put("id", newTeam.getId());
+        map.put("name", newTeam.getName());
+
+        return map;
+    }
+
+    /**
+     * 수정폼에 팀의 특정 값을 미리 불러온다.
+     *
+     * @param teamId 팀 아이디
+     * @return TeamEditFormDto 수정할 수 있는 값
+     */
+    @Override
+    public TeamEditFormDto findTeamInfo(Long teamId) {
+
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        TeamEditFormDto teamEditFormDto = new TeamEditFormDto(team);
+
+        return teamEditFormDto;
+    }
+
+
+    /**
+     * 팀 정보를 수정한다.
+     *
+     * @param teamEditDto 수정된 팀 정보
+     * @return 팀 번호
+     */
+    @Override
+    @Transactional
+    public Long editTeam(TeamEditDto teamEditDto) {
+
+        Team team = teamRepository.findById(teamEditDto.getId()).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        String key = team.getLogoKey();
+        String url = team.getLogoUrl();
+
+        if (!teamEditDto.getLogo().isEmpty()) {
+            try {
+                key = amazonS3Util.upload(teamEditDto.getLogo(), "teamLogo");
+            } catch (IOException e) {
+                log.error("S3에 이미지 저장 실패");
+                throw new CustomException(TeamErrorCode.AMAZONS3_ERROR);
+            }
+
+            url = amazonS3Util.getFileUrl(key);
+
+            if (team.getLogoKey() != null) {
+                amazonS3Util.delete(team.getLogoKey());
+            }
+
+        }
+
+        team.TeamUpdate(teamEditDto, url, key);
+
+        return team.getId();
+    }
+
+    /**
+     * 생성하는 팀 이름 중복체크 하기
+     *
+     * @param name 팀 이름
+     */
+    public boolean checkNameDuplicate(String name) {
+
+        return teamRepository.existsByName(name);
+    }
+
+    /**
+     * 수정하는 팀 이름 중복체크 하기
+     * 정보를 수정하는 팀의 현재 이름은 중복에서 제외한다.
+     *
+     * @param name   팀 이름
+     * @param teamId 팀 아이디
+     */
+    @Override
+    public boolean checkNameDuplicate(String name, Long teamId) {
+
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+
+        if (team.getName().equals(name)) {
+            return false;
+        }
+
+        return teamRepository.existsByName(name);
     }
 
     /**

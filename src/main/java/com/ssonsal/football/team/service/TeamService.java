@@ -1,9 +1,8 @@
 package com.ssonsal.football.team.service;
 
-import com.ssonsal.football.team.dto.response.TeamApplyDto;
-import com.ssonsal.football.team.dto.response.TeamDetailDto;
-import com.ssonsal.football.team.dto.response.TeamListDto;
-import com.ssonsal.football.team.dto.response.TeamMemberListDto;
+import com.ssonsal.football.team.dto.request.TeamCreateDto;
+import com.ssonsal.football.team.dto.request.TeamEditDto;
+import com.ssonsal.football.team.dto.response.*;
 
 import java.util.List;
 import java.util.Map;
@@ -31,5 +30,13 @@ public interface TeamService {
 
     public String findAgeGroup(char second);
 
+    Long editTeam(TeamEditDto teamEditDto);
 
+    Map<String, String> createTeam(TeamCreateDto teamCreateDto, Long user);
+
+    boolean checkNameDuplicate(String name, Long teamId);
+
+    boolean checkNameDuplicate(String name);
+
+    TeamEditFormDto findTeamInfo(Long teamId);
 }

@@ -1,16 +1,24 @@
 package com.ssonsal.football.team.controller;
 
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import com.ssonsal.football.team.dto.request.TeamCreateDto;
+import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.team.entity.Role;
+import com.ssonsal.football.team.exception.TeamErrorCode;
+import com.ssonsal.football.team.exception.TeamSuccessCode;
 import com.ssonsal.football.team.service.MemberService;
 import com.ssonsal.football.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 
 @Controller
@@ -138,4 +146,90 @@ public class TeamController {
         return "team/teamManage";
     }
 
+    /**
+     * 신규 팀을 생성하는 페이지로 이동한다.
+     */
+    @GetMapping("/form")
+    public String createForm(HttpSession session) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            return "login";
+        } else if (memberService.hasAnyTeam(user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_ALREADY_TEAM);
+        }
+
+        return "teamCreate";
+    }
+
+    /**
+     * 팀을 생성한다.
+     *
+     * @param teamCreateDto
+     * @return 생성된 팀 번호,팀 명
+     */
+    @PostMapping
+    @ResponseBody
+    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, HttpSession session) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (memberService.hasAnyTeam(user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_ALREADY_TEAM);
+        } else if (memberService.isUserOtherApply(user)) {
+            throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
+        } else if (teamService.checkNameDuplicate(teamCreateDto.getName())) {
+            throw new CustomException(TeamErrorCode.DUPLICATE_TEAM_NAME);
+        }
+
+        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_CREATED, teamService.createTeam(teamCreateDto, user));
+    }
+
+    /**
+     * 팀 정보 수정 페이지를 불러온다.
+     *
+     * @param teamId
+     * @return teamEditFormDto 팀 정보 DTO
+     */
+    @GetMapping("/{teamId}/edit")
+    public String editForm(HttpSession session, Model model, @PathVariable Long teamId) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            return "login";
+        } else if (!memberService.isTeamLeader(teamId, user)) {
+            return "redirect:/teams/" + teamId;
+        }
+
+        model.addAttribute("form", teamService.findTeamInfo(teamId));
+
+        return "teamEdit";
+    }
+
+    /**
+     * 팀 정보를 수정한다.
+     *
+     * @param teamEditDto
+     * @return 팀 아이디 값
+     */
+    @PatchMapping
+    @ResponseBody
+    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, HttpSession session) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (!memberService.isTeamLeader(teamEditDto.getId(), user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
+        } else if (teamService.checkNameDuplicate(teamEditDto.getName(), teamEditDto.getId())) {
+            throw new CustomException(TeamErrorCode.DUPLICATE_TEAM_NAME);
+        }
+
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_EDIT_SUCCESS, teamService.editTeam(teamEditDto));
+    }
 }
