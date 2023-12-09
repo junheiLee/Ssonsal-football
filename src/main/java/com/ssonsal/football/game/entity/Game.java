@@ -43,14 +43,17 @@ public class Game extends BaseEntity {
     private LocalDateTime schedule;
 
     @NotNull
+    @JoinColumn(name = "game_time")
     private int gameTime;
 
     private String region;
     private String stadium;
+    @JoinColumn(name = "vs_format")
     private int vsFormat;
     private String gender;
     private String rule;
     private Integer account;
+
     private int deleteCode;
     private String hometeamResult;
     private String awayteamResult;

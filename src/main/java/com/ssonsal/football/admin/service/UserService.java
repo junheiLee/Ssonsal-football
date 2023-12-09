@@ -1,8 +1,9 @@
 package com.ssonsal.football.admin.service;
 
+import com.ssonsal.football.admin.dto.request.AlarmDTO;
 import com.ssonsal.football.admin.dto.request.EmailDTO;
-import com.ssonsal.football.admin.dto.request.MessageDTO;
 import com.ssonsal.football.admin.dto.request.UserDTO;
+import com.ssonsal.football.admin.entity.Alarm;
 import com.ssonsal.football.admin.repository.UserManagementRepository;
 import com.ssonsal.football.user.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -62,12 +63,6 @@ public class UserService {
                 user.updateRole(newRole);
             }
         }
-    }
-@Transactional
-    public List<EmailDTO> memberList() {
-        List<EmailDTO> memberList = userManagementRepository.findAllMember();
-
-        return memberList;
     }
 
 }
