@@ -98,7 +98,7 @@ function teamLeave(teamId){
     	}
 }
 
-function leaderDelegate(teamId,userId){
+function delegateLeader(teamId,userId){
 
     	if(confirm("정말 팀장을 위임하시겠습니까?")){
            $.ajax({
@@ -113,7 +113,7 @@ function leaderDelegate(teamId,userId){
     	}
 }
 
-function userBan(teamId,userId){
+function banUser(teamId,userId){
 
     	if(confirm("정말 밴하시겠습니까?")){
            $.ajax({

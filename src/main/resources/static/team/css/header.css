@@ -8,8 +8,26 @@
 }
 
 
-*{box-sizing: border-box; font-weight: bold; font-family: 'NanumSquareNeo-Variable';}
+
+
+
+*{  margin:0;
+    padding:0;
+    box-sizing: border-box;
+     font-weight: bold; font-family: 'NanumSquareNeo-Variable';}
 #wrap{width:100%;height:auto;}
+
+a{
+  color:#000;
+  text-decoration: none;
+  display: block;
+}
+li{
+  list-style: none;
+}
+button{
+  border: none;
+}
 
 header{display:flex; width:100%; height:80px; padding:0 6vw; margin:auto; background-color: #2A8757;}
 header > .logoBox{width:10vw;}
@@ -25,4 +43,3 @@ header > div > ul > li > a:hover{color:#fff;}
 
 .logInBt{width:30px; height:100%;} 
 .logInBt > button{ margin:0 auto;width:100%; height:30px; color:#2A8757; box-shadow:0 2px 2px 0 #888; margin-top:25px; border-radius: 3px; background-color: #fff;}
-
