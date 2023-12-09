@@ -60,8 +60,8 @@
                     <span th:text="${member.age}"></span><span th:if="${member.gender == 1}" th:text="여자"></span>
                     <span th:if="${member.gender == 0}" th:text="남자"></span><span th:text="${member.position}"></span></a></div>
                 <div class="leaderbtn" th:if="${member.nickname != manage.teamLeader}">
-                    <button th:onclick="'leaderDelegate(\'' + ${manage.teamId} + '\', \'' + ${member.id} + '\');'">위임</button>
-                    <button th:onclick="'userBan(\'' + ${manage.teamId} + '\', \'' + ${member.id} + '\');'">추방</button>
+                    <button th:onclick="'delegateLeader(\'' + ${manage.teamId} + '\', \'' + ${member.id} + '\');'">위임</button>
+                    <button th:onclick="'banUser(\'' + ${manage.teamId} + '\', \'' + ${member.id} + '\');'">추방</button>
                 </div>
             </div>
         </div>

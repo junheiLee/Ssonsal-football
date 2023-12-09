@@ -84,7 +84,7 @@ public class MemberController {
      * @return 성공 여부
      */
     @DeleteMapping("/{teamId}/users")
-    public ResponseEntity<ResponseBodyFormatter> userLeaveTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId) {
 
         // 추후 토큰값으로 교체할 부분임
         Long user = 1L;
@@ -99,7 +99,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_OTHER_TEAM);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_LEAVE, memberService.userLeaveTeam(teamId, user));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_LEAVE, memberService.leaveTeam(teamId, user));
     }
 
     /**
@@ -156,7 +156,7 @@ public class MemberController {
      * @return 위임받은 팀장 닉네임
      */
     @PatchMapping("/{teamId}/managers/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> leaderDelegate(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
 
@@ -168,7 +168,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_MEMBER);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_DELEGATE_SUCCESS, memberService.leaderDelegate(teamId, userId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_DELEGATE_SUCCESS, memberService.delegateLeader(teamId, userId));
     }
 
     /**
@@ -179,7 +179,7 @@ public class MemberController {
      * @return 퇴출당한 회원의 닉네임
      */
     @DeleteMapping("/{teamId}/managers/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userBan(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
 
@@ -197,6 +197,6 @@ public class MemberController {
             }
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, memberService.userBan(userId, teamId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, memberService.banUser(userId, teamId));
     }
 }

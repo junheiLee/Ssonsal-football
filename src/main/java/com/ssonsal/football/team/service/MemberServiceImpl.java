@@ -137,7 +137,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String userLeaveTeam(Long teamId, Long userId) {
+    public String leaveTeam(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
@@ -159,7 +159,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String leaderDelegate(Long teamId, Long userId) {
+    public String delegateLeader(Long teamId, Long userId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
@@ -178,7 +178,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String userBan(Long userId, Long teamId) {
+    public String banUser(Long userId, Long teamId) {
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
@@ -202,7 +202,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String userBanCancel(Long teamId, Long userId) {
+    public String banUserCancel(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
