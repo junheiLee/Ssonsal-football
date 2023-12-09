@@ -1,7 +1,9 @@
 package com.ssonsal.football.team.entity;
 
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.entity.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -33,7 +35,32 @@ public class TeamRecord extends BaseEntity {
 
     private int rank;
 
+
     public TeamRecord(Team team) {
         this.team = team;
     }
+
+    @Builder
+    public TeamRecord(int winCount, int drawCount, int loseCount) {
+        this.winCount = winCount;
+        this.drawCount = drawCount;
+        this.loseCount = loseCount;
+    }
+
+    public TeamRecord update(TeamRecord updateRecord) {
+        this.winCount += updateRecord.winCount;
+        this.drawCount += updateRecord.drawCount;
+        this.loseCount += updateRecord.loseCount;
+        this.totalGameCount++;
+        this.point = (this.winCount * (TeamResult.WIN.getScore() + 1))
+                + (this.drawCount * TeamResult.DRAW.getScore())
+                + (this.loseCount * TeamResult.LOSE.getScore());
+
+        return this;
+    }
+
+//    public TeamRecord enterTeamToRecordSet(Team team){
+//        this.team = team;
+//        return this;
+//    }
 }
