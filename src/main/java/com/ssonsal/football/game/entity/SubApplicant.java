@@ -5,11 +5,13 @@ import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "sub_applicant", uniqueConstraints = {
         @UniqueConstraint(
@@ -42,6 +44,10 @@ public class SubApplicant extends BaseEntity {
         this.subApplicantStatus = subApplicantStatus;
     }
 
+    public SubApplicant(MatchApplication matchApplication, User user) {
+        this.matchApplication = matchApplication;
+        this.user = user;
+    }
     public void UpdateSubStatus(String subApplicantStatus){
         this.subApplicantStatus=subApplicantStatus;
     }

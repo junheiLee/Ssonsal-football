@@ -23,7 +23,7 @@ public class SubRestController {
 
     @PostMapping("/{gameId}/teams/{teamId}/sub-applicants") // 용병 신청
     public String SubApply(@PathVariable Long gameId, @PathVariable Long teamId){
-        Long userId = 1L;
+        Long userId = 1L; // 용병 신청한 사람 아이디
         return subService.subApplicant(userId,gameId,teamId);
     }
 

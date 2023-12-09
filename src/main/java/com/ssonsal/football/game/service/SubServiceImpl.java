@@ -75,7 +75,7 @@ public class SubServiceImpl implements SubService {
 
         // 필요 용병 수 확인해서 필요없으면 신청 불가(matchteam ->subAcount)
         //신청한 팀과 신청한 사람의 소속이 같지 않을때 신청가능
-        if(0 >= matchApplication.getSubCount() && teamId != user.getTeam().getId()){
+        if(0 >= matchApplication.getSubCount() && teamId == user.getTeam().getId()){
             throw new CustomException(SubErrorCode.CLOSED);
         }else{
 
@@ -110,6 +110,13 @@ public class SubServiceImpl implements SubService {
             // 승인 후 용병 카운트 -1 (matchteam ->subAcount)
             matchApplication.decreaseSubCount();
             request="Success";
+
+            // 승인된 용병을 Sub 테이블에 추가하기
+            Sub savedSub = subRepository.save(Sub.builder()
+                    .user(subApplicants.getUser())
+                    .game(subApplicants.getMatchApplication().getGame())
+                    .matchApplication(subApplicants.getMatchApplication())
+                    .build());
         }
         return request;
     }
