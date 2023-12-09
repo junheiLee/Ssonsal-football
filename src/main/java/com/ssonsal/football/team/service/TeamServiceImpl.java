@@ -11,6 +11,7 @@ import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
+import com.ssonsal.football.team.util.TeamConstant;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,8 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.team.util.TeamConstant.DEFAULT_IMAGE;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,7 +45,6 @@ public class TeamServiceImpl implements TeamService {
 
     private final AmazonS3Util amazonS3Util;
 
-    private final String defaultImg = "https://clclt-s3-1.s3.ap-northeast-2.amazonaws.com/normalTeam.png";
 
 
     /**
@@ -141,7 +143,7 @@ public class TeamServiceImpl implements TeamService {
             url = amazonS3Util.getFileUrl(key);
 
         } else {
-            url = defaultImg;
+            url = DEFAULT_IMAGE;
         }
 
         User userInfo = userRepository.findById(user).orElseThrow(
