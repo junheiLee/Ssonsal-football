@@ -1,11 +1,14 @@
 package com.ssonsal.football.admin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonsal.football.admin.dto.request.AlarmDTO;
 import com.ssonsal.football.admin.dto.response.ResponseEmailDTO;
+import com.ssonsal.football.admin.exception.AdminErrorCode;
+import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.admin.service.CredentialService;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,8 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.*;
 
-import javax.servlet.http.HttpSession;
-import java.util.Map;
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RestController
@@ -24,10 +26,7 @@ import java.util.Map;
 @RequestMapping("/admin")
 public class SnsController {
 
-
     private final AlarmService alarmService;
-
-    private final CredentialService credentialService;
 
     private ResponseStatusException getResponseStatusException(SnsResponse response) {
         return new ResponseStatusException(
@@ -35,184 +34,133 @@ public class SnsController {
         );
     }
 
-    // 주제 생성
+    /**
+     * 주제 생성
+     * aws sns관리를 위한 topic 생성
+     * SsonsalEmail 과 SsonsalSMS를 만들 예정이며
+     * 이 부분은 관리자 페이지에서 보여지지 않고 단 2개만 생성해 쓸 것이다
+     *
+     * @param topicName topicName은 주제 이름이 된다
+     * @return 토픽을 생성하며 성공 메시지 반환
+     */
+
     @PostMapping("/createTopic")
-    public ResponseEntity<String> createTopic(@RequestParam final String topicName) {
-        final CreateTopicRequest createTopicRequest = CreateTopicRequest.builder()
-                .name(topicName)
-                .build();
-        SnsClient snsClient = credentialService.getSnsClient();
-        final CreateTopicResponse createTopicResponse = snsClient.createTopic(createTopicRequest);
+    public ResponseEntity<ResponseBodyFormatter> createTopic(@RequestParam final String topicName) {
 
-        if (!createTopicResponse.sdkHttpResponse().isSuccessful()) {
-            throw getResponseStatusException(createTopicResponse);
+
+        if (topicName == null) {
+            throw new CustomException(AdminErrorCode.TOPIC_CREATE_FAILED);
         }
-        log.info("topic name = " + createTopicResponse.topicArn());
-        log.info("topic list = " + snsClient.listTopics())  ;
-        snsClient.close();
-        return new ResponseEntity<>("TOPIC CREATING SUCCESS", HttpStatus.OK);
+
+        alarmService.createTopic(topicName);
+        return ResponseBodyFormatter.put(AdminSuccessCode.TOPIC_CREATE_SUCCESS);
+
     }
 
-
-    // 이메일 구독
+    /**
+     * 이메일 구독
+     * 이메일을 수신을 원하는 사용자에게 이메일 서비스를 제공한다
+     * 생성된 주제에 회원들을 구독하면 인증된 회원들에게 이메일을 보낼 수 있다
+     * 구독을 실행하면 AWS에서 구독 인증 이메일이 발송된다
+     *
+     * @param topicArn 생성된 주제로 보내야 한다
+     * @return 주제와 회원아이디를 보낸다
+     */
     @PostMapping("/memberSubscribe")
-    public ResponseEntity<AlarmDTO> subscribeAllMembers(@RequestParam final String topicArn) {
-
-        Long userId = 2L; // 특정 유저 아이디를 지정
-        String userEmail = alarmService.getUserByEmail(userId);
-
-           log.info("유저 아이디"+userEmail);
-
-       // String userEmail = (String) session.getAttribute("userEmail");
-
-
-
-        SnsClient snsClient = credentialService.getSnsClient();
-
-        SubscribeRequest subscribeRequest = SubscribeRequest.builder()
-                .protocol("email")
-                .topicArn(topicArn)
-                .endpoint(userEmail)
-                .build();
-
-        SubscribeResponse subscribeResponse = snsClient.subscribe(subscribeRequest);
-
-        log.info("구독 request"+subscribeRequest);
-        log.info("구독 Response"+subscribeResponse);
-
-        if (!subscribeResponse.sdkHttpResponse().isSuccessful()) {
-            throw getResponseStatusException(subscribeResponse);
-        }
-
-        // DB에 정보 저장 (subscriptionArn은 아직 pending confirmation 상태로 가정)
-        AlarmDTO alarmEmailInfo =alarmService.saveAlarmInfo(topicArn, "pending confirmation",userEmail);
-
-        log.info("구독 정보"+ alarmEmailInfo);
-
-        log.info("Subscribed member: " + userEmail);
-        snsClient.close();
-
-        return new ResponseEntity<AlarmDTO>(alarmEmailInfo, HttpStatus.OK);
-    }
-
-    @PostMapping("/confirm-subscription")
-    public ResponseEntity<String> confirmSubscription(@RequestParam String topicArn, @RequestBody ResponseEmailDTO responseEmailDTO) {
+    public ResponseEntity<ResponseBodyFormatter> subscribeAllMembers(@RequestParam final String topicArn) {
         Long userId = 2L;
-        String confirmSubscriptionArn = responseEmailDTO.getSubscriptionArn();
-        String infoEmail = responseEmailDTO.getUserEmail();
 
-        // 사용자 정보 가져오기
-        String userByEmail = alarmService.getUserByEmail(userId);
-
-        log.info("가져온 이메일: " + infoEmail);
-        log.info("현재 유저 이메일: " + userByEmail);
-
-        // 이메일 일치 여부 확인
-        if (infoEmail == null || !infoEmail.equals(userByEmail)) {
-            return new ResponseEntity<>("유효하지 않은 사용자 이메일", HttpStatus.BAD_REQUEST);
+        if (userId == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
-        SnsClient snsClient = credentialService.getSnsClient();
-
-        // ListSubscriptionsByTopic으로 Subscription 정보 가져오기
-        ListSubscriptionsByTopicRequest listRequest = ListSubscriptionsByTopicRequest.builder()
-                .topicArn(topicArn)
-                .build();
-
-        ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
-
-        // Subscription 정보 확인
-        for (Subscription subscription : listResponse.subscriptions()) {
-            String subscriptionArn = subscription.subscriptionArn();
-            String endpoint = subscription.endpoint();
-            log.info(endpoint+"엔드포인트");
-            log.info(subscriptionArn+"구독 arn");
-
-            // 이메일과 endpoint 일치 여부 확인
-            if (userByEmail.equals(endpoint)) {
-                if ("PendingConfirmation".equals(subscriptionArn)) {
-                    return new ResponseEntity<>("구독 확인이 안됬습니다. 다시 확인해 주세요", HttpStatus.NOT_FOUND);
-                } else {
-                    return new ResponseEntity<>("구독 확인이 되었습니다. 감사합니다", HttpStatus.OK);
-                }
-            }
-        }
-
-        return new ResponseEntity<>("해당 유저의 구독 정보를 찾을 수 없습니다", HttpStatus.NOT_FOUND);
-    }
-
-    // 이메일 전송 메서드
-    @PostMapping("/publishEmail")
-    public ResponseEntity publish(@RequestParam String topicArn,
-                          @RequestParam int number
-                         //,@RequestParam String text
-                                  ) {
         try {
-            SnsClient snsClient = credentialService.getSnsClient();
-
-            // 하드코딩된 텍스트
-            String text = "hello";
-
-            final PublishRequest publishRequest = PublishRequest.builder()
-                    .topicArn(topicArn)
-                    .subject("HTTP ENDPOINT TEST MESSAGE")
-                    .message(text)  // 수정된 부분
-                    .build();
-
-            log.info("메세지 내용"+text);
-            // SNS 주제에 메시지 발송
-             PublishResponse publishResponse = snsClient.publish(publishRequest);
-
-            log.info("Message published to topic: " + topicArn);
-
-            snsClient.close();
-            log.info("글3"+text);
-            return new ResponseEntity<>("Message published successfully. MessageId: " + publishResponse.messageId(), HttpStatus.OK);
+            alarmService.subscribeEmail(topicArn, userId);
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeEmail(topicArn, userId));
         } catch (Exception e) {
-            log.error("Error publishing message: " + e.getMessage(), e);
-            return new ResponseEntity<>("Error publishing message: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("이메일 구독 에러", e);
+            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
         }
     }
 
-    // email 구독 취소
-    @DeleteMapping("/unsubscribeEmail")
-    public ResponseEntity<String> unsubscribe(@RequestParam String topicArn) {
-        Long userId = 2L;  // 유저 ID를 어떻게 가져올지에 따라 수정 필요
-        String userByEmail = alarmService.getUserByEmail(userId);
+    /**
+     * 구독 인증 확인
+     * 구독 인증메일이 발송되면 사용자들은 구독 인증을 확인해야한다
+     * 구독 인증이 완료된것이 확인되면 요청이 완료된다
+     *
+     * @param topicArn         생성된 주제로 보내야 한다
+     * @param responseEmailDTO
+     * @return 주제와 회원 email 정보와 로그인한 유저를 담아 보낸다
+     */
+    @PostMapping("/confirm-subscription")
+    public ResponseEntity<ResponseBodyFormatter> confirmSubscription(@RequestParam String topicArn, @RequestBody ResponseEmailDTO responseEmailDTO) {
+        Long userId = 2L;
 
-        SnsClient snsClient = credentialService.getSnsClient();
-
-        // ListSubscriptionsByTopic으로 Subscription 정보 가져오기
-        ListSubscriptionsByTopicRequest listRequest = ListSubscriptionsByTopicRequest.builder()
-                .topicArn(topicArn)
-                .build();
-
-        ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
-
-        for (Subscription subscription : listResponse.subscriptions()) {
-            String subscriptionEndpoint = subscription.endpoint();
-
-            // 이메일과 endpoint 일치 여부 확인
-            if (userByEmail.equals(subscriptionEndpoint)) {
-                UnsubscribeRequest unsubscribeRequest = UnsubscribeRequest.builder()
-                        .subscriptionArn(subscription.subscriptionArn())
-                        .build();
-
-                UnsubscribeResponse unsubscribeResponse = snsClient.unsubscribe(unsubscribeRequest);
-
-                snsClient.close();
-
-                if (unsubscribeResponse.sdkHttpResponse().isSuccessful()) {
-                    log.info("Unsubscribed successfully: " + subscription.subscriptionArn());
-                    return new ResponseEntity<>("Unsubscribed Successfully", HttpStatus.OK);
-                } else {
-                    throw getResponseStatusException(unsubscribeResponse);
-                }
-            }
+        if (userId == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
-        // 찾지 못한 경우
-        return new ResponseEntity<>("해당하는 구독을 찾을 수 없습니다", HttpStatus.NOT_FOUND);
+        try {
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmService.confirmSubscription(topicArn, responseEmailDTO, userId));
+        } catch (Exception e) {
+            log.error("구독 확인 실패", e);
+            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
+        }
+    }
+
+    /**
+     * 이메일 전송 메서드
+     * 구독된 사용자들에게 실제 이메일을 보내는 기능이다
+     * 구독이 안된 사용자는 이메일이 전송이 안된다
+     * 관리자가 작성한 text 내용이 이메일로 보내진다
+     *
+     * @param topicArn,text 생성된 주제로 보내야 한다
+     *                      관리자가 작성한 text(이메일에 보내질 내용)
+     * @return 해당 주제로 본낸다
+     */
+
+    @PostMapping("/publishEmail")
+    public ResponseEntity<ResponseBodyFormatter> publish(@RequestParam String topicArn
+                                                         // ,@RequestParam String text
+    ) {
+
+        Long userId = 2L;
+
+        if (userId == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }
+
+        try {
+            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn));
+        } catch (Exception e) {
+            log.error("이메일 전송 실패", e);
+            return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
+        }
+    }
+
+    /**
+     * email 구독 취소
+     * 이메일 전송을 원하지 않는 사용자들은 취소를 통해
+     * 더이상 이메일을 안 받을 수 있다
+     *
+     * @param topicArn 해당 주제를 가져온다
+     * @return 주제 통해 구독된 이메일인지 찾고 삭제 시킨다
+     */
+
+    @DeleteMapping("/unsubscribe")
+    public ResponseEntity<ResponseBodyFormatter> unsubscribe(@RequestParam String topicArn) {
+
+        Long userId = 2L;
+
+        if (userId == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }
+        try {
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmService.unsubscribe(topicArn, userId));
+        } catch (Exception e) {
+            log.error("구독 취소 에러", e);
+            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
+        }
     }
 
 }

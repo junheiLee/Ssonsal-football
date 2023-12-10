@@ -1,7 +1,11 @@
 package com.ssonsal.football.admin.controller;
 
 import com.ssonsal.football.admin.dto.request.UpdateMonthDto;
+import com.ssonsal.football.admin.exception.AdminErrorCode;
+import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.StatsService;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,15 +22,26 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 @RequestMapping("/admin/stats")
 @RequiredArgsConstructor
-public class RestStatsController {
+public class StatsRestController {
 
     private final StatsService statsService;
 
-    // 월 통계 데이터 변환
+    /**
+     * 관리자가 선택한 달의 통계 데이터를 보여준다
+     * @param selectedDate
+     * selectedDate는 관리자가 선택한 달로
+     * 달이 선택되면 그 달의 한달 통계와 달의 하루씩 데이터를 보여준다
+     * @return 성공코드와 한달 데이터, 하루 데이터를 반환
+     */
     @PostMapping("/changeMonth")
-    public ResponseEntity<String> updateMonth(@RequestBody UpdateMonthDto selectedDate) {
-        log.info("date =={}", selectedDate.toString());
-        try {
+    public ResponseEntity<ResponseBodyFormatter> updateMonth(@RequestBody UpdateMonthDto selectedDate) {
+
+        Long user=1L;
+
+        if (user == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }
+
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate currentDate = LocalDate.parse(selectedDate.getSelectedDate(), formatter);
@@ -34,16 +49,16 @@ public class RestStatsController {
 /*            JSONObject json = new JSONObject(selectedDate);
             String dateValue = json.getString("selectedDate");
             LocalDate currentDate = LocalDate.parse(selectedDate);*/
+        if (selectedDate.getSelectedDate() == null) {
+            throw new CustomException(AdminErrorCode.MONTH_UPDATE_FAILED);
+        }
 
             statsService.monthStats(currentDate);
-
-
             statsService.monthlyDailyStats(currentDate);
 
-            return ResponseEntity.ok("업데이트 성공");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류: " + e.getMessage());
-        }
+            return ResponseBodyFormatter.put(AdminSuccessCode.MONTH_UPDATE_SUCCESS);
+
+
+
     }
 }

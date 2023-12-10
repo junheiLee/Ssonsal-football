@@ -1,6 +1,10 @@
 package com.ssonsal.football.admin.controller;
 
+import com.ssonsal.football.admin.exception.AdminErrorCode;
+import com.ssonsal.football.admin.exception.NotFoundException;
 import com.ssonsal.football.admin.service.UserService;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -16,14 +20,26 @@ public class UserManagementController {
 
     private final UserService userService;
 
-    // 유저 리스트
+    /**
+     * 관리자 페이지에서 모든 회원 리스트를 가져온다
+     *
+     * @param model
+     * @return 회원 글 리스트
+     */
     @GetMapping("/user")
     public String adminUser(Model model) {
-        model.addAttribute("userList", userService.userList());
 
-        log.info("유저!!"+userService.userList());
+        Long user = 1L;
 
-        return "admin_user";
+
+            if (user == null) {
+                throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+            }
+            model.addAttribute("userList", userService.userList());
+
+            return "admin_user";
+
+        }
+
     }
 
-}

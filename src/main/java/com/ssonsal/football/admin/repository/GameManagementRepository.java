@@ -16,8 +16,8 @@ public interface GameManagementRepository extends JpaRepository<Game, Long> {
     List<Game> findByScheduleBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     // 게임 리스트
-    @Query("SELECT new com.ssonsal.football.admin.dto.request.GameDTO(t.id, t.createdAt, t.matchStatus, t.vsFormat, t.stadium, t.schedule) FROM Game t")
-    List<GameDTO> findAllGame();
+/*    @Query("SELECT new com.ssonsal.football.admin.dto.request.GameDTO(t.id, t.createdAt, t.matchStatus, t.vsFormat, t.stadium, t.schedule) FROM Game t")
+    List<GameDTO> findAllGame();*/
 
     // 스케줄 날짜가 지나면 deleteCode변환
     @Modifying

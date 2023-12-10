@@ -16,8 +16,8 @@ public interface UserManagementRepository extends JpaRepository<User,Long> {
     Integer calculateAgeByUserId(@Param("userId") Long userId);
 
     // 유저 리스트
-    @Query("SELECT new com.ssonsal.football.admin.dto.request.UserDTO(t.id, t.name, t.nickname, t.gender, t.createdAt, t.role) FROM User t")
-    List<UserDTO> findAllUser();
+    /*@Query("SELECT new com.ssonsal.football.admin.dto.request.UserDTO(t.id, t.name, t.nickname, t.gender, t.createdAt, t.role) FROM User t")
+    List<UserDTO> findAllUser();*/
 
     @Query("SELECT new com.ssonsal.football.admin.dto.request.EmailDTO(m.id, m.email,m.phone,m.createdAt) FROM User m")
     List<EmailDTO> findAllMember();

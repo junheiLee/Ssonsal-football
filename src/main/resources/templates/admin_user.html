@@ -61,30 +61,32 @@
             };
 
             $.ajax({
-                type: 'POST',
-                url: '/admin/user/changeRole',
-                data: JSON.stringify(requestData),
-                contentType: 'application/json',
-                success: function (response) {
-                    console.log('서버 응답:', response);
-                    if (response === '권한 부여 성공') {
-                        alert('권한 부여 성공!!');
-                        window.location.href = '/admin/user';
-                    } else {
-                        alert('권한 부여 실패');
-                    }
-                },
-                error: function (error) {
-                    console.error('에러 발생:', error);
-                    alert('에러!!');
-                }
-            });
+    type: 'POST',
+    url: '/admin/user/changeRole',
+    data: JSON.stringify(requestData),
+    contentType: 'application/json',
+    dataType: 'json',
+    success: function (response) {
+        console.log('서버 응답:', response);
+
+        // 서버 응답에 따라 성공 또는 실패 처리
+        if (response.success) {
+            alert('권한 부여 성공!!');
+            window.location.href = '/admin/user';
+        }
+
+    },
+    error: function (error) {
+        console.error('에러 발생:', error);
+        alert('에러!!');
+    }
+});
         }
     </script>
 
 </head>
 <body>
-<!-- Left Panel --> 
+<!-- Left Panel -->
 <aside id="left-panel" class="left-panel">
     <nav class="navbar navbar-expand-sm navbar-default">
         <div id="main-menu" class="main-menu collapse navbar-collapse">
@@ -237,7 +239,8 @@
                                 <tbody>
                                 <tr th:each="user : ${userList}">
                                     <td>
-                                        <input type="checkbox" name="selectedUser" data-user-id="${user.id}" data-user-id-value="${user.id}" th:disabled="${user.role == 1}">
+                                        <input type="checkbox" name="selectedUser" data-user-id="${user.id}"
+                                               data-user-id-value="${user.id}" th:disabled="${user.role == 1}">
                                         <span class="user-id" th:text="${user.id}" style="display: none;"></span>
                                     </td>
                                     <td th:text="${user.name}"></td>
