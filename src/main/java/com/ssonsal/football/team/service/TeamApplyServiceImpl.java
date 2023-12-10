@@ -1,8 +1,11 @@
 package com.ssonsal.football.team.service;
 
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.team.entity.RejectId;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamApply;
 import com.ssonsal.football.team.entity.TeamReject;
+import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -33,7 +36,14 @@ public class TeamApplyServiceImpl implements TeamApplyService {
     @Override
     public void createUserApply(Long userId, Long teamId) {
 
-        TeamApply teamApply = new TeamApply(userRepository.findById(userId).get(), teamRepository.findById(teamId).get());
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND)
+        );
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND)
+        );
+
+        TeamApply teamApply = new TeamApply(user, team);
 
         teamApplyRepository.save(teamApply);
     }
@@ -77,14 +87,16 @@ public class TeamApplyServiceImpl implements TeamApplyService {
     @Override
     public String userApplyReject(Long userId, Long teamId) {
 
-        deleteUserApply(userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        RejectId rejectId = new RejectId(userId, teamId);
+        RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);
 
         teamRejectRepository.save(teamReject);
+        deleteUserApply(userId);
 
-        return userRepository.findById(userId).get().getNickname();
+        return user.getNickname();
     }
 
 

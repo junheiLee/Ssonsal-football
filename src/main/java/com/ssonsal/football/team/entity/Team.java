@@ -1,6 +1,7 @@
 package com.ssonsal.football.team.entity;
 
 import com.ssonsal.football.global.entity.BaseEntity;
+import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -26,7 +27,10 @@ public class Team extends BaseEntity {
     private String name;
 
     @Column(length = 1000)
-    private String logo;
+    private String logoUrl;
+
+    @Column(length = 1000)
+    private String logoKey;
 
     private String preferredArea;
 
@@ -46,16 +50,16 @@ public class Team extends BaseEntity {
 
     @Column(unique = true)
     @NotNull
-    @Setter
     private Long leaderId;
 
     @OneToMany(mappedBy = "team")
     List<User> users = new ArrayList<>();
 
     @Builder
-    public Team(String name, String logo, String preferredArea, String preferredTime, Integer recruit, String intro, Float mannerScore, Float skillScore, Long leaderId) {
+    public Team(String name, String logoUrl, String logoKey, String preferredArea, String preferredTime, Integer recruit, String intro, Float mannerScore, Float skillScore, Long leaderId) {
         this.name = name;
-        this.logo = logo;
+        this.logoUrl = logoUrl;
+        this.logoKey = logoKey;
         this.preferredArea = preferredArea;
         this.preferredTime = preferredTime;
         this.recruit = recruit;
@@ -63,5 +67,31 @@ public class Team extends BaseEntity {
         this.mannerScore = mannerScore;
         this.skillScore = skillScore;
         this.leaderId = leaderId;
+    }
+
+    /**
+     * 팀 정보를 업데이트 한다
+     *
+     * @param teamEditDto 팀 정보 DTO
+     * @param logoUrl     바뀐 로고 URL
+     * @param logoKey     바뀐 로고 키
+     */
+    public void TeamUpdate(TeamEditDto teamEditDto, String logoUrl, String logoKey) {
+        this.name = teamEditDto.getName();
+        this.logoUrl = logoUrl;
+        this.logoKey = logoKey;
+        this.preferredArea = teamEditDto.getPreferredArea();
+        this.preferredTime = teamEditDto.getPreferredTime();
+        this.recruit = teamEditDto.getRecruit();
+        this.intro = teamEditDto.getIntro();
+    }
+
+    /**
+     * 리더를 지정한다.
+     *
+     * @param userId 유저 아이디
+     */
+    public void delegateLeader(Long userId) {
+        this.leaderId = userId;
     }
 }
