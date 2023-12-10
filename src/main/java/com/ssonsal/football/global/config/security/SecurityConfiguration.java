@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/user/sign-in", "/user/sign-up",
                 "/user/exception").permitAll() // 가입 및 로그인 주소는 허용
             .antMatchers(HttpMethod.PATCH, "/user/profile").permitAll() // profile 이 포함되어있는 PATCH요청은 허용
-
+                .antMatchers("/games/**").permitAll()
             .antMatchers("**exception**").permitAll()
 
             .anyRequest().hasRole("ADMIN") // 나머지 요청은 인증된 ADMIN만 접근 가능
