@@ -17,6 +17,7 @@ public enum GameErrorCode implements ResponseCode {
 
     /* 게임 결과 입력 관련 */
     IMPOSSIBLE_RESULT(HttpStatus.BAD_REQUEST, "기입할 수 없는 게임 결과 형식입니다."),
+    NOT_MATCHING_RESULT(HttpStatus.BAD_REQUEST, "상대 팀과 짝이 맞지 않는 게임 결과입니다."),
     CAN_NOT_ENTER_RESULT(HttpStatus.BAD_REQUEST, "결과를 기입할 수 없는 게임입니다."),
 
     /* 팀 권한 관련 */

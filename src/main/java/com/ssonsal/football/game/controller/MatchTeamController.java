@@ -4,10 +4,8 @@ import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
-import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
-import com.ssonsal.football.game.util.GameSuccessCode;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -18,8 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
 import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
 import static com.ssonsal.football.game.util.GameConstant.MATCH_TEAM;
+import static com.ssonsal.football.game.util.GameSuccessCode.WAIT_FOR_ANOTHER_TEAM;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
@@ -86,10 +86,10 @@ public class MatchTeamController {
     private ResponseEntity<ResponseBodyFormatter> setHttpStatus(GameResultResponseDto gameResult) {
 
         if (gameResult.getTotalScore() == null) {
-            throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT, gameResult);
+            throw new CustomException(NOT_MATCHING_RESULT, gameResult);
         }
         if (gameResult.getTotalScore() < TeamResult.END.getScore()) {
-            return DataResponseBodyFormatter.put(GameSuccessCode.WAIT_FOR_ANOTHER_TEAM, gameResult);
+            return DataResponseBodyFormatter.put(WAIT_FOR_ANOTHER_TEAM, gameResult);
         }
 
         return DataResponseBodyFormatter.put(SUCCESS, gameResult);
