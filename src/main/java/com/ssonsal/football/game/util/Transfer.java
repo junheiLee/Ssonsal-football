@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class Transfer {
 
-    public static Map<String, Long> dataToMap(String key, Long value) {
+    public static Map<String, Long> longIdToMap(String key, Long value) {
 
         Map<String, Long> dataDto = new HashMap<>();
         dataDto.put(key, value);

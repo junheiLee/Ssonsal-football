@@ -6,8 +6,8 @@ import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
-import com.ssonsal.football.game.util.GameResult;
 import com.ssonsal.football.game.util.GameSuccessCode;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,13 +43,13 @@ public class MatchTeamController {
      * @return 성공 코드와 해당 게임 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-teams")
-    public ResponseEntity<ResponseBodyFormatter> approvalAwayTeam(@PathVariable Long gameId,
-                                                                  @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@PathVariable Long gameId,
+                                                                 @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         Long userId = 6L;
-        Long confirmedGameId = matchTeamService.approvalAwayTeam(userId, gameId, approvalAwayTeamDto);
+        Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalAwayTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("gameId", confirmedGameId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
     }
 
     /**
@@ -61,7 +63,7 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
                                                              @RequestBody GameResultRequestDto gameResultDto) {
 
-        Long userId = 7L;
+        Long userId = 1L;
         GameResultResponseDto gameResult = gameService.enterResult(userId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);
@@ -69,10 +71,10 @@ public class MatchTeamController {
 
     private ResponseEntity<ResponseBodyFormatter> setHttpStatus(GameResultResponseDto gameResult) {
 
-        if (gameResult.getTotalResult() == null) {
+        if (gameResult.getTotalScore() == null) {
             throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT, gameResult);
         }
-        if (gameResult.getTotalResult() < GameResult.END.getScore()) {
+        if (gameResult.getTotalScore() < TeamResult.END.getScore()) {
             return DataResponseBodyFormatter.put(GameSuccessCode.WAIT_FOR_ANOTHER_TEAM, gameResult);
         }
 

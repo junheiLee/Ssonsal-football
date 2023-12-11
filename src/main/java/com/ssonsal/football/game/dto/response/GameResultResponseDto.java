@@ -10,14 +10,17 @@ import lombok.ToString;
 @NoArgsConstructor
 public class GameResultResponseDto {
 
-    private Integer homeTeamResult;
-    private Integer awayTeamResult;
-    private Integer totalResult;
+    private String homeResult;
+    private String awayResult;
+    private Integer totalScore;
 
     @Builder
-    public GameResultResponseDto(Integer homeTeamResult, Integer awayTeamResult, Integer totalResult) {
-        this.homeTeamResult = homeTeamResult;
-        this.awayTeamResult = awayTeamResult;
-        this.totalResult = totalResult;
+    public GameResultResponseDto(String homeResult, String awayResult) {
+        this.homeResult = homeResult;
+        this.awayResult = awayResult;
+    }
+
+    public void setTotalScore(Integer totalScore) {
+        this.totalScore = totalScore;
     }
 }

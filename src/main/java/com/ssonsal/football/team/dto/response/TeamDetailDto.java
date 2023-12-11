@@ -1,5 +1,7 @@
 package com.ssonsal.football.team.dto.response;
 
+import com.ssonsal.football.team.entity.Team;
+import com.ssonsal.football.team.entity.TeamRecord;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +12,8 @@ public class TeamDetailDto {
     private Long id;
 
     private String name;
+
+    private String logoUrl;
 
     private String preferredArea;
 
@@ -31,22 +35,22 @@ public class TeamDetailDto {
 
     private Integer loseCount;
 
-    private Long memberCount;
+    private Integer memberCount;
 
-    public TeamDetailDto(Long id, String name, String preferredArea, String preferredTime, String intro,
-                         Integer winCount, Integer drawCount, Integer loseCount,
-                         Float mannerScore, Float skillScore, Long memberCount) {
-        this.id = id;
-        this.name = name;
-        this.preferredArea = preferredArea;
-        this.preferredTime = preferredTime;
-        this.intro = intro;
-        this.winCount = winCount;
-        this.drawCount = drawCount;
-        this.loseCount = loseCount;
-        this.mannerScore = mannerScore;
-        this.skillScore = skillScore;
+    public TeamDetailDto(Team team, TeamRecord teamRecord, Integer memberCount) {
+        this.id = team.getId();
+        this.logoUrl = team.getLogoUrl();
+        this.name = team.getName();
+        this.preferredArea = team.getPreferredArea();
+        this.preferredTime = team.getPreferredTime();
+        this.intro = team.getIntro();
+        this.winCount = teamRecord.getWinCount();
+        this.drawCount = teamRecord.getDrawCount();
+        this.loseCount = teamRecord.getLoseCount();
+        this.mannerScore = team.getMannerScore();
+        this.skillScore = team.getSkillScore();
         this.memberCount = memberCount;
+        this.ranking = teamRecord.getRank();
     }
 
 }

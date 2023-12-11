@@ -15,8 +15,8 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "sub_applicant", uniqueConstraints = {
         @UniqueConstraint(
-                name = "uniqueUserAndMatchTeam",
-                columnNames = {"user_id", "match_team_id"}
+                name = "unique_user_and_match_application",
+                columnNames = {"user_id", "match_application_id"}
         )
 })
 public class SubApplicant extends BaseEntity {
@@ -27,7 +27,8 @@ public class SubApplicant extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "match_team_id") // match_team
+
+    @JoinColumn(name = "match_application_id") // match_team
     private MatchApplication matchApplication;
 
     @NotNull

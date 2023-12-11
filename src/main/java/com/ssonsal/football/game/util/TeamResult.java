@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 @Getter
-public enum GameResult {
+public enum TeamResult {
 
     WIN("승", 3),
     LOSE("패", 1),
@@ -17,16 +17,15 @@ public enum GameResult {
     private final String ko;
     private final Integer score;
 
-    GameResult(String ko, Integer score) {
+    TeamResult(String ko, Integer score) {
         this.ko = ko;
         this.score = score;
     }
 
-    public static Integer peekScore(String ko) {
-        return Arrays.stream(GameResult.values())
+    public static TeamResult peekResult(String ko) {
+        return Arrays.stream(TeamResult.values())
                 .filter(result -> result.ko.equals(ko))
                 .findAny()
-                .orElseThrow(() -> new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT))
-                .getScore();
+                .orElseThrow(() -> new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT));
     }
 }

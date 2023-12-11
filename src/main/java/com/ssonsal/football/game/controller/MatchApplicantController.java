@@ -2,8 +2,6 @@ package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
-import com.ssonsal.football.game.util.Transfer;
-import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +9,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ssonsal.football.game.util.GameConstant.MATCH_APPLICATION_ID;
+import static com.ssonsal.football.game.util.GameConstant.REJECTED_MATCH_APPLICATION_ID;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,15 +31,34 @@ public class MatchApplicantController {
      * @param gameId             url에서 가져오는 해당 게임의 식별자
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
-    @PostMapping("/{gameId}/match-applicants")
-    public ResponseEntity<ResponseBodyFormatter> applyForGameAsAway(
+    @PostMapping("/{gameId}/match-applications")
+    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(
             @RequestBody MatchApplicationRequestDto applicationTeamDto,
             @PathVariable Long gameId) {
 
         Long userId = 7L;
-        Long matchTeamId = matchApplicantService.applyForGameAsAway(gameId, userId, applicationTeamDto);
+        Long matchApplicantId = matchApplicantService.applyToGameAsAway(gameId, userId, applicationTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.dataToMap("matchTeamId", matchTeamId));
+        return DataResponseBodyFormatter
+                .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
+    }
+
+    /**
+     * 해당 게임에 대한 신청을 거절하는 api
+     *
+     * @param matchApplicationId 해당 신청 식별자
+     * @param gameId             해당 게임
+     * @return 거절된 신청 아이디 반환
+     */
+    @DeleteMapping("/{gameId}/match-applications/{matchApplicationId}")
+    public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
+                                                                         @PathVariable Long gameId) {
+
+        Long userId = 3L;
+        Long rejectedMatchApplicationId = matchApplicantService.rejectApplicationAsAway(userId, gameId, matchApplicationId);
+
+        return DataResponseBodyFormatter
+                .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));
     }
 
 

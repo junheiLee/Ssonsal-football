@@ -30,6 +30,10 @@ public class Game extends BaseEntity {
     private Team home;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "away_applicant_id")
+    private User awayApplicant;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "awayteam_id")
     private Team away;
 
@@ -48,8 +52,8 @@ public class Game extends BaseEntity {
     private String rule;
     private Integer account;
     private int deleteCode;
-    private Integer hometeamResult;
-    private Integer awayteamResult;
+    private String hometeamResult;
+    private String awayteamResult;
 
     @OneToMany(mappedBy = "game")
     private List<MatchApplication> matchApplications;
@@ -71,16 +75,35 @@ public class Game extends BaseEntity {
         this.account = gameRequestDto.getAccount();
     }
 
-    public void approvalTeamApplicant(Team awayTeam) {
+    public Game update(LocalDateTime schedule, GameRequestDto gameRequestDto) {
+
+        this.schedule = schedule;
+        this.gameTime = gameRequestDto.getGameTime();
+        this.region = gameRequestDto.getRegion();
+        this.stadium = gameRequestDto.getStadium();
+        this.vsFormat = gameRequestDto.getVsFormat();
+        this.gender = gameRequestDto.getGender();
+        this.rule = gameRequestDto.getRule();
+        this.account = gameRequestDto.getAccount();
+
+        return this;
+    }
+
+    public void approveTeamApplicant(User applicant, Team awayTeam) {
+        this.awayApplicant = applicant;
         this.away = awayTeam;
         this.matchStatus = MatchStatus.CONFIRMED.getCodeNumber();
     }
 
-    public void enterHomeTeamResult(Integer score) {
-        this.hometeamResult = score;
+    public void enterHomeTeamResult(String homeResult) {
+        this.hometeamResult = homeResult;
     }
 
-    public void enterAwayTeamResult(Integer score) {
-        this.awayteamResult = score;
+    public void enterAwayTeamResult(String awayResult) {
+        this.awayteamResult = awayResult;
+    }
+
+    public void end() {
+        this.matchStatus = MatchStatus.END.getCodeNumber();
     }
 }

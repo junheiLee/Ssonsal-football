@@ -3,6 +3,7 @@ package com.ssonsal.football.game.service;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
@@ -13,6 +14,7 @@ import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
 import com.ssonsal.football.game.util.GameResult;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
@@ -25,9 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import static com.ssonsal.football.game.util.GameConstant.AWAY;
-import static com.ssonsal.football.game.util.GameConstant.HOME;
+import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,12 +45,13 @@ public class GameServiceImpl implements GameService {
     private final MatchApplicationRepository matchApplicationRepository;
     private final UserRepository userRepository;
 
+    @Override
     @Transactional
     public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicationRequestDto homeTeamDto) {
 
         checkTargetIsExist(gameDto.isFindAway(), homeTeamDto.getSubCount());
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         Team homeTeam = user.getTeam();
         checkWriterInTeam(homeTeam);
 
@@ -60,6 +66,7 @@ public class GameServiceImpl implements GameService {
 
         matchApplicationRepository.save(
                 MatchApplication.builder()
+                        .applicant(user)
                         .team(homeTeam)
                         .game(game)
                         .applicationStatus(ApplicantStatus.APPROVAL.getDescription())
@@ -69,29 +76,80 @@ public class GameServiceImpl implements GameService {
         return game.getId();
     }
 
+    @Override
+    @Transactional
+    public Long updateGame(Long userId, Long gameId,
+                           GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+
+        // 요청한 사람이 해당 게임 작성자인지 확인
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+            throw new CustomException(FORBIDDEN_USER);
+        }
+
+        // 게임 정보 변경
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
+        game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
+
+        MatchApplication homeTeam = matchApplicationRepository.findByGameAndTeam(game, game.getHome());
+        homeTeam.update(updateHomeTeamDto);
+
+        return gameId;
+    }
+
+    @Override
     @Transactional
     public GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto) {
 
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
         checkAbleToEnterResult(game);
 
         String result = gameResultDto.getResult();
 
         // 해당 팀의 팀원이 한 요청인지 확인 후 matchTeamService 호출
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
         if (gameResultDto.getTarget().equals(AWAY)) {
 
             checkUserInTeam(game.getAway(), user.getTeam());
-            return matchTeamService.enterAwayTeamResult(game, GameResult.peekScore(result));
+            return matchTeamService.enterAwayTeamResult(game, TeamResult.peekResult(result));
         }
         if (gameResultDto.getTarget().equals(HOME)) {
 
             checkUserInTeam(game.getHome(), user.getTeam());
-            return matchTeamService.enterHomeTeamResult(game, GameResult.peekScore(result));
+            return matchTeamService.enterHomeTeamResult(game, TeamResult.peekResult(result));
         }
 
         throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT);
+    }
+
+    @Override
+    public List<GameListResponseDto> findAllGamesForTeam() {
+
+        return gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
+                .stream().map(GameListResponseDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameListResponseDto> findAllGamesForSub() {
+
+        return gameRepository.searchAllGameForSub();
+    }
+
+    @Override
+    public List<GameListResponseDto> findMyGamesAsSub(Long userId) {
+
+        return gameRepository.searchMyGameAsSub(userId);
+    }
+
+    @Override
+    public List<GameListResponseDto> findOurGamesAsTeam(Long teamId) {
+
+        return gameRepository.searchOurGameAsTeam(teamId);
     }
 
     private void checkAbleToEnterResult(Game game) {
@@ -126,7 +184,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private LocalDateTime stringToLocalDateTime(String dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         log.info("stringToLocalDateTime = {}", dateTime);
         return LocalDateTime.parse(dateTime, formatter);
     }
