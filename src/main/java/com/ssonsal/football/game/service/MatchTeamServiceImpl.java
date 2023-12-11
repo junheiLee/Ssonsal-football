@@ -107,7 +107,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                     .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
-            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
+            TeamRecord awayRecord = teamRecordRepository.findById(awayId)
                     .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
@@ -154,7 +154,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                     .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
             GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
 
-            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
+            TeamRecord awayRecord = teamRecordRepository.findById(awayId)
                     .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
             GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
 
