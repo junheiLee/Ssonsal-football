@@ -1,6 +1,8 @@
 package com.ssonsal.football.game.controller;
 
+import com.ssonsal.football.game.dto.request.SubApplyListDto;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
+import com.ssonsal.football.game.entity.SubApplicant;
 import com.ssonsal.football.game.service.SubService;
 import com.ssonsal.football.user.entity.User;
 import lombok.extern.slf4j.Slf4j;

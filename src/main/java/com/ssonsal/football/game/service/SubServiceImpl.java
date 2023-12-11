@@ -1,5 +1,6 @@
 package com.ssonsal.football.game.service;
 
+import com.ssonsal.football.game.dto.request.SubApplyListDto;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
 import com.ssonsal.football.game.entity.*;
 import com.ssonsal.football.game.exception.SubErrorCode;
@@ -35,7 +36,7 @@ public class SubServiceImpl implements SubService {
     private final UserRepository userRepository;
 
     @Transactional // 용병으로 참여한 기록
-     public List<SubRecordDto> getSubRecordsByUserId(Long userId) {
+    public List<SubRecordDto> getSubRecordsByUserId(Long userId) {
         List<Sub> subRecords = subRepository.findByUser_Id(userId);
         List<SubRecordDto> subList = new ArrayList<>();
 
@@ -62,6 +63,24 @@ public class SubServiceImpl implements SubService {
             }
         }
         return subList;
+    }
+
+    @Transactional// 팀에 신청한 용병 현황
+    public List<SubApplyListDto> getSubRecordsByGameAndTeamId(Long userId, Long gameId, Long teamId){
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+
+        if (teamId.equals(user.getTeam().getId())) {
+            // 해당 팀에 신청한 모든 용병 신청 기록 가져오기
+            List<SubApplicant> subApplicants = subApplicantRepository.findByMatchApplication(matchApplication.getTeam().getId());
+            List<SubApplyListDto> mapSubDto = SubApplyListDto.mapSubApplicantsToDto(subApplicants);
+
+            return mapSubDto;
+        }
+
+        return null;
     }
 
     @Transactional // 용병 신청하기
