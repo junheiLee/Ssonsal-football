@@ -33,5 +33,10 @@ public class SubRestController {
         return subService.subAccept(subInfo.get("userId"),gameId,teamId);
     }
 
+    @DeleteMapping("/{gameId}/teams/{teamId}/sub-applicants/{userId}")//용병 거절
+    public String subReject(@RequestBody Map<String, Long> subInfo, @PathVariable Long gameId, @PathVariable Long teamId){
+        return subService.subReject(subInfo.get("userId"),gameId,teamId);
+    }
+
 
 }

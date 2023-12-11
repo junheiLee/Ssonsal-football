@@ -121,4 +121,32 @@ public class SubServiceImpl implements SubService {
         return request;
     }
 
+    @Transactional // 용병 거절
+    public String subReject(Long userId, Long teamId, Long gameId){
+        String request="오류";
+        Long cookieId = 1L;
+
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+        User loginUser = userRepository.findById(cookieId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+
+        if(loginUser.getTeam() != null && loginUser.getTeam().equals(matchApplication.getTeam())){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+
+            // 용병 신청한 사람의 상태 값을 거절으로 변경
+            SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
+            subApplicants.UpdateSubStatus(ApplicantStatus.REFUSAL.getDescription());
+
+            request="Success";
+
+            // 거절된 용병을 Sub 테이블에 추가하기
+            Sub savedSub = subRepository.save(Sub.builder()
+                    .user(subApplicants.getUser())
+                    .game(subApplicants.getMatchApplication().getGame())
+                    .matchApplication(subApplicants.getMatchApplication())
+                    .build());
+        }
+        return request;
+    }
+
 }
