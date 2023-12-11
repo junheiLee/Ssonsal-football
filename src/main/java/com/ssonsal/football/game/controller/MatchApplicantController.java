@@ -1,6 +1,7 @@
 package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -10,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.ssonsal.football.game.util.GameConstant.MATCH_APPLICATION_ID;
-import static com.ssonsal.football.game.util.GameConstant.REJECTED_MATCH_APPLICATION_ID;
+import java.util.List;
+
+import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
@@ -23,6 +26,22 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class MatchApplicantController {
 
     private final MatchApplicantService matchApplicantService;
+
+    /**
+     * 해당 게임에 신청한 대기 중인 신청 목록을 반환하는 api
+     *
+     * @param gameId 해당 게임 식별자
+     * @return 해당 게임에서 대기중인 신청 목록과 요청한 회원의 정보
+     */
+    @GetMapping("/{gameId}/match-applications")
+    public ResponseEntity<ResponseBodyFormatter> matchApplications(@PathVariable Long gameId) {
+
+        Long userId = 2L;
+        Long teamId = null;
+        List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findAWaitingApplications(gameId);
+        return DataResponseBodyFormatter
+                .put(SUCCESS, toMapIncludeUserInfo(userId, teamId, MATCH_APPLICATIONS, matchApplications));
+    }
 
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api

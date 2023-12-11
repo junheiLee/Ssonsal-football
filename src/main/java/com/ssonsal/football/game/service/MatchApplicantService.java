@@ -1,8 +1,19 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
+
+import java.util.List;
 
 public interface MatchApplicantService {
+
+    /**
+     * 대기 상태인 해당 게임의 신청 팀 복록을 반환
+     *
+     * @param gameId 신청팀 목록을 불러오고자 하는 게임의 식별자
+     * @return 대기 상태인 신청 팀 목록
+     */
+    List<MatchApplicationsResponseDto> findAWaitingApplications(Long gameId);
 
     /**
      * 회원이 팀에 소속되어있고,

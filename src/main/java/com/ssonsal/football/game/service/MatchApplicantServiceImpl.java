@@ -1,7 +1,7 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
+import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.exception.GameErrorCode;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_EXIST_APPLICATION;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
@@ -37,6 +38,11 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final GameRepository gameRepository;
     private final MatchApplicationRepository matchApplicationRepository;
 
+    @Override
+    public List<MatchApplicationsResponseDto> findAWaitingApplications(Long gameId) {
+        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
+    }
+
     @Transactional
     public Long applyToMatchAsAway(Long userId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
 
@@ -51,7 +57,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
                         .applicant(user)
                         .team(team)
                         .game(game)
-                        .applicationStatus(ApplicantStatus.WAITING.getDescription())
+                        .applicationStatus(WAITING.getDescription())
                         .matchTeamDto(applicationTeamDto)
                         .build()
         );
