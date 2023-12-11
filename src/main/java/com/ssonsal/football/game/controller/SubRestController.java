@@ -1,6 +1,7 @@
 package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.request.SubApplyListDto;
+import com.ssonsal.football.game.dto.request.SubInTeamDto;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
 import com.ssonsal.football.game.entity.SubApplicant;
 import com.ssonsal.football.game.service.SubService;
@@ -26,7 +27,19 @@ public class SubRestController {
         return subService.getSubRecordsByUserId(userId);
     }
 
-    @GetMapping("/{gameId}/teams/{teamId}/sub-applicants") // 팀별 용병신청리스트 현황
+    @GetMapping("/{gameId}/teams/{teamId}/subs") // 해당 팀에 대한 용병 (한 게임 한정)
+    public List<SubInTeamDto> getTeamSubList(@PathVariable Long gameId, @PathVariable Long teamId){
+        return subService.getTeamSubList(gameId,teamId);
+    }
+
+    /**
+     * 팀별 용병 신청 리스트 현황
+     * @param logInUser 로그인 한 유저 아이디
+     * @param gameId    게임아이디
+     * @param teamId    팀아이디
+     * @return
+     */
+    @GetMapping("/{gameId}/teams/{teamId}/sub-applicants")
     public List<SubApplyListDto> getSubRecordsByGameAndTeamId(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId){
         return subService.getSubRecordsByGameAndTeamId(logInUser.get("userId"),gameId,teamId);
     }

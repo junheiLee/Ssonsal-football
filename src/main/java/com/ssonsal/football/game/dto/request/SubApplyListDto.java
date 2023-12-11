@@ -1,8 +1,6 @@
 package com.ssonsal.football.game.dto.request;
 
 import com.ssonsal.football.game.entity.SubApplicant;
-import com.ssonsal.football.team.entity.Team;
-import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import java.util.List;
@@ -11,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 public class SubApplyListDto {
 

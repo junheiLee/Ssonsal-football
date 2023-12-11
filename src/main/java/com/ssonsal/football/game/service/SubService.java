@@ -2,6 +2,7 @@ package com.ssonsal.football.game.service;
 
 
 import com.ssonsal.football.game.dto.request.SubApplyListDto;
+import com.ssonsal.football.game.dto.request.SubInTeamDto;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
 import com.ssonsal.football.game.entity.SubApplicant;
 
@@ -22,4 +23,6 @@ public interface SubService {
     // 용병 신청에 대한 거절
     String subReject(Long userId, Long gameId, Long teamId);
 
+    // 팀에 소속된 용병 (각 게임별)
+    List<SubInTeamDto> getTeamSubList(Long gameId, Long teamId);
 }

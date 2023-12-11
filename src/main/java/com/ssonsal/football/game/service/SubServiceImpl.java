@@ -1,6 +1,7 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.SubApplyListDto;
+import com.ssonsal.football.game.dto.request.SubInTeamDto;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
 import com.ssonsal.football.game.entity.*;
 import com.ssonsal.football.game.exception.SubErrorCode;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +66,7 @@ public class SubServiceImpl implements SubService {
         return subList;
     }
 
-    @Transactional// 팀에 신청한 용병 현황
+    @Override// 팀에 신청한 용병 현황
     public List<SubApplyListDto> getSubRecordsByGameAndTeamId(Long userId, Long gameId, Long teamId){
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -82,6 +84,21 @@ public class SubServiceImpl implements SubService {
         return null;
     }
 
+    @Override // 해당 팀 용병 목록
+    public List<SubInTeamDto> getTeamSubList(Long gameId, Long teamId) {
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+        // 해당 게임에 참여하는 각 팀에 소속된 용병 목록
+        List<Sub> teamSubList = subRepository.findByGameIdAndTeamId(gameId, teamId);
+        // 용병 목록을 DTO로 매핑
+        List<SubInTeamDto> subInTeamDtos = teamSubList.stream()
+                .map(SubInTeamDto::mapToSubInTeamDto)
+                .collect(Collectors.toList());
+
+        return subInTeamDtos;
+    }
+
+    @Override
     @Transactional // 용병 신청하기
     public String subApplicant(Long userId, Long gameId, Long teamId){
         String request="오류";
@@ -109,11 +126,11 @@ public class SubServiceImpl implements SubService {
                 log.info("신청 성공");
                 request = "신청 성공";
 
-
         }
         return request;
     }
 
+    @Override
     @Transactional // 용병 승인
     public String subAccept(Long userId, Long teamId, Long gameId){
         String request="오류";
@@ -143,6 +160,7 @@ public class SubServiceImpl implements SubService {
         return request;
     }
 
+    @Override
     @Transactional // 용병 거절
     public String subReject(Long userId, Long teamId, Long gameId){
         String request="오류";
