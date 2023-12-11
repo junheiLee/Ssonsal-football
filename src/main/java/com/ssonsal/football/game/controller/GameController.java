@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
@@ -60,6 +61,17 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
     }
 
+    @GetMapping("/{gameId}")
+    public ResponseEntity<ResponseBodyFormatter> detail(@PathVariable Long gameId) {
+
+        Long userId = 2L;
+
+        GameDetailResponseDto gameDetailResponseDto = gameService.findById(gameId);
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameDetailResponseDto);
+    }
+
+
     /*
     수정 로직은 match status에 따라 수정/삭제 가능 여부가 정해진 후 확정할 수 있음.
      */
@@ -110,12 +122,12 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForSub());
     }
 
-    /**
-     * 해당 유저가 용병으로 참여한 게임 글 목록 반환 api
-     *
-     * @param userId 유저 아이디
-     * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
-     */
+//    /**
+//     * 해당 유저가 용병으로 참여한 게임 글 목록 반환 api
+//     *
+//     * @param userId 유저 아이디
+//     * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
+//     */
 //    @GetMapping("/subs/{userId}")
 //    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
 //

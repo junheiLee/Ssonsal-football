@@ -67,7 +67,7 @@ public class SubServiceImpl implements SubService {
     }
 
     @Override// 팀에 신청한 용병 현황
-    public List<SubApplyListDto> getSubRecordsByGameAndTeamId(Long userId, Long gameId, Long teamId){
+    public List<SubApplyListDto> getSubRecordsByGameAndTeamId(Long userId, Long gameId, Long teamId) {
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User user = userRepository.findById(userId)
@@ -100,13 +100,13 @@ public class SubServiceImpl implements SubService {
 
     @Override
     @Transactional // 용병 신청하기
-    public String subApplicant(Long userId, Long gameId, Long teamId){
-        String request="오류";
+    public String subApplicant(Long userId, Long gameId, Long teamId) {
+        String request = "오류";
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
-        if(!(subRepository.findById(userId).isEmpty())){
+        if (!(subRepository.findById(userId).isEmpty())) {
             log.info("00000");
             Sub sub = subRepository.findById(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -114,17 +114,17 @@ public class SubServiceImpl implements SubService {
 
         // 필요 용병 수 확인해서 필요없으면 신청 불가(matchteam ->subAcount)
         //신청한 팀과 신청한 사람의 소속이 같지 않을때 신청가능
-        if(matchApplication.getSubCount() <= 0 || teamId != user.getTeam().getId()){
+        if (matchApplication.getSubCount() <= 0 || teamId != user.getTeam().getId()) {
             throw new CustomException(SubErrorCode.CLOSED);
-        }else{
-                subApplicantRepository.save(SubApplicant.builder()
-                        .matchApplication(matchApplication)
-                        .user(user)
-                        .subApplicantStatus(ApplicantStatus.WAITING.getDescription())
-                        .build());
+        } else {
+            subApplicantRepository.save(SubApplicant.builder()
+                    .matchApplication(matchApplication)
+                    .user(user)
+                    .subApplicantStatus(ApplicantStatus.WAITING.getDescription())
+                    .build());
 
-                log.info("신청 성공");
-                request = "신청 성공";
+            log.info("신청 성공");
+            request = "신청 성공";
 
         }
         return request;
@@ -132,15 +132,15 @@ public class SubServiceImpl implements SubService {
 
     @Override
     @Transactional // 용병 승인
-    public String subAccept(Long userId, Long teamId, Long gameId){
-        String request="오류";
+    public String subAccept(Long userId, Long teamId, Long gameId) {
+        String request = "오류";
         Long cookieId = 1L;
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
-                .orElseThrow(()->new CustomException(ErrorCode.NOT_PERMISSION));
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_PERMISSION));
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
-        if(loginUser.getTeam().getId() == teamId){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+        if (loginUser.getTeam().getId() == teamId) { // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
 
             // 용병 신청한 사람의 상태 값을 수락으로 변경
             SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
@@ -148,7 +148,7 @@ public class SubServiceImpl implements SubService {
 
             // 승인 후 용병 카운트 -1 (matchteam ->subAcount)
             matchApplication.decreaseSubCount();
-            request="Success";
+            request = "Success";
 
             // 승인된 용병을 Sub 테이블에 추가하기
             Sub savedSub = subRepository.save(Sub.builder()
@@ -162,8 +162,8 @@ public class SubServiceImpl implements SubService {
 
     @Override
     @Transactional // 용병 거절
-    public String subReject(Long userId, Long teamId, Long gameId){
-        String request="오류";
+    public String subReject(Long userId, Long teamId, Long gameId) {
+        String request = "오류";
         Long cookieId = 1L;
 
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
@@ -171,13 +171,13 @@ public class SubServiceImpl implements SubService {
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
-        if(loginUser.getTeam().getId() == teamId){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+        if (loginUser.getTeam().getId() == teamId) { // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
 
             // 용병 신청한 사람의 상태 값을 거절으로 변경
             SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
             subApplicants.UpdateSubStatus(ApplicantStatus.REFUSAL.getDescription());
 
-            request="Success";
+            request = "Success";
 
             // 거절된 용병을 Sub 테이블에 추가하기
             Sub savedSub = subRepository.save(Sub.builder()

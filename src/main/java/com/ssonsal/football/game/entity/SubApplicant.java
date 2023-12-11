@@ -49,7 +49,8 @@ public class SubApplicant extends BaseEntity {
         this.matchApplication = matchApplication;
         this.user = user;
     }
-    public void UpdateSubStatus(String subApplicantStatus){
-        this.subApplicantStatus=subApplicantStatus;
+
+    public void UpdateSubStatus(String subApplicantStatus) {
+        this.subApplicantStatus = subApplicantStatus;
     }
 }

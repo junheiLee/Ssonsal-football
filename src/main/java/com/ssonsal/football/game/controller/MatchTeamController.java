@@ -63,7 +63,7 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
                                                              @RequestBody GameResultRequestDto gameResultDto) {
 
-        Long userId = 1L;
+        Long userId = 7L;
         GameResultResponseDto gameResult = gameService.enterResult(userId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);

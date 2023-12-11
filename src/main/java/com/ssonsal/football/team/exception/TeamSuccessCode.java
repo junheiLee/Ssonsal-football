@@ -19,8 +19,7 @@ public enum TeamSuccessCode implements ResponseCode {
     LEADER_DELEGATE_SUCCESS(HttpStatus.OK, "위임이 완료되었습니다."),
     LEADER_MEMBER_BANNED(HttpStatus.OK, "밴을 성공하였습니다."),
     LEADER_EDIT_SUCCESS(HttpStatus.OK, "팀 정보 수정이 완료되었습니다."),
-    LEADER_REJECT_CANCEL(HttpStatus.OK, "취소가 완료되었습니다.")
-    ;
+    LEADER_REJECT_CANCEL(HttpStatus.OK, "취소가 완료되었습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

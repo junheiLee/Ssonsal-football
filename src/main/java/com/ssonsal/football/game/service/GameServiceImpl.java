@@ -3,6 +3,7 @@ package com.ssonsal.football.game.service;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.entity.ApplicantStatus;
@@ -73,6 +74,13 @@ public class GameServiceImpl implements GameService {
                         .build());
 
         return game.getId();
+    }
+
+    @Override
+    public GameDetailResponseDto findById(Long gameId) {
+
+
+        return null;
     }
 
     @Override

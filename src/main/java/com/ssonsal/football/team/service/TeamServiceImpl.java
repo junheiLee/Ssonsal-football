@@ -11,7 +11,6 @@ import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
-import com.ssonsal.football.team.util.TeamConstant;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,6 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRejectRepository teamRejectRepository;
 
     private final AmazonS3Util amazonS3Util;
-
 
 
     /**
