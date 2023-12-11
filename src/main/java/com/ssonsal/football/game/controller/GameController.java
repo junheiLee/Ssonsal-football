@@ -116,11 +116,11 @@ public class GameController {
      * @param userId 유저 아이디
      * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
      */
-    @GetMapping("/subs/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
-
-        return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
-    }
+//    @GetMapping("/subs/{userId}")
+//    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
+//
+//        return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
+//    }
 
     /**
      * 해당 팀이 참여한 게임 글 목록 반환 api
