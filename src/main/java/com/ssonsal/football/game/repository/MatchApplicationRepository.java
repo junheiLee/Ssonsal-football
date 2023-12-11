@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long> {
 
     MatchApplication findByGameAndTeam(Game game, Team team);
-  
+
     Optional<MatchApplication> findByGameIdAndTeamId(Long gameId, Long teamId);
 }
