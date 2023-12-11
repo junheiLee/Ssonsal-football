@@ -1,6 +1,5 @@
 package com.ssonsal.football.game.dto.request;
 
-import com.ssonsal.football.game.entity.Game;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -15,7 +14,6 @@ public class SubRecordDto {
     private String stadium;
     private Integer vsFormat;
     private String gameRule;
-
 
     public SubRecordDto(LocalDateTime schedule,String gameRegion,String stadium,Integer vsFormat,String gameRule) {
         this.schedule = schedule;
