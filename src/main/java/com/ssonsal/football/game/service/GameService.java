@@ -12,9 +12,9 @@ import java.util.List;
 
 public interface GameService {
 
-    Long createGame(Long userId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
-
     GameDetailResponseDto findById(Long gameId);
+
+    Long createGame(Long userId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
 
     Long updateGame(Long userId, Long gameId,
                     GameRequestDto updateGameRequestDto, MatchApplicationRequestDto updateHomeTeamDto);

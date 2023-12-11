@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static com.ssonsal.football.game.util.GameConstant.GAME;
+import static com.ssonsal.football.game.util.GameConstant.HOME;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
@@ -35,7 +37,7 @@ public class GameController {
      * 게임 생성 시, 호출되는 api
      *
      * @param obj 게임 생성에 필요한 정보
-     * @return 성공 코드와 생성된 게임 아이디를 ResponseBody에 담아 반환
+     * @return 성공 코드와 생성된 게임 아이디를 ResponseBody 에 담아 반환
      */
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) {
@@ -46,16 +48,16 @@ public class GameController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             GameRequestDto gameDto
-                    = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
+                    = mapper.treeToValue(obj.get(GAME), GameRequestDto.class);
             MatchApplicationRequestDto homeTeamDto
-                    = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
+                    = mapper.treeToValue(obj.get(HOME), MatchApplicationRequestDto.class);
 
             Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
             createGameResponseDto = longIdToMap("createdGameId", gameId);
 
         } catch (JsonProcessingException e) {
-            log.error("Request Body의 형식이 다릅니다.");
-            throw new CustomException(e, ErrorCode.WRONG_FORMAT);
+            log.error("찾을 수 없는 key : value 입니다.");
+            throw new CustomException(e, ErrorCode.WRONG_JSON_FORMAT);
         }
 
         return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
@@ -73,9 +75,10 @@ public class GameController {
 
 
     /*
-    수정 로직은 match status에 따라 수정/삭제 가능 여부가 정해진 후 확정할 수 있음.
+    수정 로직은 match status 에 따라 수정/삭제 가능 여부가 정해진 후 확정할 수 있음.
      */
     //@PutMapping("{gameId}")
+    @Deprecated
     public ResponseEntity<ResponseBodyFormatter> updateGame(@PathVariable Long gameId, @RequestBody ObjectNode obj) {
 
         Long userId = 3L;
@@ -84,16 +87,16 @@ public class GameController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             GameRequestDto updateGameDto
-                    = mapper.treeToValue(obj.get("game"), GameRequestDto.class);
+                    = mapper.treeToValue(obj.get(GAME), GameRequestDto.class);
             MatchApplicationRequestDto updateHomeTeamDto
-                    = mapper.treeToValue(obj.get("hometeam"), MatchApplicationRequestDto.class);
+                    = mapper.treeToValue(obj.get(HOME), MatchApplicationRequestDto.class);
 
             Long updatedGameId = gameService.updateGame(userId, gameId, updateGameDto, updateHomeTeamDto);
             updateGameResponseDto = longIdToMap("updatedGameId", updatedGameId);
 
         } catch (JsonProcessingException e) {
-            log.error("Request Body의 형식이 다릅니다.");
-            throw new CustomException(e, ErrorCode.WRONG_FORMAT);
+            log.error("Request Body 의 형식이 다릅니다.");
+            throw new CustomException(e, ErrorCode.WRONG_JSON_FORMAT);
         }
 
         return DataResponseBodyFormatter.put(SUCCESS, updateGameResponseDto);
@@ -122,17 +125,17 @@ public class GameController {
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findAllGamesForSub());
     }
 
-//    /**
-//     * 해당 유저가 용병으로 참여한 게임 글 목록 반환 api
-//     *
-//     * @param userId 유저 아이디
-//     * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
-//     */
-//    @GetMapping("/subs/{userId}")
-//    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
-//
-//        return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
-//    }
+    /**
+     * 해당 유저가 용병으로 참여한 게임 글 목록 반환 api
+     *
+     * @param userId 유저 아이디
+     * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
+     */
+    @GetMapping("/subs/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));
+    }
 
     /**
      * 해당 팀이 참여한 게임 글 목록 반환 api
