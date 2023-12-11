@@ -210,7 +210,7 @@ public class GameServiceImpl implements GameService {
         game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
 
         MatchApplication homeTeam
-                = matchApplicationRepository.findByGameIdAndTeamId(game.getId(), game.getHome().getId())
+                = matchApplicationRepository.findByGameIdAndTeamId(game.getHome().getId(), game.getId())
                 .orElseThrow();
         homeTeam.update(updateHomeTeamDto);
 

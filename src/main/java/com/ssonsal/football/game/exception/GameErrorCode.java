@@ -25,12 +25,11 @@ public enum GameErrorCode implements ResponseCode {
     /* 신청 관련 */
     ALREADY_APPROVAL_TEAM(HttpStatus.BAD_REQUEST, "해당 게임에 이미 승인된 팀입니다."),
     ALREADY_APPLICANT_TEAM(HttpStatus.BAD_REQUEST, "해당 게임에 이미 신청한 팀입니다."),
-    NOT_EXIST_APPLICATION(HttpStatus.BAD_REQUEST, "존재하지 않는 신청입니다."),
+    NOT_EXIST_APPLICATION(HttpStatus.BAD_REQUEST, "해당하는 신청이 없습니다."),
     NOT_WAITING_GAME(HttpStatus.BAD_REQUEST, "대기 중인 게임이 아닙니다."),
 
-    /* 승패 기입 관련 */
-    NOT_EXIST_TEAM_RECORD(HttpStatus.BAD_REQUEST, "존재하지 않는 팀입니다.");
-
+    /* 팀 관련 */
+    NOT_EXIST_TEAM(HttpStatus.BAD_REQUEST, "존재하지 않는 팀입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

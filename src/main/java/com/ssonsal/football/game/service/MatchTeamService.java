@@ -2,10 +2,20 @@ package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
+import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.util.TeamResult;
 
 public interface MatchTeamService {
+
+    /**
+     * 게임에 확정된 팀 팀 정보와 해당 게임 신청 정보를 반환하는 기능
+     *
+     * @param teamId 해당 팀 식별자
+     * @param gameId 해당 게임 식별자
+     * @return 확정된 게임 정보
+     */
+    MatchTeamResponseDto getMatchTeam(Long teamId, Long gameId);
 
     /**
      * 승인할 팀 정보를 통해 대상 게임의 상대 팀 신청을 승인하는 기능

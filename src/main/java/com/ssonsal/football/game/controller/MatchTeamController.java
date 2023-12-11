@@ -3,13 +3,13 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
+import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
 import com.ssonsal.football.game.util.GameSuccessCode;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
+import static com.ssonsal.football.game.util.GameConstant.MATCH_TEAM;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +33,17 @@ public class MatchTeamController {
 
     private final GameService gameService;
     private final MatchTeamService matchTeamService;
+
+    @GetMapping("/{gameId}/match-teams/{teamId}")
+    public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long teamId,
+                                                               @PathVariable Long gameId) {
+        Long userId = 1L;
+        Long userTeamId = 1L;
+
+        MatchTeamResponseDto matchTeam = matchTeamService.getMatchTeam(teamId, gameId);
+
+        return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(userId, teamId, MATCH_TEAM, matchTeam));
+    }
 
     /**
      * 신청한 팀 중 한 팀을 대상으로 승인하는 기능
@@ -49,7 +63,7 @@ public class MatchTeamController {
         Long userId = 6L;
         Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
+        return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
     }
 
     /**
@@ -78,7 +92,7 @@ public class MatchTeamController {
             return DataResponseBodyFormatter.put(GameSuccessCode.WAIT_FOR_ANOTHER_TEAM, gameResult);
         }
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, gameResult);
+        return DataResponseBodyFormatter.put(SUCCESS, gameResult);
     }
 
 }

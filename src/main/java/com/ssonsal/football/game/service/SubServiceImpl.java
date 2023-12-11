@@ -68,7 +68,7 @@ public class SubServiceImpl implements SubService {
 
     @Override// 팀에 신청한 용병 현황
     public List<SubApplyListDto> getSubRecordsByGameAndTeamId(Long userId, Long gameId, Long teamId) {
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -86,10 +86,10 @@ public class SubServiceImpl implements SubService {
 
     @Override // 해당 팀 용병 목록
     public List<SubInTeamDto> getTeamSubList(Long gameId, Long teamId) {
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         // 해당 게임에 참여하는 각 팀에 소속된 용병 목록
-        List<Sub> teamSubList = subRepository.findByGameIdAndTeamId(gameId, teamId);
+        List<Sub> teamSubList = subRepository.findByGameIdAndTeamId(teamId, gameId);
         // 용병 목록을 DTO로 매핑
         List<SubInTeamDto> subInTeamDtos = teamSubList.stream()
                 .map(SubInTeamDto::mapToSubInTeamDto)
@@ -102,7 +102,7 @@ public class SubServiceImpl implements SubService {
     @Transactional // 용병 신청하기
     public String subApplicant(Long userId, Long gameId, Long teamId) {
         String request = "오류";
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -135,7 +135,7 @@ public class SubServiceImpl implements SubService {
     public String subAccept(Long userId, Long teamId, Long gameId) {
         String request = "오류";
         Long cookieId = 1L;
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_PERMISSION));
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -166,7 +166,7 @@ public class SubServiceImpl implements SubService {
         String request = "오류";
         Long cookieId = 1L;
 
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
+        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));

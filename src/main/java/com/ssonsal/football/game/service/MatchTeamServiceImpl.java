@@ -2,22 +2,27 @@ package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
+import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
+import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.game.util.GameResultSet;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamRecord;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
+import com.ssonsal.football.team.repository.TeamRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static com.ssonsal.football.game.entity.MatchStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
@@ -38,7 +43,33 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     private final GameRepository gameRepository;
     private final MatchApplicationRepository matchApplicationRepository;
     private final TeamRecordRepository teamRecordRepository;
+    private final TeamRepository teamRepository;
+    private final SubRepository subRepository;
 
+    @Override
+    public MatchTeamResponseDto getMatchTeam(Long teamId, Long gameId) {
+
+        Team team = getTeam(teamId);
+        Game game = getGame(gameId);
+
+        List<MatchTeamResponseDto> matchTeam = matchApplicationRepository.searchMatchTeamDto(teamId, gameId);
+        validateIsExistMatchTeam(matchTeam.size());
+
+        matchTeam.get(0).isHavingSub(subRepository.existsByTeamAndGame(team, game));
+
+        return matchTeam.get(0);
+    }
+
+    private void validateIsExistMatchTeam(int matchTeamSize) {
+        if (matchTeamSize != 1) {
+            throw new CustomException(NOT_EXIST_APPLICATION);
+        }
+    }
+
+    private Team getTeam(Long teamId) {
+        return teamRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_ID, teamId)));
+    }
 
     @Transactional
     public Long approveAwayTeam(Long userId, Long gameId,
@@ -55,7 +86,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
 
         MatchApplication targetApplication
-                = matchApplicationRepository.findByGameIdAndTeamId(gameId, approvalTeamId)
+                = matchApplicationRepository.findByGameIdAndTeamId(approvalTeamId, gameId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION, longIdToMap(TEAM_ID, approvalTeamId)));
         targetApplication.approve();
 
@@ -172,7 +203,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     private TeamRecord getTeamRecord(Long teamId) {
         return teamRecordRepository.findById(teamId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM_RECORD, longIdToMap(TEAM_RECORD_ID, teamId)));
+                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
     }
 
     private void initResult(Game game) {

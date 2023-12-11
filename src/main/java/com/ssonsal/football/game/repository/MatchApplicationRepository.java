@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long> {
+public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long>, MatchApplicationRepositoryCustom {
 
-    Optional<MatchApplication> findByGameIdAndTeamId(Long gameId, Long teamId);
+    Optional<MatchApplication> findByGameIdAndTeamId(Long teamId, Long gameId);
 
     List<MatchApplicationsResponseDto> findByGameIdAndApplicationStatusIs(Long gameId, String applicationStatus);
 }

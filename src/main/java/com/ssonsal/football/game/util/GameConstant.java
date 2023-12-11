@@ -9,6 +9,7 @@ public final class GameConstant {
     public static final String GAME = "game";
     public static final String AWAY = "away";
     public static final String HOME = "home";
+    public static final String MATCH_TEAM = "matchTeam";
 
     public static final String USER_INFO = "userInfo";
 
