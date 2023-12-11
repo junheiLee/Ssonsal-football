@@ -25,21 +25,25 @@ public class SubRestController {
         return subService.getSubRecordsByUserId(userId);
     }
 
+    @GetMapping("/{gameId}/teams/{teamId}/sub-applicants") // 팀별 용병신청 현황
+    public List<SubApplyListDto> getSubRecordsByGameAndTeamId(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId){
+        return subService.getSubRecordsByGameAndTeamId(logInUser.get("userId"),gameId,teamId);
+    }
+
     @PostMapping("/{gameId}/teams/{teamId}/sub-applicants") // 용병 신청
-    public String SubApply(@PathVariable Long gameId, @PathVariable Long teamId){
-        Long userId = 1L; // 용병 신청한 사람 아이디
-        return subService.subApplicant(userId,gameId,teamId);
+    public String SubApply(@RequestBody Map<String, Long> logInUser,@PathVariable Long gameId, @PathVariable Long teamId){
+        return subService.subApplicant(logInUser.get("userId"),gameId,teamId);
     }
 
     @PostMapping("/{gameId}/teams/{teamId}/subs") // 용병 수락
-    public String SubAccept(@RequestBody Map<String, Long> subInfo, @PathVariable Long gameId, @PathVariable Long teamId){
-
-        return subService.subAccept(subInfo.get("userId"),gameId,teamId);
+    public String SubAccept(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId){
+        log.info("222222222");
+        return subService.subAccept(logInUser.get("userId"),gameId,teamId);
     }
 
-    @DeleteMapping("/{gameId}/teams/{teamId}/sub-applicants/{userId}")//용병 거절
-    public String subReject(@RequestBody Map<String, Long> subInfo, @PathVariable Long gameId, @PathVariable Long teamId){
-        return subService.subReject(subInfo.get("userId"),gameId,teamId);
+    @PostMapping("/{gameId}/teams/{teamId}/sub-applicants/{userId}")//용병 거절
+    public String subReject(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId){
+        return subService.subReject(logInUser.get("userId"),gameId,teamId);
     }
 
 

@@ -96,8 +96,6 @@ public class SubServiceImpl implements SubService {
 
         // 필요 용병 수 확인해서 필요없으면 신청 불가(matchteam ->subAcount)
         //신청한 팀과 신청한 사람의 소속이 같지 않을때 신청가능
-        System.out.println(matchApplication.getSubCount());
-        System.out.println(user.getId() +"????"+ sub.getUser().getId());
         if(matchApplication.getSubCount() <= 0 || teamId != user.getTeam().getId()){
             throw new CustomException(SubErrorCode.CLOSED);
         }else{
@@ -120,13 +118,14 @@ public class SubServiceImpl implements SubService {
     public String subAccept(Long userId, Long teamId, Long gameId){
         String request="오류";
         Long cookieId = 1L;
-
         MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(gameId, teamId)
                 .orElseThrow(()->new CustomException(ErrorCode.NOT_PERMISSION));
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
-        if(loginUser.getTeam() != null && loginUser.getTeam().equals(matchApplication.getTeam())){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+        System.out.println(loginUser.getTeam().getId()+" == "+teamId);
+
+        if(loginUser.getTeam().getId() == teamId){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
 
             // 용병 신청한 사람의 상태 값을 수락으로 변경
             SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
@@ -156,7 +155,7 @@ public class SubServiceImpl implements SubService {
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
-        if(loginUser.getTeam() != null && loginUser.getTeam().equals(matchApplication.getTeam())){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+        if(loginUser.getTeam().getId() == teamId){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
 
             // 용병 신청한 사람의 상태 값을 거절으로 변경
             SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
@@ -168,7 +167,7 @@ public class SubServiceImpl implements SubService {
             Sub savedSub = subRepository.save(Sub.builder()
                     .user(subApplicants.getUser())
                     .game(subApplicants.getMatchApplication().getGame())
-                    .matchApplication(subApplicants.getMatchApplication())
+                    .matchApplication(null)
                     .build());
         }
         return request;
