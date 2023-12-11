@@ -1,18 +1,38 @@
 package com.ssonsal.football.game.dto.request;
 
-import com.ssonsal.football.team.entity.Team;
-import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.game.entity.SubApplicant;
 import lombok.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 public class SubApplyListDto {
 
-    private User user; // user_id
+    private Long userId;
+    private String nickName;
+    private Long teamId;
+    private String subApplicantStatus;
 
-    private Team team; // team_id
+    public SubApplyListDto(List<SubApplicant> subApplicants) {
+    }
 
-    private int subApplicantStatus; // default 0; 0: 대기, 1: 확정, 2: 거절
+    public static SubApplyListDto fromSubApplicant(SubApplicant subApplicant) {
+        SubApplyListDto dto = new SubApplyListDto();
+        dto.setUserId(subApplicant.getUser().getId());
+        dto.setNickName(subApplicant.getUser().getNickname());
+        dto.setTeamId(subApplicant.getMatchApplication().getTeam().getId());
+        dto.setSubApplicantStatus(subApplicant.getSubApplicantStatus());
+        return dto;
+    }
+
+    public static List<SubApplyListDto> mapSubApplicantsToDto(List<SubApplicant> subApplicants) {
+        return subApplicants.stream()
+                .map(SubApplyListDto::fromSubApplicant)
+                .collect(Collectors.toList());
+    }
 }

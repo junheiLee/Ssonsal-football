@@ -12,4 +12,5 @@ import java.util.List;
 public interface SubRepository extends JpaRepository<Sub, Long> {
     List<Sub> findByUser_Id(Long userId);
 
+    List<Sub> findByGameIdAndTeamId(Long gameId, Long teamId);
 }
