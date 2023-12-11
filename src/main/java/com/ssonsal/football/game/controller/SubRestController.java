@@ -3,6 +3,7 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.SubRecordDto;
 import com.ssonsal.football.game.service.SubService;
 import com.ssonsal.football.user.entity.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Slf4j
 @RequestMapping("/games")
 public class SubRestController {
     @Autowired
