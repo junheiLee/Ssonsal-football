@@ -8,7 +8,6 @@ import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
 import com.ssonsal.football.game.util.GameSuccessCode;
 import com.ssonsal.football.game.util.TeamResult;
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -20,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,18 +38,18 @@ public class MatchTeamController {
      * 대기 중이거나 종료된 게임의 경우 예외 발생
      * 상대 팀을 구하지 않은 게임의 경우 예외 발생
      *
-     * @param gameId              url에서 가져오는 해당 게임의 식별자
-     * @param approvalAwayTeamDto 승인 대상 팀 정보
+     * @param gameId          url에서 가져오는 해당 게임의 식별자
+     * @param approvalTeamDto 승인 대상 팀 정보
      * @return 성공 코드와 해당 게임 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-teams")
     public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@PathVariable Long gameId,
-                                                                 @RequestBody ApprovalTeamRequestDto approvalAwayTeamDto) {
+                                                                 @RequestBody ApprovalTeamRequestDto approvalTeamDto) {
 
         Long userId = 6L;
-        Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalAwayTeamDto);
+        Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalTeamDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
     }
 
     /**

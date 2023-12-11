@@ -4,8 +4,8 @@ import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
+import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
 import com.ssonsal.football.game.util.Transfer;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
-import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_EXIST_APPLICATION;
+import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
@@ -50,6 +50,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         Team team = validateUserInTeam(user.getTeam());
         Game game = getGame(gameId);
 
+        validateGameIsWaiting(game);
         validateDuplicationApplication(team, game);
 
         MatchApplication matchApplication = matchApplicationRepository.save(
@@ -78,11 +79,18 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
                 .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
     }
 
+    private void validateGameIsWaiting(Game game) {
+
+        if (game.getMatchStatus() != MatchStatus.WAITING.getCodeNumber()) {
+            throw new CustomException(NOT_WAITING_GAME, longIdToMap(GAME_ID, game.getId()));
+        }
+    }
+
     private void validateDuplicationApplication(Team team, Game game) {
 
         if (Objects.equals(team, game.getHome())) {
             log.info("해당 게임의 등록 팀입니다.");
-            throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
+            throw new CustomException(ALREADY_APPROVAL_TEAM);
         }
 
         List<MatchApplication> matchApplications = game.getMatchApplications();
@@ -90,7 +98,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
         if (count != 0) {
             log.info("해당 게임에 이미 신청한 팀입니다.");
-            throw new CustomException(MatchErrorCode.ALREADY_APPLICANT_TEAM);
+            throw new CustomException(ALREADY_APPLICANT_TEAM);
         }
     }
 

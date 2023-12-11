@@ -8,6 +8,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.*;
+
 @Entity
 @Getter
 @ToString(exclude = {"team", "game"})
@@ -63,16 +65,16 @@ public class MatchApplication extends BaseEntity {
     }
 
     public void approve() {
-        this.applicationStatus = ApplicantStatus.APPROVAL.getDescription();
+        this.applicationStatus = APPROVAL.getDescription();
         game.approveTeamApplicant(this.applicant, this.team);
     }
 
     public void reject() {
-        this.applicationStatus = ApplicantStatus.REFUSAL.getDescription();
+        this.applicationStatus = REFUSAL.getDescription();
     }
 
-    public void changeStatusToWaiting() {
-        this.applicationStatus = ApplicantStatus.WAITING.getDescription();
+    public void changeStatusToSuspension() {
+        this.applicationStatus = SUSPENSION.getDescription();
     }
 
     public void decreaseSubCount() {
