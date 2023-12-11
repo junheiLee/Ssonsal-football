@@ -16,13 +16,14 @@ public final class GameConstant {
     public static final String TEAM_RECORD_ID = "teamRecordId";
 
     public static final String CONFIRMED_GAME_ID = "confirmedGameId";
-
     public static final String MATCH_APPLICATION_ID = "matchApplicationId";
     public static final String REJECTED_MATCH_APPLICATION_ID = "rejectedMatchApplicationId";
 
     /* code */
-    public static final int DELETED = 0;
-    public static final int EXISTING = 1;
+    public static final int DELETED = 1;
+    public static final int NOT_DELETED = 0;
 
+    /* LocalDateTime 관련 */
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String SCHEDULE_FORMAT = "yy년 M월 d일 HH시";
 }

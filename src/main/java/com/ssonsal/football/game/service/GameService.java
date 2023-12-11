@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface GameService {
 
-    GameDetailResponseDto findById(Long gameId);
+    GameDetailResponseDto getDetail(Long gameId);
 
     Long createGame(Long userId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
 

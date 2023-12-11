@@ -68,7 +68,7 @@ public class GameController {
 
         Long userId = 2L;
 
-        GameDetailResponseDto gameDetailResponseDto = gameService.findById(gameId);
+        GameDetailResponseDto gameDetailResponseDto = gameService.getDetail(gameId);
 
         return DataResponseBodyFormatter.put(SUCCESS, gameDetailResponseDto);
     }
@@ -131,7 +131,7 @@ public class GameController {
      * @param userId 유저 아이디
      * @return 해당 유저가 용병으로 참여한 게임 타이틀 정보 list 반환
      */
-    @GetMapping("/subs/{userId}")
+    //@GetMapping("/subs/{userId}")
     public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
 
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findMyGamesAsSub(userId));

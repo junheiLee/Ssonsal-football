@@ -46,10 +46,10 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Override
-    public GameDetailResponseDto findById(Long gameId) {
+    public GameDetailResponseDto getDetail(Long gameId) {
 
-
-        return null;
+        Game game = getGame(gameId);
+        return new GameDetailResponseDto(game);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class GameServiceImpl implements GameService {
     }
 
     private Game getGame(Long gameId) {
-        return gameRepository.findByIdAndDeleteCodeIs(gameId, EXISTING)
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
                 .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
     }
 
