@@ -1,7 +1,11 @@
 package com.ssonsal.football.game.util;
 
+import com.ssonsal.football.game.dto.UserInfoDto;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.ssonsal.football.game.util.GameConstant.USER_INFO;
 
 public class Transfer {
 
@@ -10,5 +14,26 @@ public class Transfer {
         Map<String, Long> dataDto = new HashMap<>();
         dataDto.put(key, value);
         return dataDto;
+    }
+
+    public static Map<String, Object> objectToMap(String key, Object dto) {
+        Map<String, Object> mapData = new HashMap<>();
+        mapData.put(key, dto);
+
+        return mapData;
+    }
+
+    public static Map<String, Object> toMapIncludeUserInfo(Long userId, Long teamId, String key, Object dto) {
+
+        Map<String, Object> mapData = new HashMap<>();
+        UserInfoDto userInfoDto = UserInfoDto.builder()
+                .userId(userId)
+                .teamId(teamId)
+                .build();
+
+        mapData.put(USER_INFO, userInfoDto);
+        mapData.put(key, dto);
+
+        return mapData;
     }
 }

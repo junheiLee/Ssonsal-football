@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import static com.ssonsal.football.game.util.GameConstant.GAME;
-import static com.ssonsal.football.game.util.GameConstant.HOME;
+import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
@@ -67,10 +67,10 @@ public class GameController {
     public ResponseEntity<ResponseBodyFormatter> detail(@PathVariable Long gameId) {
 
         Long userId = 2L;
-
+        Long teamId = null;
         GameDetailResponseDto gameDetailResponseDto = gameService.getDetail(gameId);
 
-        return DataResponseBodyFormatter.put(SUCCESS, gameDetailResponseDto);
+        return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(userId, teamId, GAMES, gameDetailResponseDto));
     }
 
 

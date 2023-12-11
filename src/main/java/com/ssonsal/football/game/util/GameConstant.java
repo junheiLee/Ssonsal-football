@@ -10,6 +10,10 @@ public final class GameConstant {
     public static final String AWAY = "away";
     public static final String HOME = "home";
 
+    public static final String USER_INFO = "userInfo";
+
+    public static final String GAMES = "games";
+
     public static final String USER_ID = "userId";
     public static final String GAME_ID = "gameId";
     public static final String TEAM_ID = "teamId";
@@ -22,6 +26,7 @@ public final class GameConstant {
     /* code */
     public static final int DELETED = 1;
     public static final int NOT_DELETED = 0;
+    public static final Long NOT_IN_TEAM = -1L;
 
     /* LocalDateTime 관련 */
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
