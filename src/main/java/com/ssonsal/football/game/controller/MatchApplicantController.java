@@ -26,18 +26,21 @@ public class MatchApplicantController {
 
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
+     * <p>
+     * 해당 게임의 등록팀 팀원일 경우 예외 발생
+     * 해당 게임에 이미 신청한 팀의 팀원인 경우 예외 발생
+     * 유저가 팀이 소속되지 않은 경우 예외 발생
      *
      * @param applicationTeamDto 게임 신청에 필요한 정보
      * @param gameId             url에서 가져오는 해당 게임의 식별자
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-applications")
-    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(
-            @RequestBody MatchApplicationRequestDto applicationTeamDto,
-            @PathVariable Long gameId) {
+    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody MatchApplicationRequestDto applicationTeamDto,
+                                                                   @PathVariable Long gameId) {
 
         Long userId = 7L;
-        Long matchApplicantId = matchApplicantService.applyToGameAsAway(gameId, userId, applicationTeamDto);
+        Long matchApplicantId = matchApplicantService.applyToMatchAsAway(userId, gameId, applicationTeamDto);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
@@ -55,7 +58,8 @@ public class MatchApplicantController {
                                                                          @PathVariable Long gameId) {
 
         Long userId = 3L;
-        Long rejectedMatchApplicationId = matchApplicantService.rejectApplicationAsAway(userId, gameId, matchApplicationId);
+        Long rejectedMatchApplicationId
+                = matchApplicantService.rejectMatchApplication(userId, gameId, matchApplicationId);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));
