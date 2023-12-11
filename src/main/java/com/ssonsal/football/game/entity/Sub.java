@@ -36,11 +36,11 @@ public class Sub extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
-    private MatchApplication matchApplication;
+    private Team team;
 
     @Builder
-    public Sub(MatchApplication matchApplication, User user, Game game) {
-        this.matchApplication = matchApplication;
+    public Sub(Team team, User user, Game game) {
+        this.team = team;
         this.user = user;
         this.game = game;
     }

@@ -10,7 +10,6 @@ import com.ssonsal.football.game.repository.SubApplicantRepository;
 import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
-import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.repository.TeamRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
@@ -90,16 +89,17 @@ public class SubServiceImpl implements SubService {
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
-        Sub sub = subRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
-
+        if(!(subRepository.findById(userId).isEmpty())){
+            log.info("00000");
+            Sub sub = subRepository.findById(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+        }
 
         // 필요 용병 수 확인해서 필요없으면 신청 불가(matchteam ->subAcount)
         //신청한 팀과 신청한 사람의 소속이 같지 않을때 신청가능
         if(matchApplication.getSubCount() <= 0 || teamId != user.getTeam().getId()){
             throw new CustomException(SubErrorCode.CLOSED);
         }else{
-
                 subApplicantRepository.save(SubApplicant.builder()
                         .matchApplication(matchApplication)
                         .user(user)
@@ -123,8 +123,6 @@ public class SubServiceImpl implements SubService {
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
 
-        System.out.println(loginUser.getTeam().getId()+" == "+teamId);
-
         if(loginUser.getTeam().getId() == teamId){ // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
 
             // 용병 신청한 사람의 상태 값을 수락으로 변경
@@ -139,7 +137,7 @@ public class SubServiceImpl implements SubService {
             Sub savedSub = subRepository.save(Sub.builder()
                     .user(subApplicants.getUser())
                     .game(subApplicants.getMatchApplication().getGame())
-                    .matchApplication(subApplicants.getMatchApplication())
+                    .team(subApplicants.getMatchApplication().getTeam())
                     .build());
         }
         return request;
@@ -167,7 +165,7 @@ public class SubServiceImpl implements SubService {
             Sub savedSub = subRepository.save(Sub.builder()
                     .user(subApplicants.getUser())
                     .game(subApplicants.getMatchApplication().getGame())
-                    .matchApplication(null)
+                    .team(null)
                     .build());
         }
         return request;
