@@ -1,11 +1,11 @@
 package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamReject;
-import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -140,12 +140,12 @@ public class MemberServiceImpl implements MemberService {
     public String leaveTeam(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         user.deleteTeam();
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return team.getName();
     }
@@ -162,10 +162,10 @@ public class MemberServiceImpl implements MemberService {
     public String delegateLeader(Long teamId, Long userId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         team.delegateLeader(user.getId());
 
@@ -184,7 +184,7 @@ public class MemberServiceImpl implements MemberService {
     public String banUser(Long userId, Long teamId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         user.deleteTeam();
 
@@ -208,7 +208,7 @@ public class MemberServiceImpl implements MemberService {
     public String banUserCancel(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);

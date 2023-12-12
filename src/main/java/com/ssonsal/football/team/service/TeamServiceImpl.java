@@ -2,6 +2,7 @@ package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.AmazonS3Util;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.dto.request.TeamCreateDto;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.team.dto.response.*;
@@ -101,10 +102,10 @@ public class TeamServiceImpl implements TeamService {
     public TeamDetailDto findTeamDetail(Long teamId) {
 
         TeamRecord teamRecord = teamRecordRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return TeamDetailDto.builder()
                 .team(team)
@@ -143,7 +144,7 @@ public class TeamServiceImpl implements TeamService {
         }
 
         User userInfo = userRepository.findById(user).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         teamCreateDto.setLeaderId(user);
         Team team = teamCreateDto.toEntity(teamCreateDto, url, key);
@@ -172,7 +173,7 @@ public class TeamServiceImpl implements TeamService {
     public TeamEditFormDto findTeamInfo(Long teamId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return new TeamEditFormDto(team);
     }
@@ -189,7 +190,7 @@ public class TeamServiceImpl implements TeamService {
     public Long editTeam(TeamEditDto teamEditDto) {
 
         Team team = teamRepository.findById(teamEditDto.getId()).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         String key = team.getLogoKey();
         String url = team.getLogoUrl();
@@ -235,7 +236,7 @@ public class TeamServiceImpl implements TeamService {
     public boolean checkNameDuplicate(String name, Long teamId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         if (team.getName().equals(name)) {
             return false;
@@ -255,7 +256,7 @@ public class TeamServiceImpl implements TeamService {
 
         List<User> users = teamRepository.findById(teamId)
                 .map(Team::getUsers)
-                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return users.stream()
                 .map(member -> new TeamMemberListDto(member, calculateAge(member.getBirth())))
@@ -272,10 +273,10 @@ public class TeamServiceImpl implements TeamService {
     public String findLeaderName(Long teamId) {
 
         Team leaderId = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         User user = userRepository.findById(leaderId.getLeaderId()).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return user.getNickname();
     }
@@ -342,7 +343,7 @@ public class TeamServiceImpl implements TeamService {
 
         List<User> users = teamRepository.findById(teamId)
                 .map(Team::getUsers)
-                .orElseThrow(() -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         OptionalDouble averageValue = users.stream()
                 .map(user -> calculateAge(user.getBirth()))
@@ -350,7 +351,7 @@ public class TeamServiceImpl implements TeamService {
                 .average();
 
         double average = averageValue.orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         String numberAsString = Double.toString(average);
         int frontOfAge = (int) Math.floor(average / 10) * 10;
@@ -404,7 +405,7 @@ public class TeamServiceImpl implements TeamService {
     public Integer findRank(Long teamId) {
 
         TeamRecord teamRecord = teamRecordRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return teamRecord.getRank();
     }
