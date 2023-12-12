@@ -57,6 +57,23 @@ public class SubApplicantController {
     }
 
     /**
+     * 용병 신청을 마감하는 api
+     *
+     * @param matchApplicationId 해당 매치 팀 식별자
+     * @return 마감된 매치 팀 식별자
+     */
+    @DeleteMapping("/{matchApplicationId}/sub-applicants")
+    public ResponseEntity<ResponseBodyFormatter> closeSubApplicant(@PathVariable Long matchApplicationId) {
+
+        Long loginUserId = 8L;
+
+        Long closedMatchApplicationId = subApplicantService.closeSubApplicant(loginUserId, matchApplicationId);
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS,
+                longIdToMap(CLOSED_MATCH_APPLICATION_ID, closedMatchApplicationId));
+    }
+
+    /**
      * 용병 신청을 거절하는 api
      *
      * @param subApplicantId 거절할 용병 신청 식별자

@@ -87,6 +87,21 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         }
     }
 
+
+    @Override
+    @Transactional
+    public Long closeSubApplicant(Long loginUserId, Long matchApplicationId) {
+
+        User loginUser = getUser(loginUserId);
+        Team userTeam = getUserTeam(loginUser);
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
+        validateInTargetTeam(matchApplication.getTeam(), userTeam);
+
+        matchApplication.closeSub();
+
+        return matchApplication.getId();
+    }
+
     @Override
     @Transactional
     public Long rejectSubApplicant(Long loginUserId, Long userTeamId, Long targetId) {

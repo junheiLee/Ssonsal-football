@@ -25,6 +25,7 @@ public final class GameConstant {
 
     public static final String CONFIRMED_GAME_ID = "confirmedGameId";
     public static final String MATCH_APPLICATION_ID = "matchApplicationId";
+    public static final String CLOSED_MATCH_APPLICATION_ID = "closeMatchApplicationId";
     public static final String REJECTED_MATCH_APPLICATION_ID = "rejectedMatchApplicationId";
     public static final String REJECTED_SUB_USER_ID = "rejectedSubUserId";
 

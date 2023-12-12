@@ -82,6 +82,11 @@ public class MatchApplication extends BaseEntity {
         this.applicationStatus = SUSPENSION.getDescription();
     }
 
+    public MatchApplication closeSub() {
+        this.subCount = 0;
+        return this;
+    }
+
     public void decreaseSubCount() {
         this.subCount -= 1;
     }

@@ -5,7 +5,6 @@ import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
-import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
 import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.game.util.GameResultSet;
@@ -14,7 +13,6 @@ import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamRecord;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
-import com.ssonsal.football.team.repository.TeamRepository;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,10 +36,8 @@ import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
 public class MatchTeamServiceImpl implements MatchTeamService {
 
     private final UserRepository userRepository;
-    private final GameRepository gameRepository;
     private final MatchApplicationRepository matchApplicationRepository;
     private final TeamRecordRepository teamRecordRepository;
-    private final TeamRepository teamRepository;
     private final SubRepository subRepository;
 
     @Override
@@ -60,11 +56,6 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         if (matchTeam == null) {
             throw new CustomException(NOT_EXIST_APPLICATION);
         }
-    }
-
-    private Team getTeam(Long teamId) {
-        return teamRepository.findById(teamId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_ID, teamId)));
     }
 
     @Override
