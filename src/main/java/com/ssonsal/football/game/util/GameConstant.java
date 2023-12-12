@@ -16,6 +16,7 @@ public final class GameConstant {
     public static final String GAMES = "games";
     public static final String MATCH_APPLICATIONS = "matchApplications";
     public static final String SUB_APPLICANTS = "subApplicants";
+    public static final String SUBS = "subs";
 
     public static final String USER_ID = "userId";
     public static final String GAME_ID = "gameId";
@@ -28,6 +29,8 @@ public final class GameConstant {
     public static final String CLOSED_MATCH_APPLICATION_ID = "closeMatchApplicationId";
     public static final String REJECTED_MATCH_APPLICATION_ID = "rejectedMatchApplicationId";
     public static final String REJECTED_SUB_USER_ID = "rejectedSubUserId";
+    public static final String CREATED_SUB_ID = "createdSubId";
+
 
     /* code */
     public static final int DELETED = 1;

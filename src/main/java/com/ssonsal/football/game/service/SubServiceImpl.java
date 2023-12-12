@@ -1,6 +1,8 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.SubInTeamDto;
+import com.ssonsal.football.game.dto.request.ApprovalSubRequestDto;
+import com.ssonsal.football.game.dto.response.SubsResponseDto;
+import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.Sub;
 import com.ssonsal.football.game.entity.SubApplicant;
@@ -9,6 +11,7 @@ import com.ssonsal.football.game.repository.SubApplicantRepository;
 import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,12 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.ssonsal.football.game.exception.GameErrorCode.NOT_EXIST_APPLICATION;
+import static com.ssonsal.football.game.exception.GameErrorCode.NOT_IN_TARGET_TEAM;
+import static com.ssonsal.football.game.exception.SubErrorCode.NOT_EXIST_SUB_APPLICANT;
+import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,49 +40,68 @@ public class SubServiceImpl implements SubService {
 
 
     @Override // 해당 팀 용병 목록
-    public List<SubInTeamDto> getTeamSubList(Long gameId, Long teamId) {
-        MatchApplication matchApplication = matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+    public List<SubsResponseDto> getTeamSubList(Long matchApplicationId) {
+
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
+        Team team = matchApplication.getTeam();
+        Game game = matchApplication.getGame();
+
         // 해당 게임에 참여하는 각 팀에 소속된 용병 목록
-        List<Sub> teamSubList = subRepository.findByGameIdAndTeamId(teamId, gameId);
-        // 용병 목록을 DTO로 매핑
-        List<SubInTeamDto> subInTeamDtos = teamSubList.stream()
-                .map(SubInTeamDto::mapToSubInTeamDto)
+        List<Sub> subs = subRepository.findByGameIdAndTeamId(team.getId(), game.getId());
+
+        List<SubsResponseDto> subsResponseDtos = subs.stream()
+                .map(SubsResponseDto::new)
                 .collect(Collectors.toList());
 
-        return subInTeamDtos;
+        return subsResponseDtos;
     }
 
 
     @Override
     @Transactional // 용병 승인
-    public String subAccept(Long userId, Long teamId, Long gameId) {
-        String request = "오류";
-        Long cookieId = 1L;
-        MatchApplication matchApplication = matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_PERMISSION));
-        User loginUser = userRepository.findById(cookieId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
+    public Long acceptSub(Long loginUserId, Long matchApplicationId, ApprovalSubRequestDto approvalSubDto) {
 
-        if (loginUser.getTeam().getId() == teamId) { // 현재 로그인 한 사람이 신청한 팀에 속해 있을때
+        User loginUser = getUser(loginUserId);
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
+        Long subApplicantId = approvalSubDto.getSubApplicantId();
 
-            // 용병 신청한 사람의 상태 값을 수락으로 변경
-            SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
-            //subApplicants.reject(ApplicantStatus.APPROVAL.getDescription());
+        Team targetTeam = matchApplication.getTeam();
+        validateUserInTargetTeam(targetTeam, loginUser.getTeam());
 
-            // 승인 후 용병 카운트 -1 (matchteam ->subAcount)
-            matchApplication.decreaseSubCount();
-            request = "Success";
+        SubApplicant subApplicant = subApplicantRepository.findById(subApplicantId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_SUB_APPLICANT,
+                        longIdToMap(SUB_APPLICANT_ID, subApplicantId)));
 
-            // 승인된 용병을 Sub 테이블에 추가하기
-            Sub savedSub = subRepository.save(Sub.builder()
-                    .user(subApplicants.getUser())
-                    .game(subApplicants.getMatchApplication().getGame())
-                    .team(subApplicants.getMatchApplication().getTeam())
-                    .build());
-        }
-        return request;
+        subApplicant.accept();
+        matchApplication.acceptSub();
+
+        Sub sub = subRepository.save(Sub.builder()
+                .user(subApplicant.getUser())
+                .game(matchApplication.getGame())
+                .team(loginUser.getTeam())
+                .build());
+
+        return sub.getId();
+
     }
 
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
 
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
+
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
+    }
+
+    private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
+
+        if (!targetTeam.equals(userTeam)) {
+            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
+            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+        }
+    }
 }

@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
+import static com.ssonsal.football.game.entity.ApplicantStatus.REFUSAL;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,6 +48,10 @@ public class SubApplicant extends BaseEntity {
     }
 
     public void reject() {
-        this.subApplicantStatus = ApplicantStatus.REFUSAL.getDescription();
+        this.subApplicantStatus = REFUSAL.getDescription();
+    }
+
+    public void accept() {
+        this.subApplicantStatus = APPROVAL.getDescription();
     }
 }

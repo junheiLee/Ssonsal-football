@@ -87,7 +87,7 @@ public class MatchApplication extends BaseEntity {
         return this;
     }
 
-    public void decreaseSubCount() {
+    public void acceptSub() {
         this.subCount -= 1;
     }
 }

@@ -31,15 +31,15 @@ public class MatchTeamController {
     /**
      * 게임에 참여하는 팀의 신청 및 팀 정보를 반환하는 api
      *
-     * @param matchTeamId 해당 게임 신청 아이디
+     * @param matchApplicationId 해당 게임 신청 아이디
      * @return 게임에 참여하는 팀의 신청 및 팀 정보와 요청자의 기본 정보
      */
-    @GetMapping("/{matchTeamId}")
-    public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long matchTeamId) {
+    @GetMapping("/{matchApplicationId}")
+    public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long matchApplicationId) {
         Long loginUserId = 1L;
         Long loginUserTeamId = 1L;
 
-        MatchTeamResponseDto matchTeam = matchTeamService.getMatchTeam(matchTeamId);
+        MatchTeamResponseDto matchTeam = matchTeamService.getMatchTeam(matchApplicationId);
 
         return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(loginUserId, loginUserTeamId, MATCH_TEAM, matchTeam));
     }
