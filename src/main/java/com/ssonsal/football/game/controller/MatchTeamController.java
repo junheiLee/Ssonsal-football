@@ -37,9 +37,9 @@ public class MatchTeamController {
     /**
      * 게임에 참여하는 팀의 신청 및 팀 정보를 반환하는 api
      *
-     * @param teamId    해당 팀 식별자
-     * @param gameId    해당 게임 식별자
-     * @return  게임에 참여하는 팀의 신청 및 팀 정보와 요청자의 기본 정보
+     * @param teamId 해당 팀 식별자
+     * @param gameId 해당 게임 식별자
+     * @return 게임에 참여하는 팀의 신청 및 팀 정보와 요청자의 기본 정보
      */
     @GetMapping("/{gameId}/match-teams/{teamId}")
     public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long teamId,
