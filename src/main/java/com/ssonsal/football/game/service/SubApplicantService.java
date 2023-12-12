@@ -7,10 +7,10 @@ import java.util.List;
 public interface SubApplicantService {
 
     // 팀별 용병 신청 현황
-    List<SubApplicantsResponseDto> getSubApplicantsByGameAndTeam(Long teamId, Long gameId);
+    List<SubApplicantsResponseDto> getSubApplicantsByMatchApplication(Long matchApplicationId);
 
     // 용병 신청
-    Long applySubApplicant(Long userId, Long teamId, Long gameId);
+    Long applySubApplicant(Long userId, Long matchApplicationId);
 
     // 용병 신청에 대한 거절
     Long rejectSubApplicant(Long userId, Long userTeamId, Long targetSubApplicantId);

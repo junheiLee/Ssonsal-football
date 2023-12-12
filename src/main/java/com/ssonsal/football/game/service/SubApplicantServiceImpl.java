@@ -5,7 +5,6 @@ import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.SubApplicant;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
 import com.ssonsal.football.game.repository.SubApplicantRepository;
-import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
@@ -33,29 +32,30 @@ import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 public class SubApplicantServiceImpl implements SubApplicantService {
 
     private final SubApplicantRepository subApplicantRepository;
-    private final SubRepository subRepository;
     private final MatchApplicationRepository matchApplicationRepository;
     private final UserRepository userRepository;
 
     @Override
-    public List<SubApplicantsResponseDto> getSubApplicantsByGameAndTeam(Long teamId, Long gameId) {
+    public List<SubApplicantsResponseDto> getSubApplicantsByMatchApplication(Long matchApplicationId) {
 
-        MatchApplication matchApplication = getMatchApplication(teamId, gameId);
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
 
-        List<SubApplicant> SubApplicants = matchApplication.getSubApplicants();
+        List<SubApplicant> SubApplicants
+                = subApplicantRepository.findAllByMatchApplicationAndSubApplicantStatus(matchApplication,
+                WAITING.getDescription());
         return SubApplicants.stream().map(SubApplicantsResponseDto::new).collect(Collectors.toList());
     }
 
 
     @Override
     @Transactional
-    public Long applySubApplicant(Long userId, Long teamId, Long gameId) {
+    public Long applySubApplicant(Long userId, Long matchApplicationId) {
 
         User user = getUser(userId);
-        MatchApplication matchApplication = getMatchApplication(teamId, gameId);
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
 
-        validateMatchRequireSub(matchApplication.getSubCount(), matchApplicantInfoToMap(teamId, gameId));
-        validateNotInTargetTeam(user, teamId);
+        validateRequireSub(matchApplication.getSubCount(), longIdToMap(MATCH_APPLICATION_ID, matchApplicationId));
+        validateNotInTargetTeam(user.getTeam(), matchApplication.getTeam());
         validateNotAlreadyApplication(userId, matchApplication);
 
         SubApplicant applicant = subApplicantRepository.save(
@@ -68,22 +68,21 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         return applicant.getId();
     }
 
-    private void validateMatchRequireSub(int subCount, Map<String, Long> teamIdAndGameId) {
+    private void validateRequireSub(int subCount, Map<String, Long> matchApplicantMap) {
 
         if (subCount <= ZERO) {
-            throw new CustomException(NOT_REQUIRED_SUB, teamIdAndGameId);
+            throw new CustomException(NOT_REQUIRED_SUB, matchApplicantMap);
         }
     }
 
-    private void validateNotInTargetTeam(User user, Long teamId) {
-        Team userTeam = user.getTeam();
-        if (userTeam != null && userTeam.getId() == teamId) {
-            throw new CustomException(ALREADY_IN_TEAM, longIdToMap(USER_ID, user.getId()));
+    private void validateNotInTargetTeam(Team userTeam, Team targetTeam) {
+        if (userTeam != null && userTeam == targetTeam) {
+            throw new CustomException(ALREADY_IN_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
         }
     }
 
     private void validateNotAlreadyApplication(Long userId, MatchApplication matchApplication) {
-        if (subApplicantRepository.findByMatchApplication(matchApplication).size() > ZERO) {
+        if (subApplicantRepository.findByUserIdAndMatchApplication(userId, matchApplication).size() > ZERO) {
             throw new CustomException(ALREADY_APPLICANT_SUB, longIdToMap(USER_ID, userId));
         }
     }
@@ -128,17 +127,11 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         }
     }
 
-    private MatchApplication getMatchApplication(Long teamId, Long gameId) {
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
 
-        return matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION, matchApplicantInfoToMap(teamId, gameId)));
-    }
-
-    private Map<String, Long> matchApplicantInfoToMap(Long teamId, Long gameId) {
-        Map<String, Long> teamIdAndGameId = longIdToMap(TEAM_ID, teamId);
-        teamIdAndGameId.put(GAME_ID, gameId);
-
-        return teamIdAndGameId;
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
     }
 
 }
