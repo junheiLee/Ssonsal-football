@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
-import static com.ssonsal.football.team.util.TeamConstant.DEFAULT_IMAGE;
+import static com.ssonsal.football.team.util.TeamConstant.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -147,20 +147,19 @@ public class TeamServiceImpl implements TeamService {
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         teamCreateDto.setLeaderId(user);
-        Team team = teamCreateDto.toEntity(teamCreateDto, url, key);
 
-        Team newTeam = teamRepository.save(team);
+        Team team = teamRepository.save(teamCreateDto.toEntity(teamCreateDto, url, key));
 
-        TeamRecord teamRecord = new TeamRecord(newTeam);
+        TeamRecord teamRecord = new TeamRecord(team);
         teamRecordRepository.save(teamRecord);
 
-        userInfo.joinTeam(newTeam);
+        userInfo.joinTeam(team);
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", newTeam.getId());
-        map.put("name", newTeam.getName());
+        Map<String, Object> newTeam = new HashMap<>();
+        newTeam.put(TEAM_ID, team.getId());
+        newTeam.put(TEAM_NAME, team.getName());
 
-        return map;
+        return newTeam;
     }
 
     /**
@@ -292,11 +291,11 @@ public class TeamServiceImpl implements TeamService {
 
         Map<String, Object> manage = new HashMap<>();
 
-        manage.put("teamLeader", findLeaderName(teamId));
-        manage.put("teamId", teamId);
-        manage.put("members", findMemberList(teamId));
-        manage.put("applies", findApplyList(teamId));
-        manage.put("rejects", findRejectList(teamId));
+        manage.put(TEAM_LEADER, findLeaderName(teamId));
+        manage.put(TEAM_ID, teamId);
+        manage.put(MEMBERS, findMemberList(teamId));
+        manage.put(APPLIES, findApplyList(teamId));
+        manage.put(REJECTS, findRejectList(teamId));
 
         return manage;
     }
