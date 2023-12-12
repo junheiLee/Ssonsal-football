@@ -7,10 +7,14 @@ import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.ssonsal.football.game.entity.ApplicantStatus.*;
 
 @Entity
 @Getter
-@ToString(exclude = {"team", "game"})
+@ToString(exclude = {"team", "game", "applicant", "matchApplication"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "match_application",
         uniqueConstraints = {
@@ -42,6 +46,9 @@ public class MatchApplication extends BaseEntity {
 
     private String applicationStatus;
 
+    @OneToMany(mappedBy = "matchApplication")
+    private List<SubApplicant> subApplicants = new ArrayList<>();
+
     @Builder
     public MatchApplication(User applicant, Team team, Game game,
                             String applicationStatus, MatchApplicationRequestDto matchTeamDto) {
@@ -51,7 +58,7 @@ public class MatchApplication extends BaseEntity {
         this.applicationStatus = applicationStatus;
         this.uniform = matchTeamDto.getUniform();
         this.subCount = matchTeamDto.getSubCount();
-        // game.getMatchTeams().add(this);
+        game.getMatchApplications().add(this);
     }
 
     public MatchApplication update(MatchApplicationRequestDto updateHomeTeamDto) {
@@ -63,19 +70,24 @@ public class MatchApplication extends BaseEntity {
     }
 
     public void approve() {
-        this.applicationStatus = ApplicantStatus.APPROVAL.getDescription();
+        this.applicationStatus = APPROVAL.getDescription();
         game.approveTeamApplicant(this.applicant, this.team);
     }
 
     public void reject() {
-        this.applicationStatus = ApplicantStatus.REFUSAL.getDescription();
+        this.applicationStatus = REFUSAL.getDescription();
     }
 
-    public void changeStatusToWaiting() {
-        this.applicationStatus = ApplicantStatus.WAITING.getDescription();
+    public void changeStatusToSuspension() {
+        this.applicationStatus = SUSPENSION.getDescription();
     }
 
-    public void decreaseSubCount() {
+    public MatchApplication closeSub() {
+        this.subCount = 0;
+        return this;
+    }
+
+    public void acceptSub() {
         this.subCount -= 1;
     }
 }

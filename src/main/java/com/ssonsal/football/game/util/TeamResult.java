@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.util;
 
-import com.ssonsal.football.game.exception.MatchErrorCode;
+import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.global.exception.CustomException;
 import lombok.Getter;
 
@@ -26,6 +26,6 @@ public enum TeamResult {
         return Arrays.stream(TeamResult.values())
                 .filter(result -> result.ko.equals(ko))
                 .findAny()
-                .orElseThrow(() -> new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT));
+                .orElseThrow(() -> new CustomException(GameErrorCode.IMPOSSIBLE_RESULT));
     }
 }

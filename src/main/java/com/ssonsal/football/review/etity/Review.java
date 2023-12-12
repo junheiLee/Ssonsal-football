@@ -43,7 +43,7 @@ public class Review extends BaseEntity {
     private int deleteCode;
 
     @Builder
-    public Review(User user, Game game, int reviewCode, Long targetId, int mannerScore, int skillScore, String comment){
+    public Review(User user, Game game, int reviewCode, Long targetId, int mannerScore, int skillScore, String comment) {
         this.user = user;
         this.game = game;
         this.reviewCode = reviewCode;

@@ -14,8 +14,10 @@ import java.util.List;
 @Repository
 public interface SubApplicantRepository extends JpaRepository<SubApplicant, Long> {
 
-    @Query("SELECT sa FROM SubApplicant sa WHERE match_team_id = :teamId")
-    List<SubApplicant> findByMatchApplication(@Param("teamId") Long teamId);
+    List<SubApplicant> findAllByMatchApplicationAndSubApplicantStatus(MatchApplication matchApplication,
+                                                                      String subApplicantStatus);
+
+    List<SubApplicant> findByUserIdAndMatchApplication(Long userId, MatchApplication matchApplication);
 
     @Transactional
     @Modifying // 용병 승인 후 (subCount - 1)

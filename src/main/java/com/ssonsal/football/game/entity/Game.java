@@ -11,6 +11,8 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -87,6 +89,12 @@ public class Game extends BaseEntity {
         this.account = gameRequestDto.getAccount();
 
         return this;
+    }
+
+    public void changeRemainApplicationsStatus() {
+        matchApplications.stream()
+                .filter(application -> application.getApplicationStatus().equals(WAITING.getDescription()))
+                .forEach(MatchApplication::changeStatusToSuspension);
     }
 
     public void approveTeamApplicant(User applicant, Team awayTeam) {

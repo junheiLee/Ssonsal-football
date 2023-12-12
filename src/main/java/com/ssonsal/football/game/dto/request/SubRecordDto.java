@@ -15,7 +15,7 @@ public class SubRecordDto {
     private Integer vsFormat;
     private String gameRule;
 
-    public SubRecordDto(LocalDateTime schedule,String gameRegion,String stadium,Integer vsFormat,String gameRule) {
+    public SubRecordDto(LocalDateTime schedule, String gameRegion, String stadium, Integer vsFormat, String gameRule) {
         this.schedule = schedule;
         this.gameRegion = gameRegion;
         this.stadium = stadium;

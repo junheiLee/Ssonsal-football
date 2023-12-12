@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
+import static com.ssonsal.football.game.entity.ApplicantStatus.REFUSAL;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +30,7 @@ public class SubApplicant extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-
-    @JoinColumn(name = "match_application_id") // match_team
+    @JoinColumn(name = "match_application_id")
     private MatchApplication matchApplication;
 
     @NotNull
@@ -36,7 +38,7 @@ public class SubApplicant extends BaseEntity {
     @JoinColumn(name = "user_id") // user
     private User user;
 
-    private String subApplicantStatus; // default 0; 0: 대기, 1: 확정, 2: 거절
+    private String subApplicantStatus; // default 대기;
 
     @Builder
     public SubApplicant(MatchApplication matchApplication, User user, String subApplicantStatus) {
@@ -45,11 +47,11 @@ public class SubApplicant extends BaseEntity {
         this.subApplicantStatus = subApplicantStatus;
     }
 
-    public SubApplicant(MatchApplication matchApplication, User user) {
-        this.matchApplication = matchApplication;
-        this.user = user;
+    public void reject() {
+        this.subApplicantStatus = REFUSAL.getDescription();
     }
-    public void UpdateSubStatus(String subApplicantStatus){
-        this.subApplicantStatus=subApplicantStatus;
+
+    public void accept() {
+        this.subApplicantStatus = APPROVAL.getDescription();
     }
 }

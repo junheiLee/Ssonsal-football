@@ -33,6 +33,7 @@ public class TeamRecord extends BaseEntity {
 
     private int totalGameCount;
 
+    @Column(name = "team_rank")
     private int rank;
 
 
@@ -57,6 +58,10 @@ public class TeamRecord extends BaseEntity {
                 + (this.loseCount * TeamResult.LOSE.getScore());
 
         return this;
+    }
+
+    public void enterRank(int rank) {
+        this.rank = rank;
     }
 
 //    public TeamRecord enterTeamToRecordSet(Team team){

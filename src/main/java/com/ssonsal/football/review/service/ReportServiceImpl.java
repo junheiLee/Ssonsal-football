@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ReportServiceImpl implements ReportService{
+public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
     private final ReviewRepository reviewRepository;
@@ -29,7 +29,7 @@ public class ReportServiceImpl implements ReportService{
     public List<ReportResponseDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
 
-        if(reports.isEmpty()){
+        if (reports.isEmpty()) {
             log.error("신고된 리뷰가 없습니다.");
             throw new CustomException(ReviewErrorCode.REPORT_NOT_FOUND);
         }
