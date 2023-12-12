@@ -35,18 +35,13 @@ public class SubApplicant extends BaseEntity {
     @JoinColumn(name = "user_id") // user
     private User user;
 
-    private String subApplicantStatus; // default 0; 0: 대기, 1: 확정, 2: 거절
+    private String subApplicantStatus; // default 대기;
 
     @Builder
     public SubApplicant(MatchApplication matchApplication, User user, String subApplicantStatus) {
         this.matchApplication = matchApplication;
         this.user = user;
         this.subApplicantStatus = subApplicantStatus;
-    }
-
-    public SubApplicant(MatchApplication matchApplication, User user) {
-        this.matchApplication = matchApplication;
-        this.user = user;
     }
 
     public void reject() {

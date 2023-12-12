@@ -1,7 +1,6 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.response.SubApplicantsResponseDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.SubApplicant;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
@@ -21,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.exception.SubErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
@@ -58,11 +58,12 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         validateNotInTargetTeam(user, teamId);
         validateNotAlreadyApplication(userId, matchApplication);
 
-        SubApplicant applicant = subApplicantRepository.save(SubApplicant.builder()
-                .matchApplication(matchApplication)
-                .user(user)
-                .subApplicantStatus(ApplicantStatus.WAITING.getDescription())
-                .build());
+        SubApplicant applicant = subApplicantRepository.save(
+                SubApplicant.builder()
+                        .matchApplication(matchApplication)
+                        .user(user)
+                        .subApplicantStatus(WAITING.getDescription())
+                        .build());
 
         return applicant.getId();
     }
@@ -75,7 +76,8 @@ public class SubApplicantServiceImpl implements SubApplicantService {
     }
 
     private void validateNotInTargetTeam(User user, Long teamId) {
-        if (user.getTeam().getId() == teamId) {
+        Team userTeam = user.getTeam();
+        if (userTeam != null && userTeam.getId() == teamId) {
             throw new CustomException(ALREADY_IN_TEAM, longIdToMap(USER_ID, user.getId()));
         }
     }

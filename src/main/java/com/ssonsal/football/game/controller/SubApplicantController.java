@@ -64,15 +64,15 @@ public class SubApplicantController {
     /**
      * 용병 신청을 거절하는 api
      *
-     * @param targetId 거절할 용병 신청 식별자
+     * @param subApplicantId 거절할 용병 신청 식별자
      * @return 거절된 용병 신청을 한 회원 아이디
      */
-    @DeleteMapping("/{gameId}/teams/{teamId}/sub-applicants/{targetId}")
-    public ResponseEntity<ResponseBodyFormatter> rejectSubApplicant(@PathVariable Long targetId) {
+    @DeleteMapping("/{gameId}/teams/{teamId}/sub-applicants/{subApplicantId}")
+    public ResponseEntity<ResponseBodyFormatter> rejectSubApplicant(@PathVariable Long subApplicantId) {
         Long userId = 1L;
         Long userTeamId = 1L;
 
-        Long rejectSubUserId = subApplicantService.rejectSubApplicant(userId, userTeamId, targetId);
+        Long rejectSubUserId = subApplicantService.rejectSubApplicant(userId, userTeamId, subApplicantId);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(REJECTED_SUB_USER_ID, rejectSubUserId));
     }
 

@@ -14,7 +14,7 @@ import static com.ssonsal.football.game.entity.ApplicantStatus.*;
 
 @Entity
 @Getter
-@ToString(exclude = {"team", "game"})
+@ToString(exclude = {"team", "game", "applicant", "matchApplication"})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "match_application",
         uniqueConstraints = {
