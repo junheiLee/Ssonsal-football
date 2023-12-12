@@ -53,7 +53,7 @@ public class MatchApplication extends BaseEntity {
         this.applicationStatus = applicationStatus;
         this.uniform = matchTeamDto.getUniform();
         this.subCount = matchTeamDto.getSubCount();
-        // game.getMatchTeams().add(this);
+        game.getMatchApplications().add(this);
     }
 
     public MatchApplication update(MatchApplicationRequestDto updateHomeTeamDto) {
