@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
+import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
+import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.service.GameService;
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -19,7 +22,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
 import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.GameSuccessCode.WAIT_FOR_ANOTHER_TEAM;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
@@ -74,6 +79,34 @@ public class GameController {
                 toMapIncludeUserInfo(loginUserId, loginUserTeamId, GAMES, gameDetailResponseDto));
     }
 
+    /**
+     * 상대팀을 구한 게임이 확정된 후, 각 팀에 경기 후 결과를 기입하는 기능
+     *
+     * @param gameId        url에서 가져오는 해당 게임의 식별자
+     * @param gameResultDto 확정된 게임에서 기입한 결과와 대상 팀
+     * @return 성공 코드와 해당 게임의 각각 두 팀의 result와 두 팀의 result를 더한 값을 ResponseBody에 담아 반환
+     */
+    @PostMapping("/{gameId}/result")
+    public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
+                                                             @RequestBody GameResultRequestDto gameResultDto) {
+
+        Long loginUserId = 7L;
+        GameResultResponseDto gameResult = gameService.enterResult(loginUserId, gameId, gameResultDto);
+
+        return setHttpStatus(gameResult);
+    }
+
+    private ResponseEntity<ResponseBodyFormatter> setHttpStatus(GameResultResponseDto gameResult) {
+
+        if (gameResult.getTotalScore() == null) {
+            throw new CustomException(NOT_MATCHING_RESULT, gameResult);
+        }
+        if (gameResult.getTotalScore() < TeamResult.END.getScore()) {
+            return DataResponseBodyFormatter.put(WAIT_FOR_ANOTHER_TEAM, gameResult);
+        }
+
+        return DataResponseBodyFormatter.put(SUCCESS, gameResult);
+    }
 
     /*
     수정 로직은 match status 에 따라 수정/삭제 가능 여부가 정해진 후 확정할 수 있음.
@@ -102,7 +135,6 @@ public class GameController {
 
         return DataResponseBodyFormatter.put(SUCCESS, updateGameResponseDto);
     }
-
 
     /**
      * 팀을 구하고 있는 게임 글 목록을 반환하는 api

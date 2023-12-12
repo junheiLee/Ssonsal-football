@@ -5,7 +5,6 @@ import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.dto.response.QMatchTeamResponseDto;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
 import static com.ssonsal.football.game.entity.QMatchApplication.matchApplication;
@@ -20,15 +19,14 @@ public class MatchApplicationRepositoryImpl implements MatchApplicationRepositor
     }
 
     @Override
-    public List<MatchTeamResponseDto> searchMatchTeamDto(Long teamId, Long gameId) {
+    public MatchTeamResponseDto searchMatchTeamDto(Long matchTeamId) {
         return queryFactory
                 .select(new QMatchTeamResponseDto(team.id, team.logoUrl, team.name, team.skillScore,
-                        matchApplication.uniform, matchApplication.subCount))
+                        matchApplication.game.id, matchApplication.uniform, matchApplication.subCount))
                 .from(matchApplication)
                 .join(matchApplication.team, team)
-                .where(matchApplication.game.id.eq(gameId),
-                        team.id.eq(teamId),
+                .where(matchApplication.id.eq(matchTeamId),
                         matchApplication.applicationStatus.eq(APPROVAL.getDescription()))
-                .fetch();
+                .fetchOne();
     }
 }

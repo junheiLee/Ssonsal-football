@@ -22,8 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static com.ssonsal.football.game.entity.MatchStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
@@ -47,21 +45,19 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     private final SubRepository subRepository;
 
     @Override
-    public MatchTeamResponseDto getMatchTeam(Long teamId, Long gameId) {
+    public MatchTeamResponseDto getMatchTeam(Long matchTeamId) {
 
-        Team team = getTeam(teamId);
-        Game game = getGame(gameId);
 
-        List<MatchTeamResponseDto> matchTeam = matchApplicationRepository.searchMatchTeamDto(teamId, gameId);
-        validateIsExistMatchTeam(matchTeam.size());
+        MatchTeamResponseDto matchTeam = matchApplicationRepository.searchMatchTeamDto(matchTeamId);
+        validateIsExistMatchTeam(matchTeam);
 
-        matchTeam.get(0).isHavingSub(subRepository.existsByTeamAndGame(team, game));
+        matchTeam.isHavingSub(subRepository.existsByTeamIdAndGameId(matchTeam.getTeamId(), matchTeam.getGameId()));
 
-        return matchTeam.get(0);
+        return matchTeam;
     }
 
-    private void validateIsExistMatchTeam(int matchTeamSize) {
-        if (matchTeamSize != 1) {
+    private void validateIsExistMatchTeam(MatchTeamResponseDto matchTeam) {
+        if (matchTeam == null) {
             throw new CustomException(NOT_EXIST_APPLICATION);
         }
     }
@@ -73,22 +69,20 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     @Override
     @Transactional
-    public Long approveAwayTeam(Long loginUserId, Long gameId,
-                                ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public Long approveAwayTeam(Long loginUserId, ApprovalTeamRequestDto approvalAwayTeamDto) {
 
         User loginUser = getUser(loginUserId);
-        Game game = getGame(gameId);
-        Long approvalTeamId = approvalAwayTeamDto.getTeamId();
+
+        Long matchApplicationId = approvalAwayTeamDto.getMatchApplicationId();
+        MatchApplication targetApplication = getMatchApplication(matchApplicationId);
+
+        Game game = targetApplication.getGame();
 
         validateUserInTargetTeam(game.getHome(), loginUser.getTeam());
         validateGameIsWaiting(game);
-        validateIsNotHome(game, approvalTeamId);
+        validateIsNotHome(game, targetApplication.getTeam());
 
         game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
-
-        MatchApplication targetApplication
-                = matchApplicationRepository.findByTeamIdAndGameId(approvalTeamId, gameId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION, longIdToMap(TEAM_ID, approvalTeamId)));
         targetApplication.approve();
 
         return game.getId();
@@ -99,9 +93,10 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
     }
 
-    private Game getGame(Long gameId) {
-        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
     }
 
     private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
@@ -119,8 +114,8 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         }
     }
 
-    private void validateIsNotHome(Game game, Long teamId) {
-        if (game.getHome().getId().equals(teamId)) {
+    private void validateIsNotHome(Game game, Team team) {
+        if (game.getHome().equals(team)) {
             log.error("home 은 신청한 팀이 아니므로 승인할 수 없음.");
             throw new CustomException(NOT_EXIST_APPLICATION);
         }
