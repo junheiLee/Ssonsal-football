@@ -46,7 +46,7 @@ public class MatchApplication extends BaseEntity {
 
     private String applicationStatus;
 
-    @OneToMany(mappedBy = "match_application")
+    @OneToMany(mappedBy = "matchApplication")
     private List<SubApplicant> subApplicants = new ArrayList<>();
 
     @Builder
