@@ -142,7 +142,7 @@ public class MemberServiceImpl implements MemberService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        user.deleteTeam(user);
+        user.deleteTeam();
 
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
@@ -164,9 +164,12 @@ public class MemberServiceImpl implements MemberService {
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        team.delegateLeader(userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        return userRepository.findById(userId).get().getNickname();
+        team.delegateLeader(user.getId());
+
+        return user.getNickname();
     }
 
     /**
@@ -183,7 +186,7 @@ public class MemberServiceImpl implements MemberService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
 
-        user.deleteTeam(user);
+        user.deleteTeam();
 
         RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);
