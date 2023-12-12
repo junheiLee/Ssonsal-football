@@ -33,7 +33,7 @@ public class SubServiceImpl implements SubService {
 
     @Override // 해당 팀 용병 목록
     public List<SubInTeamDto> getTeamSubList(Long gameId, Long teamId) {
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
+        MatchApplication matchApplication = matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
         // 해당 게임에 참여하는 각 팀에 소속된 용병 목록
         List<Sub> teamSubList = subRepository.findByGameIdAndTeamId(teamId, gameId);
@@ -51,7 +51,7 @@ public class SubServiceImpl implements SubService {
     public String subAccept(Long userId, Long teamId, Long gameId) {
         String request = "오류";
         Long cookieId = 1L;
-        MatchApplication matchApplication = matchApplicationRepository.findByGameIdAndTeamId(teamId, gameId)
+        MatchApplication matchApplication = matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_PERMISSION));
         User loginUser = userRepository.findById(cookieId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
@@ -60,7 +60,7 @@ public class SubServiceImpl implements SubService {
 
             // 용병 신청한 사람의 상태 값을 수락으로 변경
             SubApplicant subApplicants = subApplicantRepository.findByUserId(userId);
-            subApplicants.UpdateSubStatus(ApplicantStatus.APPROVAL.getDescription());
+            //subApplicants.reject(ApplicantStatus.APPROVAL.getDescription());
 
             // 승인 후 용병 카운트 -1 (matchteam ->subAcount)
             matchApplication.decreaseSubCount();

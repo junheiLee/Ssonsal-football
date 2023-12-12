@@ -27,8 +27,7 @@ public class SubApplicant extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-
-    @JoinColumn(name = "match_application_id") // match_team
+    @JoinColumn(name = "match_application_id")
     private MatchApplication matchApplication;
 
     @NotNull
@@ -50,7 +49,7 @@ public class SubApplicant extends BaseEntity {
         this.user = user;
     }
 
-    public void UpdateSubStatus(String subApplicantStatus) {
-        this.subApplicantStatus = subApplicantStatus;
+    public void reject() {
+        this.subApplicantStatus = ApplicantStatus.REFUSAL.getDescription();
     }
 }

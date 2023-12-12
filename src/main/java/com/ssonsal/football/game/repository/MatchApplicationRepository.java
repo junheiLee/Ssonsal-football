@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long>, MatchApplicationRepositoryCustom {
 
-    Optional<MatchApplication> findByGameIdAndTeamId(Long teamId, Long gameId);
+    Optional<MatchApplication> findByTeamIdAndGameId(Long teamId, Long gameId);
 
     List<MatchApplicationsResponseDto> findByGameIdAndApplicationStatusIs(Long gameId, String applicationStatus);
 }

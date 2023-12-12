@@ -1,13 +1,21 @@
 package com.ssonsal.football.game.controller;
 
-import com.ssonsal.football.game.dto.request.SubApplyListDto;
+import com.ssonsal.football.game.dto.response.SubApplicantsResponseDto;
 import com.ssonsal.football.game.service.SubApplicantService;
+import com.ssonsal.football.global.util.SuccessCode;
+import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
+import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,24 +28,52 @@ public class SubApplicantController {
     /**
      * 팀별 용병 신청 리스트 현황
      *
-     * @param logInUser 로그인 한 유저 아이디
-     * @param gameId    게임아이디
-     * @param teamId    팀아이디
-     * @return
+     * @param gameId 게임아이디
+     * @param teamId 팀아이디
+     * @return 해당 게임의 해당 팀의 용병 신청 목록과 요청한 회원의 기본 정보
      */
     @GetMapping("/{gameId}/teams/{teamId}/sub-applicants")
-    public List<SubApplyListDto> getSubRecordsByGameAndTeamId(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId) {
-        return subApplicantService.getSubRecordsByGameAndTeamId(logInUser.get("userId"), gameId, teamId);
+    public ResponseEntity<ResponseBodyFormatter> subApplicantsByTeamAndGame(@PathVariable Long gameId,
+                                                                            @PathVariable Long teamId) {
+
+        Long userId = 11L;
+        Long userTeamId = null;
+        List<SubApplicantsResponseDto> subApplicants = subApplicantService.getSubApplicantsByGameAndTeam(teamId, gameId);
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS,
+                toMapIncludeUserInfo(userId, userTeamId, SUB_APPLICANTS, subApplicants));
     }
 
-    @PostMapping("/{gameId}/teams/{teamId}/sub-applicants") // 용병 신청
-    public String SubApply(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId) {
-        return subApplicantService.subApplicant(logInUser.get("userId"), gameId, teamId);
+    /**
+     * 매치 팀에 용병 신청하는 api
+     *
+     * @param targetUser RequestBody 에 담겨 있는 용병 신청하는 userId
+     * @param gameId     매치 팀에 해당하는 게임 식별자
+     * @param teamId     매치 팀에 해당하는 팀 식별자
+     * @return 생성된 용병 신청 식별자
+     */
+    @PostMapping("/{gameId}/teams/{teamId}/sub-applicants")
+    public ResponseEntity<ResponseBodyFormatter> applyGameAsSub(@RequestBody Map<String, Long> targetUser,
+                                                                @PathVariable Long gameId,
+                                                                @PathVariable Long teamId) {
+
+        Long subApplicantId = subApplicantService.applySubApplicant(targetUser.get("userId"), teamId, gameId);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(SUB_APPLICANT_ID, subApplicantId));
     }
 
-    @PostMapping("/{gameId}/teams/{teamId}/sub-applicants/{userId}")//용병 거절
-    public String subReject(@RequestBody Map<String, Long> logInUser, @PathVariable Long gameId, @PathVariable Long teamId) {
-        return subApplicantService.subReject(logInUser.get("userId"), gameId, teamId);
+    /**
+     * 용병 신청을 거절하는 api
+     *
+     * @param targetId 거절할 용병 신청 식별자
+     * @return 거절된 용병 신청을 한 회원 아이디
+     */
+    @DeleteMapping("/{gameId}/teams/{teamId}/sub-applicants/{targetId}")
+    public ResponseEntity<ResponseBodyFormatter> rejectSubApplicant(@PathVariable Long targetId) {
+        Long userId = 1L;
+        Long userTeamId = 1L;
+
+        Long rejectSubUserId = subApplicantService.rejectSubApplicant(userId, userTeamId, targetId);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(REJECTED_SUB_USER_ID, rejectSubUserId));
     }
 
 }

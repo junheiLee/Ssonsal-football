@@ -86,7 +86,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
 
         MatchApplication targetApplication
-                = matchApplicationRepository.findByGameIdAndTeamId(approvalTeamId, gameId)
+                = matchApplicationRepository.findByTeamIdAndGameId(approvalTeamId, gameId)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION, longIdToMap(TEAM_ID, approvalTeamId)));
         targetApplication.approve();
 

@@ -7,6 +7,8 @@ import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.*;
 
@@ -43,6 +45,9 @@ public class MatchApplication extends BaseEntity {
     private int subCount;
 
     private String applicationStatus;
+
+    @OneToMany(mappedBy = "match_application")
+    private List<SubApplicant> subApplicants = new ArrayList<>();
 
     @Builder
     public MatchApplication(User applicant, Team team, Game game,

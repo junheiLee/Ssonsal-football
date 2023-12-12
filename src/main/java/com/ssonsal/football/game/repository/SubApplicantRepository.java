@@ -1,5 +1,6 @@
 package com.ssonsal.football.game.repository;
 
+import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.SubApplicant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,8 +14,7 @@ import java.util.List;
 @Repository
 public interface SubApplicantRepository extends JpaRepository<SubApplicant, Long> {
 
-    @Query("SELECT sa FROM SubApplicant sa WHERE match_team_id = :teamId")
-    List<SubApplicant> findByMatchApplication(@Param("teamId") Long teamId);
+    List<SubApplicant> findByMatchApplication(MatchApplication matchApplication);
 
     @Transactional
     @Modifying // 용병 승인 후 (subCount - 1)
