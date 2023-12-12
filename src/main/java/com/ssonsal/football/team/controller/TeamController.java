@@ -123,9 +123,9 @@ public class TeamController {
         }
 
         Map<String, Object> details = new HashMap<>();
-        details.put("userLevel", userLevel);
-        details.put("detail", teamService.findTeamDetail(teamId));
-        details.put("members", teamService.findMemberList(teamId));
+        details.put(USER_LEVEL, userLevel);
+        details.put(DETAIL, teamService.findTeamDetail(teamId));
+        details.put(MEMBERS, teamService.findMemberList(teamId));
 
         return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, details);
     }
