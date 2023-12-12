@@ -2,6 +2,7 @@ package com.ssonsal.football.team.dto.response;
 
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamRecord;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,8 @@ public class TeamDetailDto {
 
     private Integer memberCount;
 
-    public TeamDetailDto(Team team, TeamRecord teamRecord, Integer memberCount) {
+    @Builder
+    public TeamDetailDto(Team team, TeamRecord teamRecord, Integer memberCount, String leaderName) {
         this.id = team.getId();
         this.logoUrl = team.getLogoUrl();
         this.name = team.getName();
@@ -51,6 +53,7 @@ public class TeamDetailDto {
         this.skillScore = team.getSkillScore();
         this.memberCount = memberCount;
         this.ranking = teamRecord.getRank();
+        this.leaderName = leaderName;
     }
 
 }

@@ -111,7 +111,12 @@ public class TeamServiceImpl implements TeamService {
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
 
-        TeamDetailDto teamDetailDto = new TeamDetailDto(team, teamRecord, team.getUsers().size());
+        TeamDetailDto teamDetailDto = TeamDetailDto.builder()
+                .team(team)
+                .teamRecord(teamRecord)
+                .memberCount(team.getUsers().size())
+                .leaderName(findLeaderName(teamId))
+                .build();
 
         return teamDetailDto;
     }
