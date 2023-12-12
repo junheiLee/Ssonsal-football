@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 
-
     private final UserRepository userRepository;
 
     @Override

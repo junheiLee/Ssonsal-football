@@ -1,13 +1,14 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
+import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
+import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
+import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.Team;
@@ -21,8 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 
-import static com.ssonsal.football.game.util.GameConstant.GAME_ID;
-import static com.ssonsal.football.game.util.GameConstant.USER_ID;
+import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
+import static com.ssonsal.football.game.exception.GameErrorCode.*;
+import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
 
@@ -36,25 +38,28 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final GameRepository gameRepository;
     private final MatchApplicationRepository matchApplicationRepository;
 
+    @Override
+    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
+        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
+    }
+
+    @Override
     @Transactional
-    public Long applyToGameAsAway(Long gameId, Long userId, MatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToMatchAsAway(Long loginUserId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
 
-        // 공통 처리 고안 필수
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-        Team team = user.getTeam();
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
+        User loginUser = getUser(loginUserId);
+        Team loginUserTeam = validateUserInTeam(loginUser.getTeam());
+        Game game = getGame(gameId);
 
-        checkWriterInTeam(team);
-        checkDuplicateApplication(team, game);
+        validateGameIsWaiting(game);
+        validateNewApplication(loginUserTeam, game);
 
         MatchApplication matchApplication = matchApplicationRepository.save(
                 MatchApplication.builder()
-                        .applicant(user)
-                        .team(team)
+                        .applicant(loginUser)
+                        .team(loginUserTeam)
                         .game(game)
-                        .applicationStatus(ApplicantStatus.WAITING.getDescription())
+                        .applicationStatus(WAITING.getDescription())
                         .matchTeamDto(applicationTeamDto)
                         .build()
         );
@@ -62,28 +67,31 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         return matchApplication.getId();
     }
 
-    @Transactional
-    public Long rejectApplicationAsAway(Long userId, Long gameId, Long matchApplicationId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    private Team validateUserInTeam(Team userTeam) {
 
-        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
-            throw new CustomException(FORBIDDEN_USER);
+        if (userTeam == null) {
+            throw new CustomException(GameErrorCode.NOT_IN_TEAM);
         }
-
-        MatchApplication matchApplication = matchApplicationRepository.findById(matchApplicationId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST));
-        matchApplication.reject();
-
-        return matchApplication.getId();
+        return userTeam;
     }
 
+    private Game getGame(Long gameId) {
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
+                .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    }
 
-    private void checkDuplicateApplication(Team team, Game game) {
+    private void validateGameIsWaiting(Game game) {
+
+        if (game.getMatchStatus() != MatchStatus.WAITING.getCodeNumber()) {
+            throw new CustomException(NOT_WAITING_GAME, longIdToMap(GAME_ID, game.getId()));
+        }
+    }
+
+    private void validateNewApplication(Team team, Game game) {
 
         if (Objects.equals(team, game.getHome())) {
-            log.info("해당 게임에 이미 확정된 팀입니다.");
-            throw new CustomException(MatchErrorCode.ALREADY_APPROVAL_TEAM);
+            log.info("해당 게임의 등록 팀입니다.");
+            throw new CustomException(ALREADY_APPROVAL_TEAM);
         }
 
         List<MatchApplication> matchApplications = game.getMatchApplications();
@@ -91,13 +99,38 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
         if (count != 0) {
             log.info("해당 게임에 이미 신청한 팀입니다.");
-            throw new CustomException(MatchErrorCode.ALREADY_APPLICANT_TEAM);
+            throw new CustomException(ALREADY_APPLICANT_TEAM);
         }
     }
 
-    private void checkWriterInTeam(Team team) {
-        if (team == null) {
-            throw new CustomException(GameErrorCode.WRITER_NOT_IN_TEAM);
+    @Override
+    @Transactional
+    public Long rejectMatchApplication(Long loginUserId, Long gameId, Long matchApplicationId) {
+        User loginUser = getUser(loginUserId);
+        validateUserPermission(loginUser, gameId);
+
+        MatchApplication matchApplication
+                = matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(
+                        () -> new CustomException(NOT_EXIST_APPLICATION,
+                                longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
+
+        matchApplication.reject();
+        return matchApplication.getId();
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private void validateUserPermission(User user, Long gameId) {
+
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+
+            log.error("게임의 작성자만 신청을 거절할 수 있습니다. userId ={}", user.getId());
+            throw new CustomException(FORBIDDEN_USER, Transfer.longIdToMap(USER_ID, user.getId()));
         }
     }
+
 }

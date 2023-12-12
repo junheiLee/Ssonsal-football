@@ -3,17 +3,14 @@ package com.ssonsal.football.game.service;
 import com.ssonsal.football.game.dto.request.GameRequestDto;
 import com.ssonsal.football.game.dto.request.GameResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.MatchStatus;
-import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.exception.MatchErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
-import com.ssonsal.football.game.util.GameResult;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
@@ -30,6 +27,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
+import static com.ssonsal.football.game.entity.MatchStatus.CONFIRMED;
+import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
@@ -46,19 +46,24 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional
-    public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicationRequestDto homeTeamDto) {
+    public GameDetailResponseDto getDetail(Long gameId) {
 
-        checkTargetIsExist(gameDto.isFindAway(), homeTeamDto.getSubCount());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-        Team homeTeam = user.getTeam();
-        checkWriterInTeam(homeTeam);
+        Game game = getGame(gameId);
+        return new GameDetailResponseDto(game);
+    }
+
+    @Override
+    @Transactional
+    public Long createGame(Long loginUserId, GameRequestDto gameDto, MatchApplicationRequestDto homeDto) {
+
+        validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());
+        User loginUser = getUser(loginUserId);
+        Team home = getUserTeam(loginUser);
 
         Game game = gameRepository.save(
                 Game.builder()
-                        .writer(user)
-                        .home(homeTeam)
+                        .writer(loginUser)
+                        .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
                         .schedule(stringToLocalDateTime(gameDto.getSchedule()))
                         .gameRequestDto(gameDto)
@@ -66,65 +71,99 @@ public class GameServiceImpl implements GameService {
 
         matchApplicationRepository.save(
                 MatchApplication.builder()
-                        .applicant(user)
-                        .team(homeTeam)
+                        .applicant(loginUser)
+                        .team(home)
                         .game(game)
-                        .applicationStatus(ApplicantStatus.APPROVAL.getDescription())
-                        .matchTeamDto(homeTeamDto)
+                        .applicationStatus(APPROVAL.getDescription())
+                        .matchTeamDto(homeDto)
                         .build());
 
         return game.getId();
     }
 
-    @Override
-    @Transactional
-    public Long updateGame(Long userId, Long gameId,
-                           GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-
-        // 요청한 사람이 해당 게임 작성자인지 확인
-        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
-            throw new CustomException(FORBIDDEN_USER);
+    private void validateHasTarget(boolean findAway, int subCount) {
+        if (!findAway && subCount == 0) {
+            log.error("구하는 대상이 있어야 게임 글을 올릴 수 있음.");
+            throw new CustomException(NOT_FOUND_TARGET);
         }
+    }
 
-        // 게임 정보 변경
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
-        game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
 
-        MatchApplication homeTeam = matchApplicationRepository.findByGameAndTeam(game, game.getHome());
-        homeTeam.update(updateHomeTeamDto);
+    private Team getUserTeam(User user) {
+        Team userTeam = user.getTeam();
 
-        return gameId;
+        if (userTeam == null) {
+            throw new CustomException(NOT_IN_TEAM);
+        }
+        return userTeam;
+    }
+
+    private MatchStatus isRequireAway(boolean isNeedAway) {
+        if (isNeedAway) {
+            return MatchStatus.WAITING;
+        }
+        return CONFIRMED;
+    }
+
+    private LocalDateTime stringToLocalDateTime(String dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        log.info("stringToLocalDateTime = {}", dateTime);
+        return LocalDateTime.parse(dateTime, formatter);
     }
 
     @Override
     @Transactional
-    public GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto) {
+    public GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto) {
 
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
-        checkAbleToEnterResult(game);
+        Game game = getGame(gameId);
+        validateAbleToEnterResult(game);
+
+        User loginUser = getUser(loginUserId);
 
         String result = gameResultDto.getResult();
+        String target = gameResultDto.getTarget();
 
         // 해당 팀의 팀원이 한 요청인지 확인 후 matchTeamService 호출
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-        if (gameResultDto.getTarget().equals(AWAY)) {
+        if (target.equals(HOME)) {
 
-            checkUserInTeam(game.getAway(), user.getTeam());
-            return matchTeamService.enterAwayTeamResult(game, TeamResult.peekResult(result));
-        }
-        if (gameResultDto.getTarget().equals(HOME)) {
-
-            checkUserInTeam(game.getHome(), user.getTeam());
+            validateUserInTargetTeam(game.getHome(), loginUser.getTeam());
             return matchTeamService.enterHomeTeamResult(game, TeamResult.peekResult(result));
         }
 
-        throw new CustomException(MatchErrorCode.IMPOSSIBLE_RESULT);
+        if (target.equals(AWAY)) {
+
+            validateUserInTargetTeam(game.getAway(), loginUser.getTeam());
+            return matchTeamService.enterAwayTeamResult(game, TeamResult.peekResult(result));
+        }
+
+        throw new CustomException(IMPOSSIBLE_RESULT);
+    }
+
+    private Game getGame(Long gameId) {
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    }
+
+    private void validateAbleToEnterResult(Game game) {
+        if (game.getMatchStatus() != CONFIRMED.getCodeNumber()) {
+            log.error("대기 중이거나 종료된 게임은 결과를 기입할 수 없음.");
+            throw new CustomException(CAN_NOT_ENTER_RESULT, longIdToMap(GAME_ID, game.getId()));
+        }
+        if (game.getAway() == null) {
+            log.error("확정이지만 상대 팀을 구하지 않는 게임 글인 경우 결과 기입 불가");
+            throw new CustomException(CAN_NOT_ENTER_RESULT, longIdToMap(GAME_ID, game.getId()));
+        }
+    }
+
+    private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
+        if (!targetTeam.equals(userTeam)) {
+            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
+            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+        }
     }
 
     @Override
@@ -152,47 +191,29 @@ public class GameServiceImpl implements GameService {
         return gameRepository.searchOurGameAsTeam(teamId);
     }
 
-    private void checkAbleToEnterResult(Game game) {
-        if (game.getMatchStatus() != MatchStatus.CONFIRMED.getCodeNumber()) {
-            log.error("대기 중이거나 종료된 게임은 결과를 기입할 수 없음.");
-            throw new CustomException(GameErrorCode.CAN_NOT_ENTER_RESULT, game.getId());
-        }
-        if (game.getAway() == null) {
-            log.error("상대 팀을 구하지 않는 게임 글인 경우 결과 기입 불가");
-            throw new CustomException(GameErrorCode.CAN_NOT_ENTER_RESULT);
-        }
-    }
+    @Override
+    @Transactional
+    @Deprecated
+    public Long updateGame(Long loginUserId, Long gameId,
+                           GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
 
-    private void checkUserInTeam(Team targetTeam, Team userTeam) {
-        if (!targetTeam.equals(userTeam)) {
-            log.error("user가 접근하려는 Team의 팀원이 아님.");
-            throw new CustomException(MatchErrorCode.NOT_TEAM_MEMBER);
-        }
-    }
+        User loginUser = getUser(loginUserId);
 
-    private void checkWriterInTeam(Team team) {
-        if (team == null) {
-            throw new CustomException(GameErrorCode.WRITER_NOT_IN_TEAM);
+        // 요청한 사람이 해당 게임 작성자인지 확인
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, loginUser)) {
+            throw new CustomException(FORBIDDEN_USER);
         }
-    }
 
-    private void checkTargetIsExist(boolean findAway, int subCount) {
-        if (!findAway && subCount == 0) {
-            log.error("구하는 대상이 있어야 게임 글을 올릴 수 있음.");
-            throw new CustomException(GameErrorCode.NOT_FOUND_TARGET);
-        }
-    }
+        // 게임 정보 변경
+        Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
+        game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
 
-    private LocalDateTime stringToLocalDateTime(String dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        log.info("stringToLocalDateTime = {}", dateTime);
-        return LocalDateTime.parse(dateTime, formatter);
-    }
+        MatchApplication homeTeam
+                = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), game.getId())
+                .orElseThrow();
+        homeTeam.update(updateHomeTeamDto);
 
-    private MatchStatus isRequireAway(boolean isNeedAway) {
-        if (isNeedAway) {
-            return MatchStatus.WAITING;
-        }
-        return MatchStatus.CONFIRMED;
+        return gameId;
     }
 }

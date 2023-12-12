@@ -172,7 +172,7 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto) {
 
-        Long user = 1L;
+        Long user = 11L;
 
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);

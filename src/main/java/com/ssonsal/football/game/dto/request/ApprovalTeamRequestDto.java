@@ -7,6 +7,6 @@ import lombok.ToString;
 @Getter
 public class ApprovalTeamRequestDto {
 
-    private Long teamId;
+    private Long matchApplicationId;
 
 }

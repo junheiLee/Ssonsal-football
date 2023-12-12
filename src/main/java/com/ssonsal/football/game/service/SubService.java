@@ -1,17 +1,18 @@
 package com.ssonsal.football.game.service;
 
 
-import com.ssonsal.football.game.dto.request.SubRecordDto;
+import com.ssonsal.football.game.dto.request.ApprovalSubRequestDto;
+import com.ssonsal.football.game.dto.response.SubsResponseDto;
 
 import java.util.List;
 
 public interface SubService {
 
-    //용병 신청
-    String subApplicant(Long gameId, Long teamId, Long id);
+    // 팀에 소속된 용병 (각 게임별)
+    List<SubsResponseDto> getTeamSubList(Long matchApplicationId);
 
-    //용병으로 참여한 기록
-    List<SubRecordDto> getSubRecordsByUserId(Long userId);
+    // 용병신청에 대한 승낙
+    Long acceptSub(Long loginUserId, Long matchApplicationId, ApprovalSubRequestDto approvalSubDto);
 
-    String subAccept(Long userId, Long gameId, Long teamId);
+
 }

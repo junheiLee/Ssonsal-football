@@ -4,7 +4,10 @@ import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;

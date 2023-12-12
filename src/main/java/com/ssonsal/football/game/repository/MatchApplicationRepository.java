@@ -1,16 +1,16 @@
 package com.ssonsal.football.game.repository;
 
-import com.ssonsal.football.game.entity.Game;
+import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.MatchApplication;
-import com.ssonsal.football.team.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 
-public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long> {
+public interface MatchApplicationRepository extends JpaRepository<MatchApplication, Long>, MatchApplicationRepositoryCustom {
 
-    MatchApplication findByGameAndTeam(Game game, Team team);
-  
-    Optional<MatchApplication> findByGameIdAndTeamId(Long gameId, Long teamId);
+    Optional<MatchApplication> findByTeamIdAndGameId(Long teamId, Long gameId);
+
+    List<MatchApplicationsResponseDto> findByGameIdAndApplicationStatusIs(Long gameId, String applicationStatus);
 }
