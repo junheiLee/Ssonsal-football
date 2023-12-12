@@ -15,6 +15,7 @@ public final class TeamConstant {
     public static final String REJECTS = "rejects";
 
     public static final String FORM = "form";
+    public static final String DETAIL = "detail";
 
     public static final String USER_LEVEL = "userLevel";
 
