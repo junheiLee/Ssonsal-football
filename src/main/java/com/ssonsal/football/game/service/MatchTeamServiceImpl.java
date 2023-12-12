@@ -71,15 +71,16 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                 .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_ID, teamId)));
     }
 
+    @Override
     @Transactional
-    public Long approveAwayTeam(Long userId, Long gameId,
+    public Long approveAwayTeam(Long loginUserId, Long gameId,
                                 ApprovalTeamRequestDto approvalAwayTeamDto) {
 
-        User user = getUser(userId);
+        User loginUser = getUser(loginUserId);
         Game game = getGame(gameId);
         Long approvalTeamId = approvalAwayTeamDto.getTeamId();
 
-        validateUserInTargetTeam(game.getHome(), user.getTeam());
+        validateUserInTargetTeam(game.getHome(), loginUser.getTeam());
         validateGameIsWaiting(game);
         validateIsNotHome(game, approvalTeamId);
 
@@ -125,6 +126,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         }
     }
 
+    @Override
     @Transactional
     public GameResultResponseDto enterHomeTeamResult(Game game, TeamResult homeResult) {
 
@@ -157,6 +159,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         return GameResultResponseDto.builder().build();
     }
 
+    @Override
     @Transactional
     public GameResultResponseDto enterAwayTeamResult(Game game, TeamResult awayResult) {
         String homeResultInKo = game.getHometeamResult();

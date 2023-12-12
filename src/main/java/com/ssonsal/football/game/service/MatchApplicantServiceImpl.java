@@ -39,24 +39,25 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchApplicationRepository matchApplicationRepository;
 
     @Override
-    public List<MatchApplicationsResponseDto> findAWaitingApplications(Long gameId) {
+    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
         return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
     }
 
+    @Override
     @Transactional
-    public Long applyToMatchAsAway(Long userId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToMatchAsAway(Long loginUserId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
 
-        User user = getUser(userId);
-        Team team = validateUserInTeam(user.getTeam());
+        User loginUser = getUser(loginUserId);
+        Team loginUserTeam = validateUserInTeam(loginUser.getTeam());
         Game game = getGame(gameId);
 
         validateGameIsWaiting(game);
-        validateDuplicationApplication(team, game);
+        validateNewApplication(loginUserTeam, game);
 
         MatchApplication matchApplication = matchApplicationRepository.save(
                 MatchApplication.builder()
-                        .applicant(user)
-                        .team(team)
+                        .applicant(loginUser)
+                        .team(loginUserTeam)
                         .game(game)
                         .applicationStatus(WAITING.getDescription())
                         .matchTeamDto(applicationTeamDto)
@@ -86,7 +87,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         }
     }
 
-    private void validateDuplicationApplication(Team team, Game game) {
+    private void validateNewApplication(Team team, Game game) {
 
         if (Objects.equals(team, game.getHome())) {
             log.info("해당 게임의 등록 팀입니다.");
@@ -102,10 +103,11 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         }
     }
 
+    @Override
     @Transactional
-    public Long rejectMatchApplication(Long userId, Long gameId, Long matchApplicationId) {
-        User user = getUser(userId);
-        validateUserPermission(user, gameId);
+    public Long rejectMatchApplication(Long loginUserId, Long gameId, Long matchApplicationId) {
+        User loginUser = getUser(loginUserId);
+        validateUserPermission(loginUser, gameId);
 
         MatchApplication matchApplication
                 = matchApplicationRepository.findById(matchApplicationId)

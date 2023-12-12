@@ -1,7 +1,6 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.SubInTeamDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
 import com.ssonsal.football.game.entity.MatchApplication;
 import com.ssonsal.football.game.entity.Sub;
 import com.ssonsal.football.game.entity.SubApplicant;

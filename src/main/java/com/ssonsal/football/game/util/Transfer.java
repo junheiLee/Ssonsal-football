@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.util;
 
-import com.ssonsal.football.game.dto.UserInfoDto;
+import com.ssonsal.football.game.dto.LoginUserInfoDto;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,12 +26,12 @@ public class Transfer {
     public static Map<String, Object> toMapIncludeUserInfo(Long userId, Long teamId, String key, Object dto) {
 
         Map<String, Object> mapData = new HashMap<>();
-        UserInfoDto userInfoDto = UserInfoDto.builder()
+        LoginUserInfoDto loginUserInfoDto = LoginUserInfoDto.builder()
                 .userId(userId)
                 .teamId(teamId)
                 .build();
 
-        mapData.put(USER_INFO, userInfoDto);
+        mapData.put(USER_INFO, loginUserInfoDto);
         mapData.put(key, dto);
 
         return mapData;

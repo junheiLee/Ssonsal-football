@@ -5,13 +5,13 @@ import lombok.*;
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserInfoDto {
+public class LoginUserInfoDto {
 
     private Long userId;
     private Long teamId;
 
     @Builder
-    public UserInfoDto(Long userId, Long teamId) {
+    public LoginUserInfoDto(Long userId, Long teamId) {
         this.userId = userId;
         this.teamId = teamId;
     }

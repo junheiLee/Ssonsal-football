@@ -54,15 +54,15 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
-    public Long createGame(Long userId, GameRequestDto gameDto, MatchApplicationRequestDto homeDto) {
+    public Long createGame(Long loginUserId, GameRequestDto gameDto, MatchApplicationRequestDto homeDto) {
 
         validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());
-        User user = getUser(userId);
-        Team home = getUserTeam(user);
+        User loginUser = getUser(loginUserId);
+        Team home = getUserTeam(loginUser);
 
         Game game = gameRepository.save(
                 Game.builder()
-                        .writer(user)
+                        .writer(loginUser)
                         .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
                         .schedule(stringToLocalDateTime(gameDto.getSchedule()))
@@ -71,7 +71,7 @@ public class GameServiceImpl implements GameService {
 
         matchApplicationRepository.save(
                 MatchApplication.builder()
-                        .applicant(user)
+                        .applicant(loginUser)
                         .team(home)
                         .game(game)
                         .applicationStatus(APPROVAL.getDescription())
@@ -117,12 +117,12 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
-    public GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto) {
+    public GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto) {
 
         Game game = getGame(gameId);
         validateAbleToEnterResult(game);
 
-        User user = getUser(userId);
+        User loginUser = getUser(loginUserId);
 
         String result = gameResultDto.getResult();
         String target = gameResultDto.getTarget();
@@ -130,13 +130,13 @@ public class GameServiceImpl implements GameService {
         // 해당 팀의 팀원이 한 요청인지 확인 후 matchTeamService 호출
         if (target.equals(HOME)) {
 
-            validateUserInTargetTeam(game.getHome(), user.getTeam());
+            validateUserInTargetTeam(game.getHome(), loginUser.getTeam());
             return matchTeamService.enterHomeTeamResult(game, TeamResult.peekResult(result));
         }
 
         if (target.equals(AWAY)) {
 
-            validateUserInTargetTeam(game.getAway(), user.getTeam());
+            validateUserInTargetTeam(game.getAway(), loginUser.getTeam());
             return matchTeamService.enterAwayTeamResult(game, TeamResult.peekResult(result));
         }
 
@@ -194,13 +194,13 @@ public class GameServiceImpl implements GameService {
     @Override
     @Transactional
     @Deprecated
-    public Long updateGame(Long userId, Long gameId,
+    public Long updateGame(Long loginUserId, Long gameId,
                            GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
 
-        User user = getUser(userId);
+        User loginUser = getUser(loginUserId);
 
         // 요청한 사람이 해당 게임 작성자인지 확인
-        if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
+        if (!gameRepository.existsByIdAndWriterEquals(gameId, loginUser)) {
             throw new CustomException(FORBIDDEN_USER);
         }
 

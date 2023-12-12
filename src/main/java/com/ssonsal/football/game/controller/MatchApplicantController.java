@@ -36,11 +36,11 @@ public class MatchApplicantController {
     @GetMapping("/{gameId}/match-applications")
     public ResponseEntity<ResponseBodyFormatter> matchApplications(@PathVariable Long gameId) {
 
-        Long userId = 2L;
-        Long teamId = null;
-        List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findAWaitingApplications(gameId);
+        Long loginUserId = 2L;
+        Long loginUserTeamId = null;
+        List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findWaitingApplications(gameId);
         return DataResponseBodyFormatter
-                .put(SUCCESS, toMapIncludeUserInfo(userId, teamId, MATCH_APPLICATIONS, matchApplications));
+                .put(SUCCESS, toMapIncludeUserInfo(loginUserId, loginUserTeamId, MATCH_APPLICATIONS, matchApplications));
     }
 
     /**
@@ -58,8 +58,8 @@ public class MatchApplicantController {
     public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody MatchApplicationRequestDto applicationTeamDto,
                                                                    @PathVariable Long gameId) {
 
-        Long userId = 7L;
-        Long matchApplicantId = matchApplicantService.applyToMatchAsAway(userId, gameId, applicationTeamDto);
+        Long loginUserId = 7L;
+        Long matchApplicantId = matchApplicantService.applyToMatchAsAway(loginUserId, gameId, applicationTeamDto);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
@@ -76,9 +76,9 @@ public class MatchApplicantController {
     public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
                                                                          @PathVariable Long gameId) {
 
-        Long userId = 3L;
+        Long loginUserId = 3L;
         Long rejectedMatchApplicationId
-                = matchApplicantService.rejectMatchApplication(userId, gameId, matchApplicationId);
+                = matchApplicantService.rejectMatchApplication(loginUserId, gameId, matchApplicationId);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));

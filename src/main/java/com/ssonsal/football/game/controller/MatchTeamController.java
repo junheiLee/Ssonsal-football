@@ -44,17 +44,17 @@ public class MatchTeamController {
     @GetMapping("/{gameId}/match-teams/{teamId}")
     public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long teamId,
                                                                @PathVariable Long gameId) {
-        Long userId = 1L;
-        Long userTeamId = 1L;
+        Long loginUserId = 1L;
+        Long loginUserTeamId = 1L;
 
         MatchTeamResponseDto matchTeam = matchTeamService.getMatchTeam(teamId, gameId);
 
-        return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(userId, teamId, MATCH_TEAM, matchTeam));
+        return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(loginUserId, teamId, MATCH_TEAM, matchTeam));
     }
 
     /**
      * 신청한 팀 중 한 팀을 대상으로 승인하는 기능
-     * <p>
+     *
      * 승-패, 무-무 외의 입력 시, 두 결과를 모두 null로 초기화 후 예외 발생
      * 대기 중이거나 종료된 게임의 경우 예외 발생
      * 상대 팀을 구하지 않은 게임의 경우 예외 발생
@@ -67,8 +67,8 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@PathVariable Long gameId,
                                                                  @RequestBody ApprovalTeamRequestDto approvalTeamDto) {
 
-        Long userId = 6L;
-        Long confirmedGameId = matchTeamService.approveAwayTeam(userId, gameId, approvalTeamDto);
+        Long loginUserId = 6L;
+        Long confirmedGameId = matchTeamService.approveAwayTeam(loginUserId, gameId, approvalTeamDto);
 
         return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
     }
@@ -84,8 +84,8 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
                                                              @RequestBody GameResultRequestDto gameResultDto) {
 
-        Long userId = 7L;
-        GameResultResponseDto gameResult = gameService.enterResult(userId, gameId, gameResultDto);
+        Long loginUserId = 7L;
+        GameResultResponseDto gameResult = gameService.enterResult(loginUserId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);
     }

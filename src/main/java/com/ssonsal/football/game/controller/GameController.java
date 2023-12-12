@@ -42,7 +42,7 @@ public class GameController {
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) {
 
-        Long userId = 3L;
+        Long loginUserId = 3L;
         Map<String, Long> createGameResponseDto;
 
         ObjectMapper mapper = new ObjectMapper();
@@ -52,7 +52,7 @@ public class GameController {
             MatchApplicationRequestDto homeTeamDto
                     = mapper.treeToValue(obj.get(HOME), MatchApplicationRequestDto.class);
 
-            Long gameId = gameService.createGame(userId, gameDto, homeTeamDto);
+            Long gameId = gameService.createGame(loginUserId, gameDto, homeTeamDto);
             createGameResponseDto = longIdToMap("createdGameId", gameId);
 
         } catch (JsonProcessingException e) {
@@ -66,11 +66,12 @@ public class GameController {
     @GetMapping("/{gameId}")
     public ResponseEntity<ResponseBodyFormatter> detail(@PathVariable Long gameId) {
 
-        Long userId = 2L;
-        Long teamId = null;
+        Long loginUserId = 2L;
+        Long loginUserTeamId = null;
         GameDetailResponseDto gameDetailResponseDto = gameService.getDetail(gameId);
 
-        return DataResponseBodyFormatter.put(SUCCESS, toMapIncludeUserInfo(userId, teamId, GAMES, gameDetailResponseDto));
+        return DataResponseBodyFormatter.put(SUCCESS,
+                toMapIncludeUserInfo(loginUserId, loginUserTeamId, GAMES, gameDetailResponseDto));
     }
 
 
@@ -81,7 +82,7 @@ public class GameController {
     @Deprecated
     public ResponseEntity<ResponseBodyFormatter> updateGame(@PathVariable Long gameId, @RequestBody ObjectNode obj) {
 
-        Long userId = 3L;
+        Long loginUserId = 3L;
         Map<String, Long> updateGameResponseDto;
 
         ObjectMapper mapper = new ObjectMapper();
@@ -91,7 +92,7 @@ public class GameController {
             MatchApplicationRequestDto updateHomeTeamDto
                     = mapper.treeToValue(obj.get(HOME), MatchApplicationRequestDto.class);
 
-            Long updatedGameId = gameService.updateGame(userId, gameId, updateGameDto, updateHomeTeamDto);
+            Long updatedGameId = gameService.updateGame(loginUserId, gameId, updateGameDto, updateHomeTeamDto);
             updateGameResponseDto = longIdToMap("updatedGameId", updatedGameId);
 
         } catch (JsonProcessingException e) {

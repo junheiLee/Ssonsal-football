@@ -14,12 +14,12 @@ public interface GameService {
 
     GameDetailResponseDto getDetail(Long gameId);
 
-    Long createGame(Long userId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
+    Long createGame(Long loginUserId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
 
-    Long updateGame(Long userId, Long gameId,
+    Long updateGame(Long loginUserId, Long gameId,
                     GameRequestDto updateGameRequestDto, MatchApplicationRequestDto updateHomeTeamDto);
 
-    GameResultResponseDto enterResult(Long userId, Long gameId, GameResultRequestDto gameResultDto);
+    GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto);
 
     List<GameListResponseDto> findAllGamesForTeam();
 
