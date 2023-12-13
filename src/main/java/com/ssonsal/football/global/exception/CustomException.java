@@ -14,6 +14,18 @@ public class CustomException extends RuntimeException {
     private final ResponseCode errorCode;
     private final Object data;
 
+    public CustomException(String message, ResponseCode errorCode) {
+        super(message);
+        this.errorCode = errorCode;
+        this.data = null;
+    }
+
+    public CustomException(Throwable cause, ResponseCode errorCode) {
+        super(cause);
+        this.errorCode = errorCode;
+        this.data = null;
+    }
+
     public CustomException(ResponseCode errorCode) {
         this.errorCode = errorCode;
         this.data = null;
