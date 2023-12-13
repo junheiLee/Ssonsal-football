@@ -1,15 +1,10 @@
 package com.ssonsal.football.team.dto.response;
 
-import com.ssonsal.football.team.entity.TeamApply;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
-@NoArgsConstructor
 public class TeamApplyDto {
 
     private Long id;
@@ -22,11 +17,11 @@ public class TeamApplyDto {
 
     private String position;
 
-    public TeamApplyDto(TeamApply teamApply, Integer age) {
-        this.id = teamApply.getUser().getId();
-        this.nickname = teamApply.getUser().getNickname();
-        this.gender = teamApply.getUser().getGender();
-        this.position = teamApply.getUser().getPosition();
+    public TeamApplyDto(Long id, String nickname, String gender, String position,Integer age) {
+        this.id = id;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.position = position;
         this.age = age;
     }
 

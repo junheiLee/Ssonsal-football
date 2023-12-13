@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum MatchStatus {
     WAITING(0, "대기"),
-    CONFIRMED(1, "확정"),
+    MATCHING(1, "확정"),
     END(2, "종료");
 
     private final int codeNumber;
