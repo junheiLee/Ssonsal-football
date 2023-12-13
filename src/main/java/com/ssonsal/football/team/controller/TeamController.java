@@ -26,7 +26,7 @@ import static com.ssonsal.football.team.util.Transfer.objectToMap;
 
 
 @RestController
-@RequestMapping("/teams")
+@RequestMapping("/api/teams")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin("*")
