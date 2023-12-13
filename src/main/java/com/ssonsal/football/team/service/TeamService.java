@@ -1,8 +1,9 @@
 package com.ssonsal.football.team.service;
 
-import com.ssonsal.football.team.dto.request.TeamCreateDto;
-import com.ssonsal.football.team.dto.request.TeamEditDto;
-import com.ssonsal.football.team.dto.response.*;
+import com.ssonsal.football.team.dto.response.TeamApplyDto;
+import com.ssonsal.football.team.dto.response.TeamDetailDto;
+import com.ssonsal.football.team.dto.response.TeamListDto;
+import com.ssonsal.football.team.dto.response.TeamMemberListDto;
 
 import java.util.List;
 import java.util.Map;
@@ -12,15 +13,17 @@ public interface TeamService {
 
     List<TeamListDto> findAllTeams();
 
+    Integer findRank(Long teamId);
+
     List<TeamListDto> findRecruitList();
 
     List<TeamListDto> findSearchList(String keyword);
 
-    TeamDetailDto findTeamDetail(Long teamId);
+    TeamDetailDto findDetail(Long teamId);
 
     List<TeamMemberListDto> findMemberList(Long teamId);
 
-    String findLeaderName(Long teamId);
+    String findLeader(Long teamId);
 
     Map<String, Object> findManageList(Long teamId);
 
@@ -29,15 +32,5 @@ public interface TeamService {
     String findAgeAverage(Long teamId);
 
     public String findAgeGroup(char second);
-
-    Long editTeam(TeamEditDto teamEditDto);
-
-    Map<String, Object> createTeam(TeamCreateDto teamCreateDto, Long user);
-
-    boolean checkNameDuplicate(String name, Long teamId);
-
-    boolean checkNameDuplicate(String name);
-
-    TeamEditFormDto findTeamInfo(Long teamId);
 
 }

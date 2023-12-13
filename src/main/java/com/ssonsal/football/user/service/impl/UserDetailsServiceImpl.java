@@ -14,11 +14,13 @@ import org.springframework.stereotype.Service;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 
+
     private final UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) {
         log.info("[loadUserByUsername] loadUserByUsername 수행. email : {}", email);
+        // UsernamePasswordAuthenticationToken 생성하는데 필요
         return userRepository.getByEmail(email);
     }
 

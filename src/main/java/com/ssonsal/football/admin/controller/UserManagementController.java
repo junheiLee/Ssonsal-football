@@ -21,7 +21,7 @@ public class UserManagementController {
     public String adminUser(Model model) {
         model.addAttribute("userList", userService.userList());
 
-        log.info("유저!!" + userService.userList());
+        log.info("유저!!"+userService.userList());
 
         return "admin_user";
     }

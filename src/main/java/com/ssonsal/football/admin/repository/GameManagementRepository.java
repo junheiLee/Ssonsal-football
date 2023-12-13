@@ -2,7 +2,7 @@ package com.ssonsal.football.admin.repository;
 
 import com.ssonsal.football.admin.dto.request.GameDTO;
 import com.ssonsal.football.game.entity.Game;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.ssonsal.football.game.repository.GameRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-public interface GameManagementRepository extends JpaRepository<Game, Long> {
+public interface GameManagementRepository extends GameRepository {
 
     List<Game> findByScheduleBetween(LocalDateTime startDate, LocalDateTime endDate);
 

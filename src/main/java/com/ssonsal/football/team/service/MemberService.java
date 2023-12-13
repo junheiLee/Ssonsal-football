@@ -18,13 +18,10 @@ public interface MemberService {
 
     boolean isUserApply(Long userId, Long teamId);
 
-    String leaveTeam(Long teamId, Long userId);
+    String userLeaveTeam(Long teamId, Long userId);
 
-    String delegateLeader(Long teamId, Long userId);
+    String leaderDelegate(Long teamId, Long userId);
 
-    String banUser(Long userId, Long teamId);
+    String userBan(Long userId, Long teamId);
 
-    String banUserCancel(Long teamId, Long userId);
-
-    boolean isTeamRecruit(Long teamId);
 }

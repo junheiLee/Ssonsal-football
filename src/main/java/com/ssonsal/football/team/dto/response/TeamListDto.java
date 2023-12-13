@@ -1,6 +1,5 @@
 package com.ssonsal.football.team.dto.response;
 
-import com.ssonsal.football.team.entity.Team;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,20 +13,18 @@ public class TeamListDto {
 
     private String preferredArea;
 
-    private Integer ranking;
+    private Integer rank;
 
     private Float skillScore;
 
+
     private String ageAverage;
 
-    public TeamListDto(Team team, Integer ranking, String ageAverage) {
-        this.id = team.getId();
-        this.name = team.getName();
-        this.preferredArea = team.getPreferredArea();
-        this.skillScore = team.getSkillScore();
-        this.ranking = ranking;
-        this.ageAverage = ageAverage;
+    public TeamListDto(long id, String name, String preferredArea, float skillScore) {
+        this.id = id;
+        this.name = name;
+        this.preferredArea = preferredArea;
+        this.skillScore = skillScore;
     }
-
 
 }

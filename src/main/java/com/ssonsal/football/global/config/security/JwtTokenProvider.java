@@ -9,6 +9,9 @@
 
 package com.ssonsal.football.global.config.security;
 
+import com.ssonsal.football.global.util.CookieUtil;
+import com.ssonsal.football.user.service.RedisService;
+import com.ssonsal.football.user.service.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +19,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,10 +27,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * JWT 토큰을 생성하고 유효성을 검증하는 컴포넌트 클래스 JWT 는 여러 암호화 알고리즘을 제공하고 알고리즘과 비밀키를 가지고 토큰을 생성
@@ -44,13 +52,17 @@ public class JwtTokenProvider {
 
 
     private final UserDetailsService userDetailsService; // Spring Security 에서 제공하는 서비스 레이어
-
+    private final RedisServiceImpl redisServiceimpl;
+    private  final RedisTemplate<String,String> redisTemplate;
     @Value("${springboot.jwt.secret}")
     private String secretKey;
+
     @Value("${spring.jwt.token.access-expiration-time}")
-    private long accessTokenValid; // 1시간 토큰 유효
+    private long accessExpirationTime;
+
     @Value("${spring.jwt.token.refresh-expiration-time}")
-    private long refreshTokenValid; // 3시간 토큰 유효
+    private long refreshExpirationTime;
+
 
     /**
      * SecretKey 에 대해 인코딩 수행
@@ -63,23 +75,33 @@ public class JwtTokenProvider {
         log.info("[init] 복호화 된 secretKey : {}",secretKey);
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
     }
+    public String generateToken(String email, long expirationTime, int role, String tokenType) {
+        Date now = new Date();
+        return createToken(email, new Date(now.getTime() + expirationTime), role, tokenType);
+    }//지금은 email로 설정해 뒀는데 토큰에 이메일을 넣는건 보안상 좋지 않은것 같음 => pk인 id값으로 변경예정
 
 
     // JWT 토큰 생성
-    public String createToken(String userUid, int role) {
+    public String createToken(String email,Date expiry ,int role, String tokenType) {
         log.info("[createToken] 토큰 생성 시작");
-        Claims claims = Jwts.claims().setSubject(userUid);
+        Claims claims = Jwts.claims().setSubject(email);
         claims.put("role", role);
+        claims.put("tokenType", tokenType);
 
         Date now = new Date();
         String token = Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
-            .setExpiration(new Date(now.getTime() + accessTokenValid))
+            .setExpiration(expiry)
             .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret 값 세팅
             .compact();
 
-        log.info("[createToken] 토큰 생성 완료");
+
+        log.info("[createToken] 토큰 생성 완료 : {}", token);
+        if (tokenType.equals("refreshToken")){// redis에 저장
+        log.info("[saveRefreshToken] redis에 refresh` 토큰 저장 ");
+        redisServiceimpl.setRefreshToken(email,token,refreshExpirationTime);
+        }
         return token;
     }
 
@@ -94,7 +116,17 @@ public class JwtTokenProvider {
             userDetails.getAuthorities());
     }
 
+    public Long getUserId(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("id", Long.class);
+    }
 
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+    }
     // JWT 토큰에서 회원 구별 정보 추출, getUserEmail로 변경필요
     public String getUsername(String token) {
         log.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
@@ -111,10 +143,20 @@ public class JwtTokenProvider {
      * @return String type Token 값
      */
     public String resolveToken(HttpServletRequest request) {
-        log.info("[resolveToken] HTTP 헤더에서 Token 값 추출");
-        return request.getHeader("X-AUTH-TOKEN");
-    }
 
+//        Cookie[] cookieList = request.getCookies();
+//        if(cookieList != null) {
+//            String token = getCookieValue(cookieList, "token");
+//            log.info("[getCookieValue] HTTP 쿠키에서 Token 값 추출 : {}", token);
+//        }
+//        log.info("[resolveToken] 헤더정보 전부 출력 : {}",request.getParameterNames());
+//
+//        log.info("[resolveToken] HTTP 헤더에서 Token 값 추출 3 : {}", request.getHeader("Cookie"));
+
+//        return token;
+        log.info("[resloveToken] 헤더에서 값을 제대로 가져오는지 ssonToken : {}",request.getHeader("ssonToken"));//대소문자안먹음
+        return request.getHeader("ssonToken");
+    }
 
     // JWT 토큰의 유효성 + 만료일 체크
     public boolean validateToken(String token) {
@@ -128,4 +170,26 @@ public class JwtTokenProvider {
             return false;
         }
     }
+
+    public String reissue(String email){
+        log.info("[reissue] : 토큰 재발급 시작" );
+        log.info("[reissue] : accessToken에서 유저의 이메일 정보 수집 : {}", email );
+        int role = 1;//role 정보도 가져와야 함
+        String reAccessToken = generateToken(email,accessExpirationTime,role,"accessToken");
+        return reAccessToken;
+    }
+    public void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response, String accessToken) {
+        CookieUtil.deleteCookie(request, response, "token");
+        CookieUtil.addCookie(response, "token", accessToken);
+    }
+    public String getCookieValue(Cookie[]cookies,String cookieName){
+        for(Cookie cookie : cookies){
+            if(cookie.getName().equals(cookieName)){
+                return cookie.getValue();
+            }
+        }
+        return"";
+    }
+
+
 }
