@@ -1,5 +1,7 @@
 package com.ssonsal.football.global.util;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.util.SerializationUtils;
 
 import javax.servlet.http.Cookie;
@@ -7,13 +9,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Base64;
 
+@Service
+@Slf4j
 public class CookieUtil {
 
-    public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
+    public static void addCookie(HttpServletResponse response, String name, String value) {
+        log.info("[addCookie] 쿠키에 토큰을 저장합니다 name : {}, value : {}", name, value);
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-
+        cookie.setMaxAge(60*60*6);
+        log.info("[addCookie] 저장된 토큰 확인 : {}",cookie.toString());
         response.addCookie(cookie);
     }
 

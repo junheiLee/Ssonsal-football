@@ -20,6 +20,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) {
         log.info("[loadUserByUsername] loadUserByUsername 수행. email : {}", email);
+        // UsernamePasswordAuthenticationToken 생성하는데 필요
         return userRepository.getByEmail(email);
     }
 
