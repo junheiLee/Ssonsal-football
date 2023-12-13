@@ -116,7 +116,7 @@ public class MemberController {
     public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
-        log.info("요청옴");
+
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
         } else if (!memberService.isTeamLeader(teamId, user)) {
