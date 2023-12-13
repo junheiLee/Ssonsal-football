@@ -1,11 +1,11 @@
 package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamApply;
 import com.ssonsal.football.team.entity.TeamReject;
-import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -34,24 +34,25 @@ public class TeamApplyServiceImpl implements TeamApplyService {
      * @param teamId 팀 아이디
      */
     @Override
-    public void createUserApply(Long userId, Long teamId) {
+    public String createUserApply(Long userId, Long teamId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND)
-        );
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND)
-        );
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         TeamApply teamApply = new TeamApply(user, team);
 
         teamApplyRepository.save(teamApply);
+
+        return team.getName();
     }
 
     /**
      * 팀 가입 신청을 취소합니다.
      *
-     * @param userId
+     * @param userId 유저 아이디
      */
     @Override
     public void deleteUserApply(Long userId) {
@@ -62,17 +63,22 @@ public class TeamApplyServiceImpl implements TeamApplyService {
     /**
      * 유저의 신청을 수락합니다.
      *
-     * @param userId
-     * @param teamId
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
      * @return 수락한 유저 닉네임
      */
     @Override
     public String userApplyAccept(Long userId, Long teamId) {
 
-        deleteUserApply(userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        User user = userRepository.findById(userId).get();
-        user.setTeam(teamRepository.findById(teamId).get());
+        Team team = teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+
+        user.joinTeam(team);
+
+        deleteUserApply(userId);
 
         return user.getNickname();
     }
@@ -80,15 +86,15 @@ public class TeamApplyServiceImpl implements TeamApplyService {
     /**
      * 유저의 신청을 거절합니다.
      *
-     * @param userId
-     * @param teamId
+     * @param userId 유저 아이디
+     * @param teamId 팀 아이디
      * @return 거절한 유저 닉네임
      */
     @Override
     public String userApplyReject(Long userId, Long teamId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);

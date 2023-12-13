@@ -155,11 +155,13 @@ public class User extends BaseEntity implements UserDetails {
         return true;
     }
 
-    public void deleteTeam(User user) {
-
+    public void deleteTeam() {
+        team.getUsers().remove(this);
+        this.team = null;
     }
 
     public void joinTeam(Team team) {
-
+        this.team = team;
+        team.getUsers().add(this);
     }
 }

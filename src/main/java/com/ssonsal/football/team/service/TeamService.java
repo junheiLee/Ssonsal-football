@@ -32,7 +32,7 @@ public interface TeamService {
 
     Long editTeam(TeamEditDto teamEditDto);
 
-    Map<String, String> createTeam(TeamCreateDto teamCreateDto, Long user);
+    Map<String, Object> createTeam(TeamCreateDto teamCreateDto, Long user);
 
     boolean checkNameDuplicate(String name, Long teamId);
 
