@@ -19,6 +19,7 @@ public final class TeamConstant {
 
     public static final String USER_LEVEL = "userLevel";
 
+    public static final String USER_NAME = "userName";
     public static final String TEAM_NAME = "teamName";
     public static final String TEAM_LEADER = "teamLeader";
 
