@@ -1,5 +1,6 @@
 package com.ssonsal.football.team.controller;
 
+import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -13,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.ssonsal.football.team.util.TeamConstant.TEAM_NAME;
+import static com.ssonsal.football.team.util.TeamConstant.USER_NAME;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -50,9 +54,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.MEMBER_ALREADY_TEAM);
         }
 
-        teamApplyService.createUserApply(user, teamId);
-
-        return ResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_APPLY);
+        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_APPLY, Transfer.objectToMap(TEAM_NAME, teamApplyService.createUserApply(user, teamId)));
     }
 
     /**
@@ -100,7 +102,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_OTHER_TEAM);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_LEAVE, memberService.leaveTeam(teamId, user));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.USER_TEAM_LEAVE, Transfer.objectToMap(TEAM_NAME, memberService.leaveTeam(teamId, user)));
     }
 
     /**
@@ -123,7 +125,8 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_APPLY_ACCEPT, teamApplyService.userApplyAccept(userId, teamId));
+
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_APPLY_ACCEPT, Transfer.objectToMap(USER_NAME, teamApplyService.userApplyAccept(userId, teamId)));
     }
 
     /**
@@ -146,7 +149,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_APPLY_REJECT, teamApplyService.userApplyReject(userId, teamId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_APPLY_REJECT, Transfer.objectToMap(USER_NAME, teamApplyService.userApplyReject(userId, teamId)));
     }
 
     /**
@@ -169,7 +172,7 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_MEMBER);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_DELEGATE_SUCCESS, memberService.delegateLeader(teamId, userId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_DELEGATE_SUCCESS, Transfer.objectToMap(USER_NAME, memberService.delegateLeader(teamId, userId)));
     }
 
     /**
@@ -198,7 +201,7 @@ public class MemberController {
             }
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, memberService.banUser(userId, teamId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, Transfer.objectToMap(USER_NAME, memberService.banUser(userId, teamId)));
     }
 
     /**
@@ -221,6 +224,6 @@ public class MemberController {
             throw new CustomException(TeamErrorCode.USER_NOT_REJECT);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_REJECT_CANCEL, memberService.banUserCancel(teamId, userId));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_REJECT_CANCEL, Transfer.objectToMap(USER_NAME, memberService.banUserCancel(teamId, userId)));
     }
 }
