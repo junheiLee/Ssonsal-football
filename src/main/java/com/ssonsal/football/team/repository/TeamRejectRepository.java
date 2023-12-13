@@ -5,6 +5,8 @@ import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.TeamReject;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface TeamRejectRepository extends JpaRepository<TeamReject, RejectId> {
 
     /**
@@ -14,5 +16,7 @@ public interface TeamRejectRepository extends JpaRepository<TeamReject, RejectId
      * @param teamId
      */
     boolean existsByRejectIdUserIdAndRejectIdTeamId(Long userId, Long teamId);
+
+    List<TeamReject> findAllByRejectId_TeamId(Long teamId);
 
 }

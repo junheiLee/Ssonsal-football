@@ -9,11 +9,14 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"writer", "hometeam", "awayteam"})
+@ToString(exclude = {"writer", "home", "away"})
 public class Game extends BaseEntity {
 
     @Id
@@ -26,11 +29,15 @@ public class Game extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hometeam_id")
-    private Team hometeam;
+    private Team home;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "away_applicant_id")
+    private User awayApplicant;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "awayteam_id")
-    private Team awayteam;
+    private Team away;
 
     private int matchStatus;
 
@@ -47,15 +54,18 @@ public class Game extends BaseEntity {
     private String rule;
     private Integer account;
     private int deleteCode;
-    private int hometeamResult;
-    private int awayteamResult;
+    private String hometeamResult;
+    private String awayteamResult;
+
+    @OneToMany(mappedBy = "game")
+    private List<MatchApplication> matchApplications;
 
     @Builder
-    public Game(User writer, Team hometeam,
+    public Game(User writer, Team home,
                 LocalDateTime schedule, MatchStatus matchStatus,
                 GameRequestDto gameRequestDto) {
         this.writer = writer;
-        this.hometeam = hometeam;
+        this.home = home;
         this.schedule = schedule;
         this.matchStatus = matchStatus.getCodeNumber();
         this.gameTime = gameRequestDto.getGameTime();
@@ -65,5 +75,43 @@ public class Game extends BaseEntity {
         this.gender = gameRequestDto.getGender();
         this.rule = gameRequestDto.getRule();
         this.account = gameRequestDto.getAccount();
+    }
+
+    public Game update(LocalDateTime schedule, GameRequestDto gameRequestDto) {
+
+        this.schedule = schedule;
+        this.gameTime = gameRequestDto.getGameTime();
+        this.region = gameRequestDto.getRegion();
+        this.stadium = gameRequestDto.getStadium();
+        this.vsFormat = gameRequestDto.getVsFormat();
+        this.gender = gameRequestDto.getGender();
+        this.rule = gameRequestDto.getRule();
+        this.account = gameRequestDto.getAccount();
+
+        return this;
+    }
+
+    public void changeRemainApplicationsStatus() {
+        matchApplications.stream()
+                .filter(application -> application.getApplicationStatus().equals(WAITING.getDescription()))
+                .forEach(MatchApplication::changeStatusToSuspension);
+    }
+
+    public void approveTeamApplicant(User applicant, Team awayTeam) {
+        this.awayApplicant = applicant;
+        this.away = awayTeam;
+        this.matchStatus = MatchStatus.CONFIRMED.getCodeNumber();
+    }
+
+    public void enterHomeTeamResult(String homeResult) {
+        this.hometeamResult = homeResult;
+    }
+
+    public void enterAwayTeamResult(String awayResult) {
+        this.awayteamResult = awayResult;
+    }
+
+    public void end() {
+        this.matchStatus = MatchStatus.END.getCodeNumber();
     }
 }

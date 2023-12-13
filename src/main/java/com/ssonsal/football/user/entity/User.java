@@ -83,7 +83,7 @@ public class User extends BaseEntity implements UserDetails {
     @Builder
     public User(String email, String password, String auth) {
         this.email = email;
-        this.password = password;   
+        this.password = password;
     }
 
     public void updateRole(int role) {
@@ -153,5 +153,15 @@ public class User extends BaseEntity implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void deleteTeam() {
+        team.getUsers().remove(this);
+        this.team = null;
+    }
+
+    public void joinTeam(Team team) {
+        this.team = team;
+        team.getUsers().add(this);
     }
 }

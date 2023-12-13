@@ -1,29 +1,27 @@
 package com.ssonsal.football.team.dto.response;
 
+
+import com.ssonsal.football.user.entity.User;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 public class TeamMemberListDto {
 
     private Long id;
 
     private String nickname;
 
-    private Integer birth;
+    private Integer age;
 
     private String gender;
 
     private String position;
 
-    private Integer age;
-
-    public TeamMemberListDto(Long id, String nickname, String gender, String position, Integer age) {
-        this.id = id;
-        this.nickname = nickname;
-        this.gender = gender;
-        this.position = position;
+    public TeamMemberListDto(User user, Integer age) {
+        this.id = user.getId();
+        this.nickname = user.getNickname();
+        this.gender = user.getGender();
+        this.position = user.getPosition();
         this.age = age;
     }
 }
