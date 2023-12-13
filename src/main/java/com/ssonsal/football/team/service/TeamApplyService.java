@@ -2,7 +2,7 @@ package com.ssonsal.football.team.service;
 
 public interface TeamApplyService {
 
-    String createUserApply(Long userId, Long teamId);
+    void createUserApply(Long userId, Long teamId);
 
     void deleteUserApply(Long userId);
 

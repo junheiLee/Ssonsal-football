@@ -18,21 +18,16 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 @Service
-public class ReportServiceImpl implements ReportService {
+public class ReportServiceImpl implements ReportService{
 
     private final ReportRepository reportRepository;
     private final ReviewRepository reviewRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReportResponseDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
-
-        if (reports.isEmpty()) {
-            log.error("신고된 리뷰가 없습니다.");
-            throw new CustomException(ReviewErrorCode.REPORT_NOT_FOUND);
-        }
 
         return reports.stream()
                 .map(ReportResponseDto::fromEntity)
@@ -42,8 +37,8 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public ReportResponseDto createReport(ReportRequestDto reportRequestDto) {
 
-        Review review = reviewRepository.findById(reportRequestDto.getReviewId())
-                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findById(reportRequestDto.getReviewId()).get();
+        checkReviewIsExist(review);
 
         Report report = Report.builder()
                 .review(review)
@@ -55,14 +50,10 @@ public class ReportServiceImpl implements ReportService {
         return ReportResponseDto.fromEntity(report);
     }
 
-    @Transactional
-    public void updateDeleteCode(Long reportId, Integer reportCode) {
-        reportRepository.findById(reportId)
-                .orElseThrow(() -> new CustomException(ReviewErrorCode.ID_NOT_FOUND));
-        if (!(reportCode == 0 || reportCode == 1)) {
-            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
+    private void checkReviewIsExist(Review review) {
+        if (review.getId() == null) {
+            log.error("해당 리뷰를 찾을 수 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
         }
-
-        reportRepository.updateReportCode(reportId, reportCode);
     }
 }

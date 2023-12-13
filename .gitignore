@@ -39,6 +39,3 @@ out/
 ### properties ###
 *.properties
 application.yml
-
-### Querydsl
-/src/main/generated

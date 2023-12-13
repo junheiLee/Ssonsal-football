@@ -1,7 +1,5 @@
 package com.ssonsal.football.team.service;
 
-import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.entity.Team;
@@ -89,7 +87,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean hasAnyTeam(Long userId) {
 
-        return teamRepository.existsByUsers_IdAndUsers_TeamIsNotNull(userId);
+        return teamRepository.existsByUserId(userId);
     }
 
     /**
@@ -137,17 +135,12 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String leaveTeam(Long teamId, Long userId) {
+    public String userLeaveTeam(Long teamId, Long userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).get();
+        user.setTeam(null);
 
-        user.deleteTeam();
-
-        Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
-
-        return team.getName();
+        return teamRepository.findById(teamId).get().getName();
     }
 
     /**
@@ -159,17 +152,12 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String delegateLeader(Long teamId, Long userId) {
+    public String leaderDelegate(Long teamId, Long userId) {
 
-        Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
+        Team team = teamRepository.findById(teamId).get();
+        team.setLeaderId(userId);
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        team.delegateLeader(user.getId());
-
-        return user.getNickname();
+        return userRepository.findById(userId).get().getNickname();
     }
 
     /**
@@ -181,14 +169,13 @@ public class MemberServiceImpl implements MemberService {
      */
     @Override
     @Transactional
-    public String banUser(Long userId, Long teamId) {
+    public String userBan(Long userId, Long teamId) {
 
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).get();
+        user.setTeam(null);
 
-        user.deleteTeam();
+        RejectId rejectId = new RejectId(userId, teamId);
 
-        RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);
 
         teamRejectRepository.save(teamReject);
@@ -196,35 +183,4 @@ public class MemberServiceImpl implements MemberService {
         return user.getNickname();
     }
 
-    /**
-     * 특정 유저의 밴을 해제한다.
-     *
-     * @param teamId 팀 아이디
-     * @param userId 대상 유저 아이디
-     * @return 해제된 유저 닉네임
-     */
-    @Override
-    @Transactional
-    public String banUserCancel(Long teamId, Long userId) {
-
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        RejectId rejectId = new RejectId(user, teamId);
-        TeamReject teamReject = new TeamReject(rejectId);
-        teamRejectRepository.delete(teamReject);
-
-        return user.getNickname();
-    }
-
-    /**
-     * 팀이 모집중인지 확인한다.
-     *
-     * @param teamId 팀 아이디
-     */
-    @Override
-    public boolean isTeamRecruit(Long teamId) {
-
-        return teamRepository.existsByIdAndRecruit(teamId, 1);
-    }
 }

@@ -1,7 +1,6 @@
 package com.ssonsal.football.user.dto;
 
 import lombok.*;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
