@@ -4,7 +4,8 @@ import com.ssonsal.football.user.dto.LogOutResultDto;
 import com.ssonsal.football.user.dto.SignInResultDto;
 import com.ssonsal.football.user.dto.SignUpResultDto;
 import com.ssonsal.football.user.service.SignService;
-import io.swagger.v3.oas.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class SignController {
     public SignController(SignService signService) {
         this.signService = signService;
     }
+
     // SignController 가 실행되면 이 생성자를 호출하고 SignService 빈 객체를 주입받아서 signService로 사용하겠다고 말하는거
     @Operation(summary = "로그인", description = "email 과 password를 입력해서 로그인 합니다.")
     @PostMapping(value = "/sign-in")
@@ -39,17 +41,18 @@ public class SignController {
 
             @Parameter(description = "Email", required = true) @RequestParam String email,
             @Parameter(description = "Password 필수값임", required = true) @RequestParam String password)
-            //@Parameter(value = "Password", required = true) String password은 Swagger UI에서 명세화를 진행하면서
-            //@RequestParam String password 한마디로 password 변수가 어떤걸 의미하는지 설명문을 추가해줄수있다
-            //어떤 클래스에서 어떻게 넘어오고 어떠한 용도로 사용되는지도 전부 명시할수있음
-        throws RuntimeException {
+    //@Parameter(value = "Password", required = true) String password은 Swagger UI에서 명세화를 진행하면서
+    //@RequestParam String password 한마디로 password 변수가 어떤걸 의미하는지 설명문을 추가해줄수있다
+    //어떤 클래스에서 어떻게 넘어오고 어떠한 용도로 사용되는지도 전부 명시할수있음
+            throws RuntimeException {
         // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
 
-        log.info("[signIn] 로그인을 시도하고 있습니다. email : {}, pw : ****",email);
+        log.info("[signIn] 로그인을 시도하고 있습니다. email : {}, pw : ****", email);
         SignInResultDto signInResultDto = signService.signIn(email, password);
 
         if (signInResultDto.getCode() == 0) {
             log.info("[signIn] 정상적으로 로그인되었습니다. email : {}, token : {}", email,
+
                 signInResultDto.getToken());
             log.info("[signIn] signResultDto가 가지고 있는 정보 : {} ",signInResultDto);
         }
@@ -75,7 +78,7 @@ public class SignController {
         log.info("[signUp] 회원가입을 수행합니다 입값 확인용. email : {}, password : ****, name : {},birth : {}, gender : {}, nickname : {}, position : {}, phone : {}, intro : {}, time : {}. area : {}, role : {}",
                 email, name, birth, gender, nickname, position, phone, intro, preffered_time, preffered_area, role);
         SignUpResultDto signUpResultDto = signService.signUp(email, password, name, birth, gender, nickname,
-                position, phone, intro, preffered_time,preffered_area, role);
+                position, phone, intro, preffered_time, preffered_area, role);
 
         log.info("[signUp] 회원가입을 완료했습니다. Email : {}", email);
         return signUpResultDto;

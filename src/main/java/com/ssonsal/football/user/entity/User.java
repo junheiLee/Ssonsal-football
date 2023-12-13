@@ -154,4 +154,14 @@ public class User extends BaseEntity implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public void deleteTeam() {
+        team.getUsers().remove(this);
+        this.team = null;
+    }
+
+    public void joinTeam(Team team) {
+        this.team = team;
+        team.getUsers().add(this);
+    }
 }

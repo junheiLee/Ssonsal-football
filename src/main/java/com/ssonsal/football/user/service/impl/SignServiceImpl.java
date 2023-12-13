@@ -101,9 +101,9 @@ public class SignServiceImpl implements SignService {
                     .build();
         }
 
-        log.info("[userSave] builder 패턴으로 만든 User객체 확인용 : {}",user.toString());
+        log.info("[userSave] builder 패턴으로 만든 User객체 확인용 : {}", user.toString());
         User savedUser = userRepository.save(user);
-        log.info("[userSave] builder 패턴으로 만든 User객체 저장완료 : {}",savedUser);
+        log.info("[userSave] builder 패턴으로 만든 User객체 저장완료 : {}", savedUser);
         SignUpResultDto signUpResultDto = new SignInResultDto();
 
         log.info("[getSignUpResult] userEntity 값이 들어왔는지 확인 후 결과값 주입");
