@@ -1,5 +1,6 @@
 package com.ssonsal.football.user.controller;
 
+import com.ssonsal.football.user.dto.LogOutResultDto;
 import com.ssonsal.football.user.dto.SignInResultDto;
 import com.ssonsal.football.user.dto.SignUpResultDto;
 import com.ssonsal.football.user.service.SignService;
@@ -8,11 +9,13 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +52,9 @@ public class SignController {
 
         if (signInResultDto.getCode() == 0) {
             log.info("[signIn] 정상적으로 로그인되었습니다. email : {}, token : {}", email,
-                    signInResultDto.getToken());
+
+                signInResultDto.getToken());
+            log.info("[signIn] signResultDto가 가지고 있는 정보 : {} ",signInResultDto);
         }
         return signInResultDto;
     }
@@ -57,18 +62,19 @@ public class SignController {
     @PostMapping(value = "/sign-up")
     @Operation(summary = "회원가입", description = "회원가입에 필요한 데이터를 입력받아서 회원가입 합니다.")
     public SignUpResultDto signUp(
-            @Parameter(description = "Email", required = true) @RequestParam String email,
-            @Parameter(description = "비밀번호", required = true) @RequestParam String password,
-            @Parameter(description = "이름", required = true) @RequestParam String name,
-            @Parameter(description = "생년월일", required = true) @RequestParam LocalDate birth,
-            @Parameter(description = "성별", required = true) @RequestParam String gender,
-            @Parameter(description = "별명", required = true) @RequestParam String nickname,
-            @Parameter(description = "포지션", required = true) @RequestParam String position,
-            @Parameter(description = "핸드폰 번호", required = true) @RequestParam String phone,
-            @Parameter(description = "한줄소개", required = true) @RequestParam String intro,
-            @Parameter(description = "유저 선호 시간", required = true) @RequestParam String preffered_time,
-            @Parameter(description = "유저 선호 지역", required = true) @RequestParam String preffered_area,
-            @Parameter(description = "권한", required = true) @RequestParam int role) {
+        @Parameter(description = "Email", required = true) @RequestParam String email,
+        @Parameter(description = "비밀번호", required = true) @RequestParam String password,
+        @Parameter(description = "이름", required = true) @RequestParam String name,
+        @Parameter(description = "생년월일", required = true) @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate birth,
+        @Parameter(description = "성별", required = true) @RequestParam String gender,
+        @Parameter(description = "별명", required = true) @RequestParam String nickname,
+        @Parameter(description = "포지션", required = true) @RequestParam String position,
+        @Parameter(description = "핸드폰 번호", required = true) @RequestParam String phone,
+        @Parameter(description = "한줄소개", required = true) @RequestParam String intro,
+        @Parameter(description = "유저 선호 시간", required = true) @RequestParam String preffered_time,
+        @Parameter(description = "유저 선호 지역", required = true) @RequestParam String preffered_area,
+        @Parameter(description = "권한", required = true) @RequestParam int role)
+    {
         log.info("[signUp] 회원가입을 수행합니다 입값 확인용. email : {}, password : ****, name : {},birth : {}, gender : {}, nickname : {}, position : {}, phone : {}, intro : {}, time : {}. area : {}, role : {}",
                 email, name, birth, gender, nickname, position, phone, intro, preffered_time, preffered_area, role);
         SignUpResultDto signUpResultDto = signService.signUp(email, password, name, birth, gender, nickname,
@@ -78,6 +84,23 @@ public class SignController {
         return signUpResultDto;
     }
 
+    @DeleteMapping(value = "/logout")
+    @Operation(summary = "로그아웃", description = "redis 에서 해당 유저의 refreshToken을 삭제합니다.")
+    public LogOutResultDto logOut(@Parameter(description = "Email", required = true) @RequestParam String email
+    )throws RuntimeException {
+        // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
+
+        log.info("[logOut] 로그아웃을 시도하고 있습니다. email : {}",email);
+        LogOutResultDto logOutResultDto = signService.logOut(email);
+
+        if (logOutResultDto.getCode() == 0) {
+            log.info("[logOut] 정상적으로 로그아웃 되었습니다. email : {}", email);
+            log.info("[logOut] logOutResultDto가 가지고 있는 정보 : {} ",logOutResultDto);
+        }
+        return logOutResultDto;
+    }
+
+
     @GetMapping(value = "/exception")
     public void exceptionTest() throws RuntimeException {
         throw new RuntimeException("접근이 금지되었습니다.");
@@ -86,7 +109,7 @@ public class SignController {
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
         HttpHeaders responseHeaders = new HttpHeaders();
-        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json");
+        //responseHeaders.add(HttpHeaders.CONTENT_TYPE, "application/json") ;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         log.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());

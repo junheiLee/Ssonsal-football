@@ -30,10 +30,10 @@ import java.util.Date;
 
 /**
  * JWT 토큰을 생성하고 유효성을 검증하는 컴포넌트 클래스 JWT 는 여러 암호화 알고리즘을 제공하고 알고리즘과 비밀키를 가지고 토큰을 생성
- * <p>
+ * 유저 정보로 JWT access/refresh 토큰을 생성하고 발급받음
  * claim 정보에는 토큰에 부가적으로 정보를 추가할 수 있음 claim 정보에 회원을 구분할 수 있는 값을 세팅하였다가 토큰이 들어오면 해당 값으로 회원을 구분하여 리소스
  * 제공
- * <p>
+ *
  * JWT 토큰에 expire time을 설정할 수 있음
  */
 
@@ -46,8 +46,11 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService; // Spring Security 에서 제공하는 서비스 레이어
 
     @Value("${springboot.jwt.secret}")
-    private String secretKey = "secretKey";
-    private final long tokenValidMillisecond = 1000L * 60 * 60; // 1시간 토큰 유효
+    private String secretKey;
+    @Value("${spring.jwt.token.access-expiration-time}")
+    private long accessTokenValid; // 1시간 토큰 유효
+    @Value("${spring.jwt.token.refresh-expiration-time}")
+    private long refreshTokenValid; // 3시간 토큰 유효
 
     /**
      * SecretKey 에 대해 인코딩 수행
@@ -55,9 +58,9 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 시작");
-        System.out.println(secretKey);
+        log.info("[init] @Value 로 주입받은 secretKey : {}",secretKey);
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
-        System.out.println(secretKey);
+        log.info("[init] 복호화 된 secretKey : {}",secretKey);
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
     }
 
@@ -72,7 +75,7 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(now)
-            .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
+            .setExpiration(new Date(now.getTime() + accessTokenValid))
             .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret 값 세팅
             .compact();
 
@@ -92,7 +95,7 @@ public class JwtTokenProvider {
     }
 
 
-    // JWT 토큰에서 회원 구별 정보 추출
+    // JWT 토큰에서 회원 구별 정보 추출, getUserEmail로 변경필요
     public String getUsername(String token) {
         log.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
         String info = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody()
