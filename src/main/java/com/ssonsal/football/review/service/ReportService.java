@@ -7,5 +7,8 @@ import java.util.List;
 
 public interface ReportService {
     List<ReportResponseDto> getAllReports();
+
     ReportResponseDto createReport(ReportRequestDto reportRequestDto);
+
+    void updateDeleteCode(Long reportId, Integer reportCode);
 }

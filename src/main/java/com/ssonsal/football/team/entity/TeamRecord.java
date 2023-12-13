@@ -1,7 +1,9 @@
 package com.ssonsal.football.team.entity;
 
+import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.entity.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,20 +23,55 @@ public class TeamRecord extends BaseEntity {
     @JoinColumn(name = "team_id")
     private Team team;
 
-    private Integer point;
+    private int point;
 
-    private Integer winCount;
+    private int winCount;
 
-    private Integer drawCount;
+    private int drawCount;
 
-    private Integer loseCount;
+    private int loseCount;
 
-    private Integer totalGameCount;
+    private int totalGameCount;
 
-    @Column(name="team_rank")
-    private Integer rank;
+    @Column(name = "team_rank")
+    private int rank;
 
+
+    /**
+     * 생성할때 rank 기본값을 -1로 생성
+     *
+     * @param team
+     */
     public TeamRecord(Team team) {
         this.team = team;
+        this.rank = -1;
     }
+
+    @Builder
+    public TeamRecord(int winCount, int drawCount, int loseCount) {
+        this.winCount = winCount;
+        this.drawCount = drawCount;
+        this.loseCount = loseCount;
+    }
+
+    public TeamRecord update(TeamRecord updateRecord) {
+        this.winCount += updateRecord.winCount;
+        this.drawCount += updateRecord.drawCount;
+        this.loseCount += updateRecord.loseCount;
+        this.totalGameCount++;
+        this.point = (this.winCount * (TeamResult.WIN.getScore() + 1))
+                + (this.drawCount * TeamResult.DRAW.getScore())
+                + (this.loseCount * TeamResult.LOSE.getScore());
+
+        return this;
+    }
+
+    public void enterRank(int rank) {
+        this.rank = rank;
+    }
+
+//    public TeamRecord enterTeamToRecordSet(Team team){
+//        this.team = team;
+//        return this;
+//    }
 }

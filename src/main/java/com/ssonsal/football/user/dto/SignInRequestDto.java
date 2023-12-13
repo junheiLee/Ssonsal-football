@@ -2,10 +2,15 @@ package com.ssonsal.football.user.dto;
 
 import lombok.*;
 
-@Getter
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
 public class SignInRequestDto {
 
     private String email;
+
     private String password;
 
 }

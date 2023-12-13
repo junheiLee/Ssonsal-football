@@ -1,10 +1,7 @@
 package com.ssonsal.football.team.repository;
 
-import com.ssonsal.football.team.dto.response.TeamApplyDto;
 import com.ssonsal.football.team.entity.TeamApply;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,13 +9,12 @@ public interface TeamApplyRepository extends JpaRepository<TeamApply, Long> {
 
 
     /**
-     * 팀에 신청중인 유저 정보를 가져온다.
+     * 특정 팀의 모든 신청을 가져온다.
      *
-     * @param teamId 팀 아이디
-     * @return 신청한 유저 정보
+     * @param teamId
+     * @return 신청 정보
      */
-    @Query("SELECT new com.ssonsal.football.team.dto.response.TeamApplyDto(ta.id, u.nickname, u.gender, u.position, YEAR(CURRENT_DATE) - YEAR(u.birth)) FROM TeamApply ta JOIN ta.user u WHERE ta.team.id = :teamId")
-    List<TeamApplyDto> findTeamAppliesWithUserAge(@Param("teamId") Long teamId);
+    List<TeamApply> findAllByTeamId(Long teamId);
 
     /**
      * 유저가 해당 팀에 가입신청 중 인지 확인한다.

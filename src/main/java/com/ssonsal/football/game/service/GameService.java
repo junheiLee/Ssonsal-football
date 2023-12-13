@@ -2,11 +2,31 @@ package com.ssonsal.football.game.service;
 
 
 import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.MatchTeamRequestDto;
+import com.ssonsal.football.game.dto.request.GameResultRequestDto;
+import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
+import com.ssonsal.football.game.dto.response.GameListResponseDto;
+import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 
-import java.text.ParseException;
+import java.util.List;
 
 public interface GameService {
 
-    Long createGame(Long userId, GameRequestDto gameRequestDto, MatchTeamRequestDto homeTeamRequestDto) throws ParseException;
+    GameDetailResponseDto getDetail(Long gameId);
+
+    Long createGame(Long loginUserId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
+
+    Long updateGame(Long loginUserId, Long gameId,
+                    GameRequestDto updateGameRequestDto, MatchApplicationRequestDto updateHomeTeamDto);
+
+    GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto);
+
+    List<GameListResponseDto> findAllGamesForTeam();
+
+    List<GameListResponseDto> findAllGamesForSub();
+
+    List<GameListResponseDto> findMyGamesAsSub(Long userId);
+
+    List<GameListResponseDto> findOurGamesAsTeam(Long teamId);
+
 }
