@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/members")
+@CrossOrigin("*")
 @Tag(name = "Member", description = "Member API")
 public class MemberController {
 
@@ -31,7 +32,7 @@ public class MemberController {
      * @param teamId 팀 아이디
      * @return 성공 여부
      */
-    @PostMapping("/{teamId}/users")
+    @PostMapping("/{teamId}/application")
     public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId) {
 
         // 추후 토큰값으로 교체할 부분임
@@ -60,7 +61,7 @@ public class MemberController {
      * @param teamId 팀 아이디
      * @return 성공 여부
      */
-    @DeleteMapping("/{teamId}/applications/users")
+    @DeleteMapping("/{teamId}/application")
     public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId) {
 
         // 추후 토큰값으로 교체할 부분임
@@ -83,7 +84,7 @@ public class MemberController {
      * @param teamId 팀 아이디
      * @return 성공 여부
      */
-    @DeleteMapping("/{teamId}/users")
+    @DeleteMapping("/{teamId}/team")
     public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId) {
 
         // 추후 토큰값으로 교체할 부분임
@@ -109,11 +110,11 @@ public class MemberController {
      * @param userId 신청자 아이디
      * @return 신청자 닉네임
      */
-    @PostMapping("/{teamId}/applications/{userId}")
+    @PostMapping("/{teamId}/application/{userId}")
     public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
-
+        log.info("요청옴");
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
         } else if (!memberService.isTeamLeader(teamId, user)) {
@@ -132,7 +133,7 @@ public class MemberController {
      * @param userId 신청자 아이디
      * @return 신청자 닉네임
      */
-    @DeleteMapping("/{teamId}/applications/{userId}")
+    @DeleteMapping("/{teamId}/application/{userId}")
     public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
@@ -155,7 +156,7 @@ public class MemberController {
      * @param userId 위임받을 팀원 아이디
      * @return 위임받은 팀장 닉네임
      */
-    @PatchMapping("/{teamId}/managers/{userId}")
+    @PatchMapping("/{teamId}/manager/{userId}")
     public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
@@ -178,7 +179,7 @@ public class MemberController {
      * @param userId 퇴출할 회원의 아이디
      * @return 퇴출당한 회원의 닉네임
      */
-    @DeleteMapping("/{teamId}/managers/{userId}")
+    @PostMapping("/{teamId}/manager/{userId}")
     public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId) {
 
         Long user = 1L;
@@ -198,5 +199,28 @@ public class MemberController {
         }
 
         return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_MEMBER_BANNED, memberService.banUser(userId, teamId));
+    }
+
+    /**
+     * 유저 밴 / 거절 기록을 삭제합니다.
+     *
+     * @param teamId 팀 아이디
+     * @param userId 유저 아이디
+     * @return 밴이 풀린 회원의 닉네임
+     */
+    @DeleteMapping("/{teamId}/manager/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId) {
+
+        Long user = 1L;
+
+        if (user == null) {
+            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (!memberService.isTeamLeader(teamId, user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
+        } else if (!teamRejectService.isUserRejected(userId, teamId)) {
+            throw new CustomException(TeamErrorCode.USER_NOT_REJECT);
+        }
+
+        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_REJECT_CANCEL, memberService.banUserCancel(teamId, userId));
     }
 }
