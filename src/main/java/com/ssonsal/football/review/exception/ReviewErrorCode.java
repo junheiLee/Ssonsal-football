@@ -13,7 +13,8 @@ public enum ReviewErrorCode implements ResponseCode {
     GAME_NOT_FOUND(HttpStatus.BAD_REQUEST, "게임ID를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "유저ID를 찾을 수 없습니다."),
     NO_QUALIFICATION(HttpStatus.BAD_REQUEST, "리뷰를 작성할 수 없습니다."),
-    STATUS_ERROR(HttpStatus.BAD_REQUEST, "0 또는 1만 작성해주세요.");
+    STATUS_ERROR(HttpStatus.BAD_REQUEST, "0 또는 1만 작성해주세요."),
+    SCORE_NOT_FOUND(HttpStatus.BAD_REQUEST, "점수가 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
