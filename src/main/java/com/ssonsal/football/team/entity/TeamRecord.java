@@ -37,8 +37,14 @@ public class TeamRecord extends BaseEntity {
     private int rank;
 
 
+    /**
+     * 생성할때 rank 기본값을 -1로 생성
+     *
+     * @param team
+     */
     public TeamRecord(Team team) {
         this.team = team;
+        this.rank = -1;
     }
 
     @Builder

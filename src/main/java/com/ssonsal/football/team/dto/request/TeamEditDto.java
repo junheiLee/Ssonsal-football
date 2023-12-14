@@ -1,6 +1,5 @@
 package com.ssonsal.football.team.dto.request;
 
-import com.ssonsal.football.team.entity.Team;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,17 +29,4 @@ public class TeamEditDto {
 
     private Integer recruit;
 
-    public Team toEntity(TeamCreateDto teamCreateDto, String url, String key) {
-        Team team = Team.builder()
-                .name(teamCreateDto.getName())
-                .logoUrl(url)
-                .logoKey(key)
-                .preferredArea(teamCreateDto.getPreferredArea())
-                .preferredTime(teamCreateDto.getPreferredTime())
-                .recruit(teamCreateDto.getRecruit())
-                .intro(teamCreateDto.getIntro())
-                .build();
-
-        return team;
-    }
 }
