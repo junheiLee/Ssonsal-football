@@ -2,6 +2,7 @@ package com.ssonsal.football.user.service.impl;
 
 import com.ssonsal.football.global.config.CommonResponse;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
+import com.ssonsal.football.user.dto.LogOutResultDto;
 import com.ssonsal.football.user.dto.SignInResultDto;
 import com.ssonsal.football.user.dto.SignUpResultDto;
 import com.ssonsal.football.user.entity.User;
@@ -138,6 +139,27 @@ public class SignServiceImpl implements SignService {
         setSuccessResult(signInResultDto);
 
         return signInResultDto;
+    }
+    @Override
+    public LogOutResultDto logOut(String email) throws RuntimeException{
+        log.info("[logOut] signDataHandler로 회원 정보 요청 ");
+        User user = userRepository.getByEmail(email);
+        log.info("[logOut] Email : {}", email);
+        log.info("[logOut] Email 정보로 redis에서 토큰 블랙리스트 처리");
+        log.info("[removeRefreshToken] ");
+        log.info("[logOut] Email 정보로 redis에서 토큰 제거");
+        log.info("[BlackedToken] ");
+        LogOutResultDto logOutResultDto = new LogOutResultDto();
+
+//        if (!redis.getRefreshToken().isEmpty()) {
+//            log.info("[removeToken] 정상 처리 완료");
+//            setSuccessResult(logOutResultDto);
+//        } else {
+//            log.info("[removeToken] 실패 처리 완료");
+//            setFailResult(logOutResultDto);
+//        }
+        log.info("[logOut] 작업 완료");
+        return logOutResultDto;
     }
 
     // 결과 모델에 api 요청 성공 데이터를 세팅해주는 메소드
