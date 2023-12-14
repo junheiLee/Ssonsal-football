@@ -59,4 +59,18 @@ public class ReviewController {
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.getReview(reviewId));
     }
+
+    @GetMapping("/subReviewScore/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> subReviewScore(@PathVariable("userId") Long userId) {
+        log.info(String.valueOf(userId));
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.subAvgScore(userId));
+    }
+
+    @GetMapping("/teamReviewScore/{teamId}")
+    public ResponseEntity<ResponseBodyFormatter> teamReviewScore(@PathVariable("teamId") Long teamId) {
+        log.info(String.valueOf(teamId));
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.teamAvgScore(teamId));
+    }
 }
