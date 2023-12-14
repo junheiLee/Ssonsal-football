@@ -18,6 +18,5 @@ public interface SignService {
 
     SignInResultDto signIn(String email, String password) throws RuntimeException;
     LogOutResultDto logOut(String email) throws RuntimeException;
-
-    void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response, String accessToken) throws RuntimeException;
+    
 }

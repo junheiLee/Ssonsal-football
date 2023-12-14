@@ -3,6 +3,7 @@ package com.ssonsal.football.user.service.impl;
 import com.ssonsal.football.global.config.CommonResponse;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.user.dto.LogOutResultDto;
+import com.ssonsal.football.user.dto.SaveRefreshTokenDto;
 import com.ssonsal.football.user.dto.SignInResultDto;
 import com.ssonsal.football.user.dto.SignUpResultDto;
 import com.ssonsal.football.user.entity.User;
@@ -10,9 +11,9 @@ import com.ssonsal.football.user.repository.UserRepository;
 import com.ssonsal.football.user.service.SignService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 
 
@@ -24,6 +25,11 @@ public class SignServiceImpl implements SignService {
     public UserRepository userRepository;
     public JwtTokenProvider jwtTokenProvider;
     public PasswordEncoder passwordEncoder;
+
+    @Value("${spring.jwt.token.access-expiration-time}")
+    private long accessTokenValid; // 1시간 토큰 유효
+    @Value("${spring.jwt.token.refresh-expiration-time}")
+    private long refreshTokenValid; // 3시간 토큰 유효
 
     @Autowired
     public SignServiceImpl(UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
@@ -129,13 +135,19 @@ public class SignServiceImpl implements SignService {
         }
         log.info("[getSignInResult] 패스워드 일치");
 
-        log.info("[getSignInResult] SignInResultDto 객체 생성");
+        log.info("[accessToken] accessToken 객체 생성");
         SignInResultDto signInResultDto = SignInResultDto.builder()
-                .token(jwtTokenProvider.createToken(String.valueOf(user.getEmail()),
-                        user.getRole()))
+                .token(jwtTokenProvider.generateToken(String.valueOf(user.getEmail()),accessTokenValid,
+                        user.getRole(),"access"))
+                .build();
+        log.info("[saveRefreshToken] refreshToken 객체 생성");
+        SaveRefreshTokenDto saveRefreshTokenDto = SaveRefreshTokenDto.builder()
+                .token(jwtTokenProvider.generateToken(String.valueOf(user.getEmail()),refreshTokenValid,
+                        user.getRole(),"refresh"))
                 .build();
 
-        log.info("[getSignInResult] SignInResultDto 객체에 값 주입");
+        log.info("[getSignInResult] SignInResultDto 객체에 값 주입 : {}", signInResultDto.toString());
+        log.info("[getSignInResult] SignInResultDto 객체에 값 주입 : {}", signInResultDto.toString());
         setSuccessResult(signInResultDto);
 
         return signInResultDto;
@@ -175,4 +187,5 @@ public class SignServiceImpl implements SignService {
         result.setCode(CommonResponse.FAIL.getCode());
         result.setMsg(CommonResponse.FAIL.getMsg());
     }
+
 }
