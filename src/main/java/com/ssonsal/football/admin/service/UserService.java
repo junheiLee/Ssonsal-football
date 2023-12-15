@@ -1,15 +1,18 @@
 package com.ssonsal.football.admin.service;
 
 import com.ssonsal.football.admin.dto.request.UserDTO;
-import com.ssonsal.football.admin.repository.UserManagementRepository;
+import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,9 +21,29 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserManagementRepository userManagementRepository;
+    private final UserRepository userRepository;
 
+    public Integer calculateAge(Long userId) {
 
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND));
+
+        if (user == null || user.getBirth() == null) {
+            return null;
+        }
+
+        LocalDate birth = user.getBirth();
+        LocalDate currentDate = LocalDate.now();
+        int age = currentDate.getYear() - birth.getYear();
+
+        if (currentDate.getMonthValue() < birth.getMonthValue()
+                || (currentDate.getMonthValue() == birth.getMonthValue()
+                && currentDate.getDayOfMonth() < birth.getDayOfMonth())) {
+            age--;
+        }
+
+        return age;
+
+    }
    /**
     유저 리스트
     회원들의 정보 전체를 꺼내온다
@@ -28,11 +51,11 @@ public class UserService {
     */
 
     public List<UserDTO> userList() {
-        List<User> userList = userManagementRepository.findAll();
+        List<User> userList = userRepository.findAll();
 
         List<UserDTO> userDTOs = userList.stream()
                 .map(user -> {
-                    Integer calculatedAge = userManagementRepository.calculateAgeByUserId(user.getId());
+                    Integer calculatedAge = calculateAge(user.getId());
 
                     return UserDTO.builder()
                             .id(user.getId())
@@ -58,11 +81,10 @@ public class UserService {
      */
     @Transactional
     public void updateRoles(List<Integer> userIds) {
-
         log.info("서비스");
 
         userIds.stream()
-                .map(userId -> userManagementRepository.findById(Long.valueOf(userId))
+                .map(userId -> userRepository.findById(Long.valueOf(userId))
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)))
                 .filter(user -> user.getRole() != 1)
                 .forEach(user -> {

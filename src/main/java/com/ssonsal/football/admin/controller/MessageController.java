@@ -7,6 +7,7 @@ import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequestMapping("/admin")
+@Tag(name = "Message", description = "Message API")
 public class MessageController {
     private final AlarmService alarmService;
 
     @PostMapping("/subscribeMessage")
-    public ResponseEntity<ResponseBodyFormatter> subscribe(@RequestParam final String topicArn) {
+    public ResponseEntity<ResponseBodyFormatter> subscribe() {
+
+        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
+
         Long userId = 2L;
 
         if (userId == null) {
@@ -36,7 +41,10 @@ public class MessageController {
     }
 
     @PostMapping("/publishMessage")
-    public ResponseEntity<ResponseBodyFormatter> publish(@RequestParam String topicArn, @RequestBody ResponseMessageDTO responseMessageDTO) {
+    public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody ResponseMessageDTO responseMessageDTO) {
+
+        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
+
         Long userId= 2L;
 
         if (userId == null) {
@@ -45,7 +53,7 @@ public class MessageController {
 
         try {
             return DataResponseBodyFormatter.put(AdminSuccessCode.MESSAGE_SEND_SUCCESS,alarmService.publishMessage(topicArn, responseMessageDTO));
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("메세지 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.MESSAGE_SEND_FAILED);
         }
@@ -53,7 +61,10 @@ public class MessageController {
 
     // sms 구독 취소
     @DeleteMapping("/unsubscribeMessage")
-    public ResponseEntity<ResponseBodyFormatter> unsubscribe(@RequestParam String topicArn) {
+    public ResponseEntity<ResponseBodyFormatter> unsubscribe() {
+
+        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
+
         Long userId= 2L;
 
         if (userId == null) {
@@ -62,7 +73,7 @@ public class MessageController {
         try {
             alarmService.unsubscribeMessage(topicArn,userId);
             return ResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
-        } catch (Exception e) {
+        } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }

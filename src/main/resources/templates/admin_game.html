@@ -261,7 +261,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-          $('#bootstrap-data-table-export').DataTable();
+          $('#bootstrap-data-table-export'  ).DataTable();
       } );
   </script>
 
@@ -291,9 +291,9 @@
                 contentType: 'application/json',
                 success: function (response) {
                     console.log('서버 응답:', response);
-                    if (response === '삭제 성공') {
-                        alert('삭제 성공');
-                        window.location.href = '/admin/game';
+               if (response && response.status === 200) {
+            alert('삭제 성공');
+            window.location.href = '/admin/game';
                     } else {
                         alert('삭제 실패');
                     }

@@ -11,11 +11,12 @@ public enum AdminErrorCode implements ResponseCode {
     USER_FAILED_Authorization(HttpStatus.FORBIDDEN, "권한 부여 실패."),
     USER_SELECTED_FAILED(HttpStatus.BAD_REQUEST, "선택된 유저가 없습니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "선택된 유저가 없습니다."),
+    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "날짜 포맷 실패"),
 
     GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "게임을 찾을 수 없습니다."),
     GAME_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 게임이 아닙니다."),
 
-    MONTH_UPDATE_FAILED(HttpStatus.CONFLICT, "달 변경 실패."),
+    MONTH_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "달 변경 실패."),
     DELETEDCODE_UPDATE_FAILED(HttpStatus.NOT_FOUND, "삭제 코드 변환 실패"),
     DATE_NOT_FOUND(HttpStatus.BAD_REQUEST, "날짜를 찾을 수 없습니다"),
 

@@ -4,27 +4,23 @@ package com.ssonsal.football.admin.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonsal.football.admin.dto.request.AlarmDTO;
 import com.ssonsal.football.admin.dto.request.MessageDTO;
-import com.ssonsal.football.admin.dto.response.ResponseEmailDTO;
 import com.ssonsal.football.admin.dto.response.ResponseMessageDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
-import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
-import com.ssonsal.football.admin.repository.UserManagementRepository;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
-import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.*;
 
 import java.util.Map;
-import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,7 +28,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class AlarmService {
     private final GameManagementRepository gameManagementRepository;
-    private final UserManagementRepository userManagementRepository;
+    private final UserRepository userRepository;
     private final CredentialService credentialService;
 
 
@@ -87,7 +83,7 @@ public class AlarmService {
      */
     public String getUserByEmail(Long userId) {
 
-        return userManagementRepository.findById(userId)
+        return userRepository.findById(userId)
                 .map(User::getEmail)
                 .orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND, userId));
     }
@@ -99,7 +95,7 @@ public class AlarmService {
      * @return 유저의 번호을 찾아 반환한다
      */
     public String getUserByPhone(Long userId) {
-        return userManagementRepository.findById(userId)
+        return userRepository.findById(userId)
                 .map(User::getPhone)
                 .orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND, userId));
     }
@@ -148,7 +144,7 @@ public class AlarmService {
      * @param topicName 생성한 주제 이름
      * @return 성공 메시지와 주제 성공 응답 반환
      */
-    public ResponseEntity<ResponseBodyFormatter> createTopic(String topicName) {
+    public String createTopic(String topicName) {
         SnsClient snsClient = credentialService.getSnsClient();
 
         try {
@@ -164,7 +160,7 @@ public class AlarmService {
             log.info("주제 이름 = " + createTopicResponse.topicArn());
             log.info("주제 list = " + snsClient.listTopics());
 
-            return DataResponseBodyFormatter.put(AdminSuccessCode.TOPIC_CREATE_SUCCESS, createTopicResponse);
+            return "주제 생성 성공";
         } finally {
             snsClient.close();
         }
@@ -181,7 +177,9 @@ public class AlarmService {
      * @param userId
      * @return 성공 메세지와 구독 응답
      */
-    public ResponseEntity<ResponseBodyFormatter> subscribeEmail(String topicArn, Long userId) {
+    public String subscribeEmail(String topicArn, Long userId) {
+        log.info("컨트 시작");
+
         String userEmail = getUserByEmail(userId);
         log.info("유저 아이디" + userEmail);
 
@@ -210,31 +208,22 @@ public class AlarmService {
         log.info("Subscribed member: " + userEmail);
         snsClient.close();
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, subscribeResponse);
+        return "이메일 구독 성공";
     }
 
     /**
      * 구독 이메일 인증 확인
      * @param topicArn
-     * @param responseEmailDTO
      * @param userId
      * 가져온 정보들로 aws sns에 저장된 값과 비교하여 구독 확인을 진행한다
      * @return
      */
-    public ResponseEntity<ResponseBodyFormatter> confirmSubscription(String topicArn, ResponseEmailDTO responseEmailDTO, Long userId) {
-        String infoEmail = responseEmailDTO.getUserEmail();
+    public String confirmSubscription(String topicArn, Long userId) {
 
         // 사용자 정보 가져오기
         String userByEmail = getUserByEmail(userId);
 
-        log.info("가져온 이메일: " + infoEmail);
         log.info("현재 유저 이메일: " + userByEmail);
-
-        // 이메일 일치 여부 확인
-        if (infoEmail == null || !infoEmail.equals(userByEmail)) {
-            return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_NOT_FOUND);
-
-        }
 
         SnsClient snsClient = credentialService.getSnsClient();
 
@@ -255,16 +244,14 @@ public class AlarmService {
             // 이메일과 endpoint 일치 여부 확인
             if (userByEmail.equals(endpoint)) {
                 if ("PendingConfirmation".equals(subscriptionArn)) {
-                    return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
-                    // return new ResponseEntity<>("구독 확인이 안됬습니다. 다시 확인해 주세요", HttpStatus.NOT_FOUND);
+                    return "이메일 불일치";
                 } else {
-                    return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS);
-                    //   return new ResponseEntity<>("구독 확인이 되었습니다. 감사합니다", HttpStatus.OK);
+                    return "이메일 일치";
                 }
             }
         }
 
-        return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIPTIONARN_NOT_FOUND);
+        return "인증 성공";
     }
 
     /**
@@ -274,17 +261,22 @@ public class AlarmService {
      * 메세지 내용을 가지고와 그 text로 이메일이 보내진다
      * @return 메세지와 메시지id
      */
-    public ResponseEntity<ResponseBodyFormatter> publishEmail(String topicArn) {
+    public String publishEmail(String topicArn, Map<String, String> payload) {
         try {
             SnsClient snsClient = credentialService.getSnsClient();
 
-            // 하드코딩된 텍스트
-            String text = "hello";
+            // "emailText" 키에 해당하는 값을 추출
+            String emailText = payload.get("emailText");
+
+            log.info("파싱전 이메일 내용"+emailText);
+
+            // HTML에서 <p> 태그를 제거하고 텍스트만 추출
+            String emailContent = removePTags(emailText);
 
             final PublishRequest publishRequest = PublishRequest.builder()
                     .topicArn(topicArn)
                     .subject("HTTP ENDPOINT TEST MESSAGE")
-                    .message(text)  // 수정된 부분
+                    .message(emailContent)
                     .build();
 
             // SNS 주제에 메시지 발송
@@ -292,11 +284,32 @@ public class AlarmService {
 
             snsClient.close();
 
-            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, publishResponse.messageId());
+            return "이메일 전송 성공";
         } catch (Exception e) {
             log.error("메세지 전송 에러: " + e.getMessage(), e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
+            return "이메일 전송 실패";
         }
+    }
+
+    /**
+     *  <p> </p> 이거 같은 태그 제거
+     *  dependency 추가함
+     * @param html
+     * @return
+     */
+
+    private String removePTags(String html) {
+        // 정규식을 사용하여 <p> 태그를 제거하고 텍스트만 추출
+        Pattern pattern = Pattern.compile("<p>(.*?)</p>");
+        Matcher matcher = pattern.matcher(html);
+
+        StringBuilder textContent = new StringBuilder();
+
+        while (matcher.find()) {
+            textContent.append(matcher.group(1)); // 매치된 그룹의 내용을 추가
+        }
+
+        return textContent.toString();
     }
 
     /**
@@ -309,7 +322,7 @@ public class AlarmService {
      * userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
      * @return
      */
-    public ResponseEntity<ResponseBodyFormatter> unsubscribe(String topicArn,Long userId) {
+    public String unsubscribe(String topicArn,Long userId) {
 
         String userByEmail = getUserByEmail(userId);
 
@@ -337,7 +350,7 @@ public class AlarmService {
 
                 if (unsubscribeResponse.sdkHttpResponse().isSuccessful()) {
                     log.info("구독 취소 성공: " + subscription.subscriptionArn());
-                    return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
+                    return "구독 취소 성공";
                 } else {
                     throw new CustomException(AdminErrorCode.EMAIL_NOT_FOUND);
                 }
@@ -345,7 +358,7 @@ public class AlarmService {
         }
 
         // 찾지 못한 경우
-        return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
+        return "구독 취소 실패";
     }
 
 // ------------------------------------------메시지----------------------------------------------------------
@@ -356,7 +369,7 @@ public class AlarmService {
      * @param userId
      * @return
      */
-    public ResponseEntity<ResponseBodyFormatter> subscribeMessage(String topicArn, Long userId) {
+    public String subscribeMessage(String topicArn, Long userId) {
         log.info("메세지");
 
         String userPhone = getUserByPhone(userId);
@@ -381,7 +394,7 @@ public class AlarmService {
             log.info("주제안 구독 Arn = " + subscribeResponse.subscriptionArn());
             log.info("구독 리시트 = " + snsClient.listSubscriptions());
 
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS);
+            return "메시지 구독 성공";
         } finally {
             snsClient.close();
         }
@@ -393,7 +406,7 @@ public class AlarmService {
      * @param responseMessageDTO
      * @return
      */
-    public ResponseEntity<ResponseBodyFormatter> publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO) {
+    public String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO) {
         Long confirmedGameId = responseMessageDTO.getConfirmedGameId();
         if (confirmedGameId == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
@@ -416,10 +429,10 @@ public class AlarmService {
 
             snsClient.close();
 
-           return DataResponseBodyFormatter.put(AdminSuccessCode.MESSAGE_SEND_SUCCESS,publishResponse.messageId());
+           return "메시지 전송 성공";
         } catch (Exception e) {
             log.error("메시지 전송 에러", e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.MESSAGE_SEND_FAILED);
+            return "메시지 전송 실패";
         }
     }
 
@@ -432,7 +445,7 @@ public class AlarmService {
      * userId의 번호은 고유값이니
      * userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
      */
-    public ResponseEntity<ResponseBodyFormatter> unsubscribeMessage(String topicArn,Long userId) {
+    public String unsubscribeMessage(String topicArn,Long userId) {
         String userByPhone = getUserByPhone(userId);
         String userPhoneNumber = userByPhone.replaceAll("-", "");
 
@@ -465,13 +478,13 @@ public class AlarmService {
 
                 if (unsubscribeResponse.sdkHttpResponse().isSuccessful()) {
 
-                    return ResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
+                    return "메시지 구독 취소 성공";
                 } else {
                     throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
                 }
             }
         }
 
-        return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
+        return "메시지 구독 취소 실패";
     }
 }

@@ -357,7 +357,7 @@
        contentType: 'application/json',
        success: function (response) {
             console.log('서버 응답:', response);
-            if (response === '업데이트 성공') {
+            if (response && response.status === 200) {
                 alert('업데이트 성공!!');
 
             } else {

@@ -60,7 +60,7 @@ public class StatsService {
     request: game.getMatchStatus의 0 또는 1 을 가져온다
     response: statsDTO에 저장
      */
-
+    @Transactional
     public StatsDTO monthStats(LocalDate currentDate) {
 
         if (currentDate == null) {
@@ -68,19 +68,25 @@ public class StatsService {
         }
 
         int year = currentDate.getYear();
+
+
         int month = currentDate.getMonthValue();
 
         LocalDate startDate = LocalDate.of(year, month, 1);
+        
+        log.info("시작날"+startDate);
 
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
+        log.info("마지막날"+endDate);
 
         List<Game> monthlyGames = gameManagementRepository.findByScheduleBetween(
                 startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
 
 
-        if (monthlyGames == null || monthlyGames.isEmpty()) {
+        if (monthlyGames == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
         }
+
 
         // StatsDTO를 활용하여 DTO 생성
         return statsDTO(monthlyGames);
@@ -121,17 +127,15 @@ public class StatsService {
     response: 하루가 지나면 deleteCode는 2로 변경된다
      */
 
-
     @Transactional
     public void updateDeleteCodeForPastGames() {
         try {
             LocalDateTime currentDate = LocalDateTime.now();
             gameManagementRepository.updateDeleteCode(currentDate);
-        } catch (Exception e) {
+        } catch (CustomException e) {
             throw new CustomException(AdminErrorCode.DELETEDCODE_UPDATE_FAILED, e);
         }
     }
-
 
     /**
     하루의 게임 수 계산
@@ -139,7 +143,6 @@ public class StatsService {
    request: 해당 경기와 기간을 가져온다
    response: 검증을 통해 해당 기간의 확정경기와 취소 경기 수를 뽑는다
     */
-
     @Transactional
     private long calculateGameCount(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus) {
 
@@ -160,7 +163,7 @@ public class StatsService {
     request: 특정 날짜를 가져온다
     response:날짜에 대한 계산된 모든 통계를 반환한다
     */
-
+     @Transactional
     public Map<LocalDate, StatsDTO> monthlyDailyStats(LocalDate currentDate) {
 
         if (currentDate == null) {
@@ -181,6 +184,8 @@ public class StatsService {
             monthDayStats.put(date, dailyStats);
         }
 
+        log.info(monthDayStats+"일별 데이터");
+        
         return monthDayStats;
     }
 }

@@ -1,6 +1,5 @@
 package com.ssonsal.football.admin.dto.request;
 
-import com.ssonsal.football.admin.repository.UserManagementRepository;
 import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
