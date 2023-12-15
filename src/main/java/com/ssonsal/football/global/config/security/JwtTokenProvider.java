@@ -9,7 +9,11 @@
 
 package com.ssonsal.football.global.config.security;
 
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.CookieUtil;
+import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.repository.UserRepository;
 import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
@@ -34,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -54,6 +59,7 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService; // Spring Security 에서 제공하는 서비스 레이어
     private final RedisServiceImpl redisServiceimpl;
     private  final RedisTemplate<String,String> redisTemplate;
+    private final UserRepository userRepository;
     @Value("${springboot.jwt.secret}")
     private String secretKey;
 
@@ -75,16 +81,18 @@ public class JwtTokenProvider {
         log.info("[init] 복호화 된 secretKey : {}",secretKey);
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
     }
-    public String generateToken(String email, long expirationTime, int role, String tokenType) {
+    public String generateToken(Long id,Long teamId, long expirationTime, int role, String tokenType) {
         Date now = new Date();
-        return createToken(email, new Date(now.getTime() + expirationTime), role, tokenType);
+        return createToken(id, teamId, new Date(now.getTime() + expirationTime), role, tokenType);
     }//지금은 email로 설정해 뒀는데 토큰에 이메일을 넣는건 보안상 좋지 않은것 같음 => pk인 id값으로 변경예정
 
 
     // JWT 토큰 생성
-    public String createToken(String email,Date expiry ,int role, String tokenType) {
+    public String createToken(Long id,Long teamId,Date expiry ,int role, String tokenType) {
         log.info("[createToken] 토큰 생성 시작");
-        Claims claims = Jwts.claims().setSubject(email);
+        Claims claims = Jwts.claims().setSubject("userInfo");
+        claims.put("id", id);
+        claims.put("teamId", teamId);
         claims.put("role", role);
         claims.put("tokenType", tokenType);
 
@@ -99,26 +107,37 @@ public class JwtTokenProvider {
 
         log.info("[createToken] 토큰 생성 완료 : {}", token);
         if (tokenType.equals("refreshToken")){// redis에 저장
-            log.info("[saveRefreshToken] redis에 refresh` 토큰 저장 ");
-            redisServiceimpl.setRefreshToken(email,token,refreshExpirationTime);
+            log.info("[saveRefreshToken] redis에 refresh 토큰 저장 ");
+            redisServiceimpl.setRefreshToken(String.valueOf(id),token,refreshExpirationTime);
         }
         return token;
     }
 
 
     // JWT 토큰으로 인증 정보 조회
-    public Authentication getAuthentication(String token) {
+    public Authentication getAuthentication(String token) throws RuntimeException{
         log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(this.getUsername(token));
-        log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}",
-                userDetails.getUsername());
-        return new UsernamePasswordAuthenticationToken(userDetails, "",
-                userDetails.getAuthorities());
+        Optional<User> user = userRepository.findById(this.getUserId(token));
+        if(user.isPresent()){
+            String email = user.get().getEmail();
+            log.info("[findEmailById] 제댜로 값을 불러옴 : {}",email);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+            log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}",
+                    userDetails.getUsername());
+            return new UsernamePasswordAuthenticationToken(userDetails, "",
+                    userDetails.getAuthorities());
+        }else {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
     public Long getUserId(String token) {
         Claims claims = getClaims(token);
         return claims.get("id", Long.class);
+    }
+    public Long getTeamId(String token) {
+        Claims claims = getClaims(token);
+        return claims.get("teamId", Long.class);
     }
 
     private Claims getClaims(String token) {
@@ -171,17 +190,13 @@ public class JwtTokenProvider {
         }
     }
 
-    public String reissue(String email){
+    public String reissue(Long userId, Long teamId){
         log.info("[reissue] : 토큰 재발급 시작" );
-        log.info("[reissue] : accessToken에서 유저의 이메일 정보 수집 : {}", email );
         int role = 1;//role 정보도 가져와야 함
-        String reAccessToken = generateToken(email,accessExpirationTime,role,"accessToken");
+        String reAccessToken = generateToken(userId,teamId,accessExpirationTime,role,"accessToken");
         return reAccessToken;
     }
-    public void addAccessTokenToCookie(HttpServletRequest request, HttpServletResponse response, String accessToken) {
-        CookieUtil.deleteCookie(request, response, "token");
-        CookieUtil.addCookie(response, "token", accessToken);
-    }
+
     public String getCookieValue(Cookie[]cookies,String cookieName){
         for(Cookie cookie : cookies){
             if(cookie.getName().equals(cookieName)){
