@@ -56,15 +56,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }else{
             //accessToken값이 유효하지 않기때문에 redis에 저장되어있는 refreshToken의 이 유효한지를 확인한다.
             //먼저 레디스에 저장되어있는 토큰값을 들고와야함
-            String username = jwtTokenProvider.getUsername(token);
-            String refreshToken = redisService.getRefreshToken(username);
+            Long userId = jwtTokenProvider.getUserId(token);
+            Long teamId = jwtTokenProvider.getTeamId(token);
+            String refreshToken = redisService.getRefreshToken(String.valueOf(userId));
             if(jwtTokenProvider.validateToken(refreshToken)){
-                jwtTokenProvider.reissue(username);
-            }
-            Authentication authentication = jwtTokenProvider.getAuthentication(jwtTokenProvider.reissue(token));
+
+
+            Authentication authentication = jwtTokenProvider.getAuthentication(jwtTokenProvider.reissue(userId,teamId));
             // 토큰이 유효하면 인증객체를 SecurityContestHolder에 저장한다
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.info("[doFilterInternal] 새로발급한 reAccessToken 값 유효성 체크 완료");
+            }
         }
 
 
