@@ -164,4 +164,5 @@ public class User extends BaseEntity implements UserDetails {
         this.team = team;
         team.getUsers().add(this);
     }
+
 }

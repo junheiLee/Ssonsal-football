@@ -27,11 +27,11 @@ public class SignUpRequestDto {
 
     private String phone;
 
+    private String intro;
+
     private String preferredTime;
 
     private String preferredArea;
-
-    private String intro;
 
     private int role;
 }

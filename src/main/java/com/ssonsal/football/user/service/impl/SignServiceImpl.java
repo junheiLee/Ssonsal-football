@@ -2,160 +2,117 @@ package com.ssonsal.football.user.service.impl;
 
 import com.ssonsal.football.global.config.CommonResponse;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
-import com.ssonsal.football.user.dto.LogOutResultDto;
-import com.ssonsal.football.user.dto.SaveRefreshTokenDto;
-import com.ssonsal.football.user.dto.SignInResultDto;
-import com.ssonsal.football.user.dto.SignUpResultDto;
+import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.user.dto.*;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import com.ssonsal.football.user.service.SignService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.time.LocalDate;
+
+import javax.transaction.Transactional;
+import java.util.Optional;
 
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
 
-    public UserRepository userRepository;
-    public JwtTokenProvider jwtTokenProvider;
-    public PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Value("${spring.jwt.token.access-expiration-time}")
     private long accessTokenValid; // 1시간 토큰 유효
     @Value("${spring.jwt.token.refresh-expiration-time}")
     private long refreshTokenValid; // 3시간 토큰 유효
 
-    @Autowired
-    public SignServiceImpl(UserRepository userRepository, JwtTokenProvider jwtTokenProvider,
-                           PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
-    public SignUpResultDto signUp(String email, String password, String name, LocalDate birth,
-                                  String gender, String nickname, String position, String phone,
-                                  String intro, String preffered_time, String preffered_area, int role) {
-        log.info("[getSignUpResult] 회원 가입 정보 전달");
-        User user;
-        if (role == 1) {
-            user = User.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .name(name)
-                    .birth(birth)
-                    .gender(gender)
-                    .nickname(nickname)
-                    .position(position)
-                    .phone(phone)
-                    .intro(intro)
-                    .preferredTime(preffered_time)
-                    .preferredArea(preffered_area)
-                    .role(1)
-                    .build();
-        } else if (role == 0) {
-            user = User.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .name(name)
-                    .birth(birth)
-                    .gender(gender)
-                    .nickname(nickname)
-                    .position(position)
-                    .phone(phone)
-                    .intro(intro)
-                    .preferredTime(preffered_time)
-                    .preferredArea(preffered_area)
-                    .role(0)
-                    .build();
-        } else if (role == 2) {
-            user = User.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .name(name)
-                    .birth(birth)
-                    .gender(gender)
-                    .nickname(nickname)
-                    .position(position)
-                    .phone(phone)
-                    .intro(intro)
-                    .preferredTime(preffered_time)
-                    .preferredArea(preffered_area)
-                    .role(2)
-                    .build();
-        } else {
-            user = User.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .name(name)
-                    .birth(birth)
-                    .gender(gender)
-                    .nickname(nickname)
-                    .position(position)
-                    .phone(phone)
-                    .intro(intro)
-                    .preferredTime(preffered_time)
-                    .preferredArea(preffered_area)
-                    .role(4)
-                    .build();
-        }
-
-        log.info("[userSave] builder 패턴으로 만든 User객체 확인용 : {}", user.toString());
-        User savedUser = userRepository.save(user);
-        log.info("[userSave] builder 패턴으로 만든 User객체 저장완료 : {}", savedUser);
-        SignUpResultDto signUpResultDto = new SignInResultDto();
-
-        log.info("[getSignUpResult] userEntity 값이 들어왔는지 확인 후 결과값 주입");
-        if (!savedUser.getName().isEmpty()) {
-            log.info("[getSignUpResult] 정상 처리 완료");
-            setSuccessResult(signUpResultDto);
-        } else {
-            log.info("[getSignUpResult] 실패 처리 완료");
-            setFailResult(signUpResultDto);
-        }
-        return signUpResultDto;
-    }
-
-    @Override
-    public SignInResultDto signIn(String email, String password) throws RuntimeException {
+    @Transactional
+    public SignInResultDto signIn(SignInRequestDto signInRequestDto) throws RuntimeException {
         log.info("[getSignInResult] signDataHandler 로 회원 정보 요청");
-        User user = userRepository.getByEmail(email);
-        log.info("[getSignInResult] Email : {}", email);
+        Optional<User> user = userRepository.getByEmail(signInRequestDto.getEmail());
 
-        log.info("[getSignInResult] 패스워드 비교 수행");
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException();
+        if (user.isPresent()) {
+            User existUser = user.get();
+            log.info("[getSignInResult] 해당 계정이 존재합니다 : {}", signInRequestDto.getEmail());
+            log.info("[getSignInResult] 해당 계정이 존재합니다 : {}", existUser);
+            log.info("[getSignInResult] 패스워드 비교 수행");
+            if (!passwordEncoder.matches(signInRequestDto.getPassword(), existUser.getPassword())) {
+                throw new CustomException(ErrorCode.WRONG_PASSWORD);
+            }
+            log.info("[getSignInResult] 패스워드 일치");
+            log.info("[accessToken] accessToken 토큰 생성");
+            String accessToken = jwtTokenProvider.generateToken(existUser.getId(),
+                    ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
+                    accessTokenValid,
+                    existUser.getRole(),"accessToken");
+            log.info("[accessToken] accessToken 토큰 확인 : {}", accessToken);
+            log.info("[refreshToken] refreshToken 토큰 생성");
+            String refreshToken = jwtTokenProvider.generateToken(existUser.getId(),
+                    ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
+                    refreshTokenValid,
+                    existUser.getRole(),"refreshToken");
+            log.info("[refreshToken] refreshToken 토큰 확인 : {}", refreshToken);
+            log.info("[signInResultDto] 작성 시작");
+            SignInResultDto signInResultDto = new SignInResultDto(existUser,accessToken,refreshToken);
+            log.info("[signInResultDto] 확인 : {}", signInResultDto);
+            return  signInResultDto;
+        } else {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
-        log.info("[getSignInResult] 패스워드 일치");
 
-        log.info("[accessToken] accessToken 객체 생성");
-        SignInResultDto signInResultDto = SignInResultDto.builder()
-                .token(jwtTokenProvider.generateToken(String.valueOf(user.getEmail()),accessTokenValid,
-                        user.getRole(),"access"))
-                .build();
-        log.info("[saveRefreshToken] refreshToken 객체 생성");
-        SaveRefreshTokenDto saveRefreshTokenDto = SaveRefreshTokenDto.builder()
-                .token(jwtTokenProvider.generateToken(String.valueOf(user.getEmail()),refreshTokenValid,
-                        user.getRole(),"refresh"))
-                .build();
-
-        log.info("[getSignInResult] SignInResultDto 객체에 값 주입 : {}", signInResultDto.toString());
-        log.info("[getSignInResult] SignInResultDto 객체에 값 주입 : {}", signInResultDto.toString());
-        setSuccessResult(signInResultDto);
-
-        return signInResultDto;
     }
+    @Override
+    @Transactional
+    public Optional<User> signUp(SignUpRequestDto signUpRequestDto) {
+        log.info("[signUpService] 회원가입을 수행합니다. 입력값 확인 : {}",signUpRequestDto);
+
+        try {
+            User user = User.builder()
+                        .email(signUpRequestDto.getEmail())
+                        .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
+                        .name(signUpRequestDto.getName())
+                        .birth(signUpRequestDto.getBirth())
+                        .gender(signUpRequestDto.getGender())
+                        .nickname(signUpRequestDto.getNickname())
+                        .position(signUpRequestDto.getPosition())
+                        .phone(signUpRequestDto.getPhone())
+                        .intro(signUpRequestDto.getIntro())
+                        .preferredTime(signUpRequestDto.getPreferredTime())
+                        .preferredArea(signUpRequestDto.getPreferredArea())
+                        .role(signUpRequestDto.getRole())
+                        .build();
+
+
+            log.info("[signUpService] User 객체 생성 확인 - {}", user.toString());
+
+            User savedUser = userRepository.save(user);
+
+            if (savedUser == null) {
+                throw new RuntimeException("회원 가입 중 오류가 발생하였습니다. (저장된 사용자 정보가 null입니다.)");
+            }
+
+            log.info("[signUpService] User 객체 저장 완료 - {}", savedUser.toString());
+
+            return Optional.ofNullable(savedUser);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("회원 가입 중 오류가 발생하였습니다. (데이터 액세스 예외)", e);
+        }
+    }
+
     @Override
     public LogOutResultDto logOut(String email) throws RuntimeException{
         log.info("[logOut] signDataHandler로 회원 정보 요청 ");
-        User user = userRepository.getByEmail(email);
+        //User user = userRepository.getByEmail(email);
         log.info("[logOut] Email : {}", email);
         log.info("[logOut] Email 정보로 redis에서 토큰 블랙리스트 처리");
         log.info("[removeRefreshToken] ");
@@ -174,18 +131,16 @@ public class SignServiceImpl implements SignService {
         return logOutResultDto;
     }
 
-    // 결과 모델에 api 요청 성공 데이터를 세팅해주는 메소드
-    private void setSuccessResult(SignUpResultDto result) {
-        result.setSuccess(true);
-        result.setCode(CommonResponse.SUCCESS.getCode());
-        result.setMsg(CommonResponse.SUCCESS.getMsg());
+    @Override
+    public ProfileResultDto viewProfile(String token) throws RuntimeException{
+        Long userId = jwtTokenProvider.getUserId(token);
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            return  new ProfileResultDto(user.get());
+        } else {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
     }
 
-    // 결과 모델에 api 요청 실패 데이터를 세팅해주는 메소드
-    private void setFailResult(SignUpResultDto result) {
-        result.setSuccess(false);
-        result.setCode(CommonResponse.FAIL.getCode());
-        result.setMsg(CommonResponse.FAIL.getMsg());
-    }
 
 }

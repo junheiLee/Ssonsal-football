@@ -11,7 +11,7 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
-@Entity
+//@Entity
 @RedisHash(value = "refresh_token")
 public class RefreshToken {
 
