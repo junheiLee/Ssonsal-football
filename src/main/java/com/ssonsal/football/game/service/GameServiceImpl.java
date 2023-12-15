@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
@@ -49,7 +50,20 @@ public class GameServiceImpl implements GameService {
     public GameDetailResponseDto getDetail(Long gameId) {
 
         Game game = getGame(gameId);
-        return new GameDetailResponseDto(game);
+        MatchApplication homeApplication = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), gameId)
+                .orElse(null);
+
+        Long awayId, awayApplicationId;
+        if(game.getAway() == null) {
+            awayId = null;
+            awayApplicationId = null;
+        } else{
+            MatchApplication awayApplication =
+                    matchApplicationRepository.findByTeamIdAndGameId(game.getAway().getId(), gameId).get();
+            awayId = awayApplication.getTeam().getId();
+            awayApplicationId = awayApplication.getId();
+        }
+        return new GameDetailResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
     }
 
     @Override
@@ -168,9 +182,11 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<GameListResponseDto> findAllGamesForTeam() {
-
-        return gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
+        List<GameListResponseDto> asd = gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
                 .stream().map(GameListResponseDto::new).collect(Collectors.toList());
+
+        log.info("for-team test={}", asd.size());
+        return asd;
     }
 
     @Override

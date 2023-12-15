@@ -6,16 +6,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
+import static com.ssonsal.football.game.util.Transfer.toStringSchedule;
 
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameDetailResponseDto {
 
+    private Long homeId;
+    private Long awayId;
+    private Long homeApplicationId;
+    private Long awayApplicationId;
+    private Long writerId;
     private int matchStatus;
     private String schedule;
     private int gameTime;
@@ -28,7 +30,12 @@ public class GameDetailResponseDto {
     private String homeResult;
     private String awayResult;
 
-    public GameDetailResponseDto(Game game) {
+    public GameDetailResponseDto(Game game, Long homeApplicationId, Long awayId, Long awayApplicationId) {
+        this.homeId = game.getHome().getId();
+        this.awayId = awayId;
+        this.homeApplicationId = homeApplicationId;
+        this.awayApplicationId = awayApplicationId;
+        this.writerId = game.getWriter().getId();
         this.matchStatus = game.getMatchStatus();
         this.schedule = toStringSchedule(game.getSchedule());
         this.gameTime = game.getGameTime();
@@ -42,8 +49,5 @@ public class GameDetailResponseDto {
         this.awayResult = game.getAwayteamResult();
     }
 
-    private String toStringSchedule(LocalDateTime schedule) {
-        return schedule.format(DateTimeFormatter.ofPattern(SCHEDULE_FORMAT));
-    }
 
 }

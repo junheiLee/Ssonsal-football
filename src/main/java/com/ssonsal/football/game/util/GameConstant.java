@@ -11,9 +11,10 @@ public final class GameConstant {
     public static final String HOME = "home";
     public static final String MATCH_TEAM = "matchTeam";
 
-    public static final String USER_INFO = "userInfo";
+    public static final String LOGIN_USER = "loginUser";
 
-    public static final String GAMES = "games";
+    public static final String GAME_INFO = "gameInfo";
+
     public static final String MATCH_APPLICATIONS = "matchApplications";
     public static final String SUB_APPLICANTS = "subApplicants";
     public static final String SUBS = "subs";

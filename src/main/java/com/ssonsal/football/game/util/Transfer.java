@@ -1,11 +1,14 @@
 package com.ssonsal.football.game.util;
 
-import com.ssonsal.football.game.dto.LoginUserInfoDto;
+import com.ssonsal.football.game.dto.LoginUser;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ssonsal.football.game.util.GameConstant.USER_INFO;
+import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
+import static com.ssonsal.football.game.util.GameConstant.LOGIN_USER;
 
 public class Transfer {
 
@@ -26,14 +29,18 @@ public class Transfer {
     public static Map<String, Object> toMapIncludeUserInfo(Long userId, Long teamId, String key, Object dto) {
 
         Map<String, Object> mapData = new HashMap<>();
-        LoginUserInfoDto loginUserInfoDto = LoginUserInfoDto.builder()
+        LoginUser loginUser = LoginUser.builder()
                 .userId(userId)
                 .teamId(teamId)
                 .build();
 
-        mapData.put(USER_INFO, loginUserInfoDto);
+        mapData.put(LOGIN_USER, loginUser);
         mapData.put(key, dto);
 
         return mapData;
+    }
+
+    public static String toStringSchedule(LocalDateTime schedule) {
+        return schedule.format(DateTimeFormatter.ofPattern(SCHEDULE_FORMAT));
     }
 }

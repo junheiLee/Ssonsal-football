@@ -76,7 +76,7 @@ public class GameController {
         GameDetailResponseDto gameDetailResponseDto = gameService.getDetail(gameId);
 
         return DataResponseBodyFormatter.put(SUCCESS,
-                toMapIncludeUserInfo(loginUserId, loginUserTeamId, GAMES, gameDetailResponseDto));
+                toMapIncludeUserInfo(loginUserId, loginUserTeamId, GAME_INFO, gameDetailResponseDto));
     }
 
     /**
