@@ -10,8 +10,7 @@ public enum AdminSuccessCode implements ResponseCode{
     ADMIN_AUTH_SUCCESS(HttpStatus.OK,"관리자 인증 성공"),
     USER_COUNT_SUCCESS(HttpStatus.OK,"유저 카운트 성공"),
     PAGE_ALTER_SUCCESS(HttpStatus.OK,"페이지 이동 성공"),
-    USER_ALTER_ROLE(HttpStatus.OK, "권한이 변경되었습니다."),
-
+    AMDIN_RECOGNIZE_SUCCESS(HttpStatus.OK, "관리자 승인 성공."),
     GAME_DELETE_SUCCESS(HttpStatus.OK, "게임이 삭제되었습니다."),
     GAME_DELETE_FAILED(HttpStatus.OK, "게임 글 삭제 성공."),
     GAME_POST_DELETED(HttpStatus.OK, "게시글이 삭제되었습니다"),

@@ -4,9 +4,9 @@ import com.ssonsal.football.admin.dto.request.StatsDTO;
 import com.ssonsal.football.admin.dto.request.UpdateMonthDto;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.GameService;
-import com.ssonsal.football.admin.service.StatsService;
-import com.ssonsal.football.admin.service.UserService;
+import com.ssonsal.football.admin.service.GameManagementServiceImpl;
+import com.ssonsal.football.admin.service.StatsServiceImpl;
+import com.ssonsal.football.admin.service.UserManagementServiceImpl;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -26,16 +26,18 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
+import static com.ssonsal.football.game.util.Transfer.objectToMap;
+
 @RestController
 @Slf4j
-@RequestMapping("/admin")
+@RequestMapping("/api/management")
 @RequiredArgsConstructor
 @Tag(name = "Admin", description = "Admin API")
 public class AdminManagementController {
 
-    private final StatsService statsService;
-    private final GameService gameService;
-    private final UserService userService;
+    private final StatsServiceImpl statsServiceImpl;
+    private final GameManagementServiceImpl gameServiceImpl;
+    private final UserManagementServiceImpl userServiceImpl;
 
     /**
      * 관리자 권한 부여시 호출되는 api
@@ -49,14 +51,14 @@ public class AdminManagementController {
         List<Integer> userIds = (List<Integer>) requestData.get("userIds");
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         } else if (userIds == null) {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
-        userService.updateRoles(userIds);
-        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_ALTER_ROLE, userIds);
+        userServiceImpl.updateRoles(userIds);
+        return DataResponseBodyFormatter.put(AdminSuccessCode.AMDIN_RECOGNIZE_SUCCESS, objectToMap("recognizeAdmin", userIds));
 
     }
 
@@ -72,15 +74,15 @@ public class AdminManagementController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         } else if (gameIds == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
         }
 
-        gameService.deleteGames(gameIds);
+        gameServiceImpl.deleteGames(gameIds);
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED,gameIds);
+        return DataResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED,objectToMap("deletePost",gameIds));
 
     }
 
@@ -98,7 +100,7 @@ public class AdminManagementController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -112,8 +114,8 @@ public class AdminManagementController {
 
             LocalDate currentDate = selectedDateTime.toLocalDate();
 
-            StatsDTO monthStats =statsService.monthStats(currentDate);
-            Map<LocalDate, StatsDTO>  monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
+            StatsDTO monthStats = statsServiceImpl.monthStats(currentDate);
+            Map<LocalDate, StatsDTO>  monthlyDailyStats = statsServiceImpl.monthlyDailyStats(currentDate);
 
             return DataResponseBodyFormatter.put(
                     AdminSuccessCode.PAGE_ALTER_SUCCESS,

@@ -1,10 +1,9 @@
 package com.ssonsal.football.admin.controller;
 
-import com.ssonsal.football.admin.dto.response.ResponseEmailDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.AlarmService;
-import com.ssonsal.football.admin.service.UserService;
+import com.ssonsal.football.admin.service.AlarmServiceImpl;
+import com.ssonsal.football.admin.service.UserManagementServiceImpl;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -26,8 +25,8 @@ import java.util.Map;
 @Tag(name = "Email", description = "Email API")
 public class SnsController {
 
-    private final AlarmService alarmService;
-    private final UserService userService;
+    private final AlarmServiceImpl alarmServiceImpl;
+    private final UserManagementServiceImpl userServiceImpl;
 
 
     private ResponseStatusException getResponseStatusException(SnsResponse response) {
@@ -54,7 +53,7 @@ public class SnsController {
             throw new CustomException(AdminErrorCode.TOPIC_CREATE_FAILED);
         }
 
-        alarmService.createTopic(topicName);
+        alarmServiceImpl.createTopic(topicName);
         return ResponseBodyFormatter.put(AdminSuccessCode.TOPIC_CREATE_SUCCESS);
 
     }
@@ -75,13 +74,13 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            alarmService.subscribeEmail(topicArn, userId);
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeEmail(topicArn, userId));
+            alarmServiceImpl.subscribeEmail(topicArn, userId);
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmServiceImpl.subscribeEmail(topicArn, userId));
         } catch (CustomException e) {
             log.error("이메일 구독 에러", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -101,12 +100,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmService.confirmSubscription(topicArn, userId));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmServiceImpl.confirmSubscription(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 확인 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
@@ -133,12 +132,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn,emailText));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmServiceImpl.publishEmail(topicArn,emailText));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
@@ -160,11 +159,11 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (!userServiceImpl.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmService.unsubscribe(topicArn, userId));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmServiceImpl.unsubscribe(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
