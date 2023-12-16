@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum AdminSuccessCode implements ResponseCode{
 
+    ADMIN_AUTH_SUCCESS(HttpStatus.OK,"관리자 인증 성공"),
+
     PAGE_ALTER_SUCCESS(HttpStatus.OK,"페이지 이동 성공"),
     USER_ALTER_ROLE(HttpStatus.OK, "권한이 변경되었습니다."),
 

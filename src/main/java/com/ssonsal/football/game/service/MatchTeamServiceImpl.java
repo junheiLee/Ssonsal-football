@@ -2,15 +2,15 @@ package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
-import com.ssonsal.football.game.entity.ApplicantStatus;
+import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
-import com.ssonsal.football.game.entity.MatchStatus;
-import com.ssonsal.football.game.exception.GameErrorCode;
-import com.ssonsal.football.game.repository.GameRepository;
+import com.ssonsal.football.game.repository.MatchApplicationRepository;
+import com.ssonsal.football.game.repository.SubRepository;
 import com.ssonsal.football.game.util.GameResultSet;
 import com.ssonsal.football.game.util.TeamResult;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamRecord;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.user.entity.User;
@@ -20,14 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-
-import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_APPLICANT_TEAM;
-import static com.ssonsal.football.game.exception.MatchErrorCode.NOT_TEAM_MEMBER;
+import static com.ssonsal.football.game.entity.MatchStatus.WAITING;
+import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
+import static com.ssonsal.football.game.util.TeamResult.END;
+import static com.ssonsal.football.game.util.TeamResult.peekResult;
 import static com.ssonsal.football.game.util.Transfer.longIdToMap;
-import static com.ssonsal.football.global.util.ErrorCode.NOT_EXIST;
 import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
 
 
@@ -37,91 +35,84 @@ import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
 @Service
 public class MatchTeamServiceImpl implements MatchTeamService {
 
-    private final GameRepository gameRepository;
     private final UserRepository userRepository;
+    private final MatchApplicationRepository matchApplicationRepository;
     private final TeamRecordRepository teamRecordRepository;
+    private final SubRepository subRepository;
+
+    @Override
+    public MatchTeamResponseDto getMatchTeam(Long matchTeamId) {
 
 
+        MatchTeamResponseDto matchTeam = matchApplicationRepository.searchMatchTeamDto(matchTeamId);
+        validateIsExistMatchTeam(matchTeam);
+
+        matchTeam.isHavingSub(subRepository.existsByTeamIdAndGameId(matchTeam.getTeamId(), matchTeam.getGameId()));
+
+        return matchTeam;
+    }
+
+    private void validateIsExistMatchTeam(MatchTeamResponseDto matchTeam) {
+        if (matchTeam == null) {
+            throw new CustomException(NOT_EXIST_APPLICATION);
+        }
+    }
+
+    @Override
     @Transactional
-    public Long approveAwayTeam(Long userId, Long gameId,
-                                ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public Long approveAwayTeam(Long loginUserId, ApprovalTeamRequestDto approvalAwayTeamDto) {
 
-        // 해당 게임
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST));
-        checkGameIsWaiting(game.getMatchStatus());
+        User loginUser = getUser(loginUserId);
 
-        // 요청을 보낸 user 가 게임을 생성한 팀의 팀원인지 확인
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-        checkUserInHomeTeam(game, user);
+        Long matchApplicationId = approvalAwayTeamDto.getMatchApplicationId();
+        MatchApplication targetApplication = getMatchApplication(matchApplicationId);
 
-        // Applicant Status 대기 -> 보류로 변경
-        List<MatchApplication> applicantsTeams = game.getMatchApplications();
-        applicantsTeams.stream()
-                .filter(team -> team.getApplicationStatus().equals(ApplicantStatus.WAITING.getDescription()))
-                .forEach(MatchApplication::changeStatusToWaiting);
+        Game game = targetApplication.getGame();
 
-        // 승인할 팀 신청
-        Long teamId = approvalAwayTeamDto.getTeamId();
-        checkIsAwayTeam(game, teamId);
-        MatchApplication applicantTeam = applicantsTeams.stream()
-                .filter(target -> Objects.equals(target.getTeam().getId(), teamId))
-                .findAny()
-                .orElseThrow(() -> new CustomException(NOT_APPLICANT_TEAM, longIdToMap(TEAM_ID, teamId)));
+        validateUserInTargetTeam(game.getHome(), loginUser.getTeam());
+        validateGameIsWaiting(game);
+        validateIsNotHome(game, targetApplication.getTeam());
 
-        // 승인 로직
-        applicantTeam.approve();
+        game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
+        targetApplication.approve();
 
         return game.getId();
     }
 
-    @Transactional
-    public GameResultResponseDto enterAwayTeamResult(Game game, TeamResult awayResult) {
-        String homeResultInKo = game.getHometeamResult();
-        Integer awayScore = awayResult.getScore();
-
-        game.enterAwayTeamResult(awayResult.getKo());
-        GameResultResponseDto gameResultResponseDto = GameResultResponseDto.builder()
-                .homeResult(homeResultInKo)
-                .awayResult(awayResult.getKo())
-                .build();
-
-        // 한 팀만 승패를 입력한 경우
-        log.info("어웨이 팀 입력 시 homeResultInKo={}", homeResultInKo);
-        if (homeResultInKo == null) {
-            gameResultResponseDto.setTotalScore(awayScore);
-            return gameResultResponseDto;
-        }
-
-        TeamResult homeResult = TeamResult.peekResult(homeResultInKo);
-        Integer totalScore = homeResult.getScore() + awayScore;
-
-        // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입 후,
-        if (totalScore.equals(TeamResult.END.getScore())) {
-
-            Long homeId = game.getHome().getId();
-            Long awayId = game.getAway().getId();
-
-            TeamRecord homeRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
-            GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
-
-            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
-            GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
-
-            game.end();
-            gameResultResponseDto.setTotalScore(totalScore);
-            return gameResultResponseDto;
-        }
-
-        // 옳은 입력이나 한팀만 입력 외에는 양팀에서 입력한 결과를 초기화 시킨다.
-        game.enterHomeTeamResult(null);
-        game.enterAwayTeamResult(null);
-        return GameResultResponseDto.builder().build();
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
     }
 
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
+    }
+
+    private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
+
+        if (!targetTeam.equals(userTeam)) {
+            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
+            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+        }
+    }
+
+    private void validateGameIsWaiting(Game game) {
+
+        if (game.getMatchStatus() != WAITING.getCodeNumber()) {
+            throw new CustomException(NOT_WAITING_GAME, longIdToMap(GAME_ID, game.getId()));
+        }
+    }
+
+    private void validateIsNotHome(Game game, Team team) {
+        if (game.getHome().equals(team)) {
+            log.error("home 은 신청한 팀이 아니므로 승인할 수 없음.");
+            throw new CustomException(NOT_EXIST_APPLICATION);
+        }
+    }
+
+    @Override
     @Transactional
     public GameResultResponseDto enterHomeTeamResult(Game game, TeamResult homeResult) {
 
@@ -135,57 +126,78 @@ public class MatchTeamServiceImpl implements MatchTeamService {
                 .build();
 
         // 한 팀만 승패를 입력한 경우
-        log.info("홈 팀 입력 시 awayResultInKo={}", awayResultInKo);
         if (awayResultInKo == null) {
-            gameResultResponseDto.setTotalScore(homeScore);
-            return gameResultResponseDto;
+            return gameResultResponseDto.setTotalScore(homeScore);
         }
 
-        TeamResult awayResult = TeamResult.peekResult(awayResultInKo);
+        TeamResult awayResult = peekResult(awayResultInKo);
         Integer totalScore = homeScore + awayResult.getScore();
 
         // 양 팀 모두 옳은 승패를 입력한 경우 team_record 테이블에 결과 기입
-        if (totalScore.equals(TeamResult.END.getScore())) {
+        if (totalScore.equals(END.getScore())) {
 
-            Long homeId = game.getHome().getId();
-            Long awayId = game.getAway().getId();
-
-            TeamRecord homeRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, homeId)));
-            GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
-
-            TeamRecord awayRecord = teamRecordRepository.findById(homeId)
-                    .orElseThrow(() -> new CustomException(NOT_EXIST, longIdToMap(TEAM_RECORD_ID, awayId)));
-            GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
-
-            game.end();
-            gameResultResponseDto.setTotalScore(totalScore);
-            return gameResultResponseDto;
+            enterResult(game, homeResult, awayResult);
+            return gameResultResponseDto.setTotalScore(totalScore);
         }
 
-        // 옳은 입력이나 한팀만 입력 외에는 양팀에서 입력한 결과를 초기화 시킨다.
-        game.enterHomeTeamResult(null);
-        game.enterAwayTeamResult(null);
+        // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
+        initResult(game);
         return GameResultResponseDto.builder().build();
     }
 
-    private void checkIsAwayTeam(Game game, Long teamId) {
-        if (game.getHome().getId().equals(teamId)) {
-            throw new CustomException(NOT_APPLICANT_TEAM);
+    @Override
+    @Transactional
+    public GameResultResponseDto enterAwayTeamResult(Game game, TeamResult awayResult) {
+        String homeResultInKo = game.getHometeamResult();
+        Integer awayScore = awayResult.getScore();
+
+        game.enterAwayTeamResult(awayResult.getKo());
+        GameResultResponseDto gameResultResponseDto = GameResultResponseDto.builder()
+                .homeResult(homeResultInKo)
+                .awayResult(awayResult.getKo())
+                .build();
+
+        // 한 팀만 승패를 입력한 경우
+        if (homeResultInKo == null) {
+            return gameResultResponseDto.setTotalScore(awayScore);
         }
+
+        TeamResult homeResult = peekResult(homeResultInKo);
+        Integer totalScore = homeResult.getScore() + awayScore;
+
+        // 양 팀 모두 옳은 승패를 입력한 경우
+        if (totalScore.equals(END.getScore())) {
+
+            enterResult(game, homeResult, awayResult);
+            return gameResultResponseDto.setTotalScore(totalScore);
+        }
+
+        // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
+        initResult(game);
+        return GameResultResponseDto.builder().build();
     }
 
-    private void checkUserInHomeTeam(Game game, User user) {
-        if (!user.getTeam().equals(game.getHome())) {
-            throw new CustomException(NOT_TEAM_MEMBER, longIdToMap(USER_ID, user.getId()));
-        }
+    private void enterResult(Game game, TeamResult homeResult, TeamResult awayResult) {
+        Long homeId = game.getHome().getId();
+        Long awayId = game.getAway().getId();
+
+        TeamRecord homeRecord = getTeamRecord(homeId);
+        GameResultSet.getHomeRecordEntity(homeRecord, homeResult, awayResult);
+
+        TeamRecord awayRecord = getTeamRecord(awayId);
+        GameResultSet.getAwayRecordEntity(awayRecord, homeResult, awayResult);
+
+        game.end();
     }
 
-    private void checkGameIsWaiting(int gameMatchStatus) {
-        int waitingStatus = MatchStatus.WAITING.getCodeNumber();
-
-        if (!(gameMatchStatus == waitingStatus)) {
-            throw new CustomException(GameErrorCode.ALREADY_CONFIRMED_GAME);
-        }
+    private TeamRecord getTeamRecord(Long teamId) {
+        return teamRecordRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
     }
+
+    private void initResult(Game game) {
+        game.enterHomeTeamResult(null);
+        game.enterAwayTeamResult(null);
+    }
+
 }

@@ -1,18 +1,20 @@
 package com.ssonsal.football.user.service;
 
 
-import com.ssonsal.football.user.dto.SignInResultDto;
-import com.ssonsal.football.user.dto.SignUpResultDto;
+import com.ssonsal.football.user.dto.*;
+import com.ssonsal.football.user.entity.User;
 
-import java.time.LocalDate;
+import java.util.Optional;
 
-// 예제 13.24
+
 public interface SignService {
 
-    SignUpResultDto signUp(String email, String password, String name, LocalDate birth,
-                           String gender, String nickname, String position, String phone,
-                           String intro, String preffered_time, String preffered_area, int role);
+    SignInResultDto signIn(SignInRequestDto signInRequestDto) throws RuntimeException;
 
-    SignInResultDto signIn(String email, String password) throws RuntimeException;
+    Optional<User> signUp(SignUpRequestDto signUpRequestDto);
+
+    LogOutResultDto logOut(String email) throws RuntimeException;
+
+    ProfileResultDto viewProfile(String token) throws RuntimeException;
 
 }

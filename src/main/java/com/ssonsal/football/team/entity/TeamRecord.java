@@ -34,10 +34,17 @@ public class TeamRecord extends BaseEntity {
     private int totalGameCount;
 
     @Column(name = "team_rank")
-    private Integer rank;
+    private int rank;
 
+
+    /**
+     * 생성할때 rank 기본값을 -1로 생성
+     *
+     * @param team
+     */
     public TeamRecord(Team team) {
         this.team = team;
+        this.rank = -1;
     }
 
     @Builder
@@ -57,6 +64,10 @@ public class TeamRecord extends BaseEntity {
                 + (this.loseCount * TeamResult.LOSE.getScore());
 
         return this;
+    }
+
+    public void enterRank(int rank) {
+        this.rank = rank;
     }
 
 //    public TeamRecord enterTeamToRecordSet(Team team){

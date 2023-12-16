@@ -1,11 +1,12 @@
 package com.ssonsal.football.review.service;
 
 import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.review.dto.request.ReviewRequestDto;
+import com.ssonsal.football.review.dto.response.ReviewListResponseDto;
 import com.ssonsal.football.review.dto.response.ReviewResponseDto;
+import com.ssonsal.football.review.dto.response.ScoreResponseDto;
 import com.ssonsal.football.review.etity.Review;
 import com.ssonsal.football.review.exception.ReviewErrorCode;
 import com.ssonsal.football.review.repository.ReviewRepository;
@@ -21,9 +22,8 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Service
-public class ReviewServiceImpl implements ReviewService{
+public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
@@ -37,8 +37,6 @@ public class ReviewServiceImpl implements ReviewService{
 
         User user = userRepository.findById(reviewRequestDto.getWriterId())
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.USER_NOT_FOUND));
-
-        qualificationToWrite(game, user);
 
         Review review = Review.builder()
                 .game(game)
@@ -56,33 +54,114 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
-    public List<ReviewResponseDto> teamReviewList(Long teamId) {
+    @Transactional(readOnly = true)
+    public List<ReviewListResponseDto> teamReviewList(Long teamId) {
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
 
-        List<ReviewResponseDto> teamReviews = new ArrayList<>();
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        List<ReviewListResponseDto> teamReviews = new ArrayList<>();
         for (Review review : reviews) {
-            teamReviews.add(ReviewResponseDto.fromEntity(review));
+            teamReviews.add(ReviewListResponseDto.fromEntity(review));
         }
 
         return teamReviews;
     }
 
     @Override
-    public List<ReviewResponseDto> userReviewList(Long userId) {
+    @Transactional(readOnly = true)
+    public List<ReviewListResponseDto> userReviewList(Long userId) {
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
 
-        List<ReviewResponseDto> userReviews = new ArrayList<>();
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        List<ReviewListResponseDto> userReviews = new ArrayList<>();
         for (Review review : reviews) {
-            userReviews.add(ReviewResponseDto.fromEntity(review));
+            userReviews.add(ReviewListResponseDto.fromEntity(review));
         }
 
         return userReviews;
     }
 
-    private void qualificationToWrite(Game game, User user) {
-        if (game == null || user == null) {
-            log.error("리뷰를 작성할 수 있는 조건이 아닙니다.");
-            throw new CustomException(ReviewErrorCode.NO_QUALIFICATION);
+    @Transactional
+    public void updateDeleteCode(Long reviewId, Integer deleteCode) {
+        reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        if (!(deleteCode == 0 || deleteCode == 1)) {
+            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
         }
+
+        reviewRepository.updateDeleteCode(reviewId, deleteCode);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ReviewResponseDto getReview(Long reviewId) {
+        reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        ReviewResponseDto review = ReviewResponseDto.fromEntity(reviewRepository.findReviewById(reviewId));
+        return review;
+    }
+
+    @Override
+    public ScoreResponseDto subAvgScore(Long userId) {
+        List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
+
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        float totalMannerScore = 0.0f;
+        float totalSkillScore = 0.0f;
+
+        for (Review review : reviews) {
+            totalMannerScore += review.getMannerScore();
+            totalSkillScore += review.getSkillScore();
+        }
+
+        float avgMannerScore = totalMannerScore / reviews.size();
+        float avgSkillScore = totalSkillScore / reviews.size();
+
+        ScoreResponseDto subScore = new ScoreResponseDto();
+        subScore.setAvgMannerScore(avgMannerScore);
+        subScore.setAvgSkillScore(avgSkillScore);
+
+        return subScore;
+    }
+
+    @Override
+    public ScoreResponseDto teamAvgScore(Long teamId) {
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        float totalMannerScore = 0.0f;
+        float totalSkillScore = 0.0f;
+
+        for (Review review : reviews) {
+            totalMannerScore += review.getMannerScore();
+            totalSkillScore += review.getSkillScore();
+        }
+
+        float avgMannerScore = totalMannerScore / reviews.size();
+        float avgSkillScore = totalSkillScore / reviews.size();
+
+        ScoreResponseDto teamScore = new ScoreResponseDto();
+        teamScore.setAvgMannerScore(avgMannerScore);
+        teamScore.setAvgSkillScore(avgSkillScore);
+
+        return teamScore;
     }
 }
