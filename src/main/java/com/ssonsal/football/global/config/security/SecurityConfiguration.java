@@ -54,6 +54,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/sign-in", "/user/sign-up",
                         "/user/exception").permitAll() // 가입 및 로그인 주소는 허용
                 .antMatchers("**exception**").permitAll()
+                .antMatchers("/api/**").permitAll()
+
                 .anyRequest().authenticated()
                 .and()
                 .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
