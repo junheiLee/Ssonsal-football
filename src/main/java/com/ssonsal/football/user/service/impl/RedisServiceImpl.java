@@ -1,5 +1,6 @@
 package com.ssonsal.football.user.service.impl;
 
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.user.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -118,28 +118,9 @@
                 <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
             </div>
         </div>
-        <div class="top-right">
-            <div class="header-menu">
-                <div class="user-area dropdown float-right">
-                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img class="user-avatar rounded-circle" th:src="@{/images/admin.jpg}" alt="User Avatar">
-                    </a>
 
-                    <div class="user-menu dropdown-menu">
-                        <a class="nav-link" th:href="@{/my-profile}"><i class="fa fa-user"></i>My Profile</a>
-
-                        <a class="nav-link" th:href="@{/notifications}"><i class="fa fa-bell"></i>Notifications <span class="count">13</span></a>
-
-                        <a class="nav-link" th:href="@{/settings}"><i class="fa fa-cog"></i>Settings</a>
-
-                        <a class="nav-link" th:href="@{/logout}"><i class="fa fa-power-off"></i>Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </header>
     <!-- Header-->
-
 
         <div class="breadcrumbs">
             <div class="breadcrumbs-inner">
@@ -157,7 +138,7 @@
                                 <ol class="breadcrumb text-right">
                                     <li>SSonsal</li>
                                     <li>글 관리</li>
-                                    <li class="active">매치 글 관리</li>
+                                    <li class="active">용병 글 관리</li>
                                 </ol>
                             </div>
                         </div>
@@ -183,7 +164,7 @@
                                         <th>등록 일자</th>
                                         <th>등록자</th>
                                         <th>경기장</th>
-                                        <th>매치 시간</th>
+                                        <th>시간</th>
                                         <th>필요 인원</th>
                                         <th>상태</th>
                                     </tr>
@@ -192,25 +173,24 @@
                                     <tr th:each="game : ${gameList}">
                                         <td>
                                             <input type="checkbox" name="selectedGame" data-user-id="${game.id}" data-user-id-value="${game.id}">
-                                            <span class="game-id" th:text="${game.id}" style="display: none;"></span>
+                                            <span class="user-id" th:text="${user.userId}" style="display: none;"></span>
                                         </td>
-                                        <td th:text="${#temporals.format(game.createdAt, 'yyyy-MM-dd')}"></td>
-                                        <td th:text="${game.writer}"></td>
+                                        <td th:text="${game.createdAt}"></td>
+                                        <td th:text="${game.writerId}"></td>
                                         <td th:text="${game.stadium}"></td>
-                                        <td th:text="${#temporals.format(game.schedule, 'MM월 dd일 HH시 mm분')}"></td>
-                                        <td th:text="${game.vsFormat}+' 명'"></td>
-                                        <td th:text="${game.matchStatus == 0 ? '매치 완료' : '매치 대기중'}"></td>
-
+                                        <td th:text="${game.schedule}"></td>
+                                        <td th:text="${game.vsFormat}"></td>
+                                        <td th:text="${game.matchStatus}"></td>
                                     </tr>
                                     </tbody>
                                 </table>
+
                                 <div style="width:100%;">
-                                    <button class="delete-Games"
+                                    <button class="grant-permission"
                                             style="float: right; margin: 30px 35px 35px 0; color: #ffffff; background-color:#292b35 "
-                                            onclick="deleteGames()">글 삭제
+                                            onclick="grantPermission()">글 삭제
                                     </button>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -246,7 +226,6 @@
     <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
     <script src="../../static/js/main.js"></script>
 
-
     <script src="../../static/js/lib/lib/data-table/datatables.min.js"></script>
     <script src="../../static/js/lib/lib/data-table/dataTables.bootstrap.min.js"></script>
     <script src="../../static/js/lib/lib/data-table/dataTables.buttons.min.js"></script>
@@ -265,47 +244,6 @@
       } );
   </script>
 
-<script>
-    function deleteGames() {
-        var selectedGameIds = $("[name='selectedGame']:checked").map(function () {
-            return $(this).closest('tr').find('.game-id').text();
-        }).get();
-
-        if (selectedGameIds.length === 0) {
-            alert('선택된 게임이 없습니다');
-            console.log('No games selected');
-            return;
-        }
-
-        var shouldDelete = confirm("삭제 하시겠습니까?");
-
-        if (shouldDelete) {
-            var requestData = {
-                gameIds: selectedGameIds.map(Number)
-            };
-
-            $.ajax({
-                type: 'POST',
-                url: '/admin/game/management',
-                data: JSON.stringify(requestData),
-                contentType: 'application/json',
-                success: function (response) {
-                    console.log('서버 응답:', response);
-                    if (response === '삭제 성공') {
-                        alert('삭제 성공');
-                        window.location.href = '/admin/game';
-                    } else {
-                        alert('삭제 실패');
-                    }
-                },
-                error: function (error) {
-                    console.error('에러 발생:', error);
-                    alert('에러!!');
-                }
-            });
-        }
-    }
-</script>
 
 </body>
 </html>

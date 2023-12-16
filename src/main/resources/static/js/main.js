@@ -29,6 +29,10 @@ jQuery(document).ready(function($) {
 		property: 'max-height'
 	});
 
+	// var chartsheight = $('.flotRealtime2').height();
+	// $('.traffic-chart').css('height', chartsheight-122);
+
+
 	// Counter Number
 	$('.count').each(function () {
 		$(this).prop('Counter',0).animate({

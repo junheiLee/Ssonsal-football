@@ -1,12 +1,19 @@
 package com.ssonsal.football.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
+import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
+
+import static com.ssonsal.football.game.util.GameConstant.DATE_TIME_FORMAT;
+import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
 
 @Getter
 @ToString

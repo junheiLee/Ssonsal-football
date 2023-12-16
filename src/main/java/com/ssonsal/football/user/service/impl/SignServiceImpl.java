@@ -1,5 +1,6 @@
 package com.ssonsal.football.user.service.impl;
 
+import com.ssonsal.football.global.config.CommonResponse;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;

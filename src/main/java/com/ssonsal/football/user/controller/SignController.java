@@ -1,5 +1,7 @@
 package com.ssonsal.football.user.controller;
 
+import com.ssonsal.football.global.config.security.JwtAuthenticationFilter;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.CookieUtil;
 import com.ssonsal.football.global.util.ErrorCode;
@@ -7,6 +9,7 @@ import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.user.dto.*;
+
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.service.SignService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,13 +17,17 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

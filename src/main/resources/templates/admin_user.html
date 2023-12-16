@@ -25,73 +25,17 @@
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/pixeden-stroke-7-icon@1.2.3/pe-icon-7-stroke/dist/pe-icon-7-stroke.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.2.0/css/flag-icon.min.css">
+    <!-- <link rel="stylesheet" href="/static/css/admin/css/cs-skin-elastic.css"> -->
+    <link rel="stylesheet" href="/static/css/admin/css/lib/datatable/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/admin/css/style.css">
 
-    <link rel="stylesheet" href="/static/css/admin/css/datatable/dataTables.bootstrap.min.css">
-    <link rel="stylesheet" href="/static/css/admin/css/style.css">>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
-    <script src="/static/js/main.js"></script>
-
-
-
-    <script type="text/javascript">
-        $(document).ready(function() {
-          $('#bootstrap-data-table-export').DataTable();
-      } );
-    </script>
-
-    <script>
-        function grantPermission() {
-            var selectedUserIds = $("[name='selectedUser']:checked").map(function () {
-                return $(this).closest('tr').find('.user-id').text();
-            }).get();
-
-            if (selectedUserIds.length === 0) {
-                alert('선택된 사용자가 없습니다.');
-                console.log('No users selected');
-                return;
-            }
-
-            // 체크박스가 비활성화 된 경우, 체크 안되게 처리
-            $("[name='selectedUser']:checked").prop("checked", false);
-
-            var newRole = confirm("권한을 부여하시겠습니까?");
-
-            var requestData = {
-                userIds: selectedUserIds.map(Number),
-            };
-
-            $.ajax({
-    type: 'POST',
-    url: '/admin/user/changeRole',
-    data: JSON.stringify(requestData),
-    contentType: 'application/json',
-    dataType: 'json',
-    success: function (response) {
-        console.log('서버 응답:', response);
-
-        // 서버 응답에 따라 성공 또는 실패 처리
-        if (response && response.status === 200) {
-            window.location.reload();
-            alert('권한 부여 성공!!');
-        }
-
-    },
-    error: function (error) {
-        console.error('에러 발생:', error);
-        alert('에러!!');
-    }
-});
-        }
-    </script>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
 
 </head>
 <body>
-<!-- Left Panel -->
+<!-- Left Panel --> 
 <aside id="left-panel" class="left-panel">
     <nav class="navbar navbar-expand-sm navbar-default">
         <div id="main-menu" class="main-menu collapse navbar-collapse">
@@ -129,6 +73,15 @@
                         <li><i class="fa fa-table"></i><a th:href="@{/admin_review.html}">리뷰 글 관리</a></li>
                     </ul>
                 </li>
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-th"></i>Forms
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-th"></i><a th:href="@{/forms-basic.html}">Basic Form</a></li>
+                    </ul>
+                </li>
 
                 <li class="menu-item-has-children dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
@@ -141,6 +94,17 @@
                     </ul>
                 </li>
 
+                <li class="menu-item-has-children dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="menu-icon fa fa-area-chart"></i>Maps
+                    </a>
+                    <ul class="sub-menu children dropdown-menu">
+                        <li><i class="menu-icon fa fa-map-o"></i><a th:href="@{/maps-gmap.html}">Google Maps</a></li>
+                        <li><i class="menu-icon fa fa-street-view"></i><a th:href="@{/maps-vector.html}">Vector Maps</a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="menu-title">Extras</li><!-- /.menu-title -->
                 <li class="menu-item-has-children dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
@@ -224,8 +188,7 @@
                                 <tbody>
                                 <tr th:each="user : ${userList}">
                                     <td>
-                                        <input type="checkbox" name="selectedUser" data-user-id="${user.id}"
-                                               data-user-id-value="${user.id}" th:disabled="${user.role == 1}">
+                                        <input type="checkbox" name="selectedUser" data-user-id="${user.id}" data-user-id-value="${user.id}" th:disabled="${user.role == 1}">
                                         <span class="user-id" th:text="${user.id}" style="display: none;"></span>
                                     </td>
                                     <td th:text="${user.name}"></td>
@@ -269,18 +232,73 @@
 
 <!-- Right Panel -->
 
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+<script src="/static/js/main.js"></script>
 
-<script th:src="@{/static/js/lib/data-table/datatables.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/dataTables.bootstrap.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/dataTables.buttons.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/buttons.bootstrap.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/jszip.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/vfs_fonts.js}"></script>
-<script th:src="@{/static/js/lib/data-table/buttons.html5.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/buttons.print.min.js}"></script>
-<script th:src="@{/static/js/lib/data-table/buttons.colVis.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/datatables.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/dataTables.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/dataTables.buttons.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.bootstrap.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/jszip.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/vfs_fonts.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.html5.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.print.min.js}"></script>
+<script th:src="@{/static/js/lib/lib/data-table/buttons.colVis.min.js}"></script>
 <script th:src="@{/static/js/init/init/datatables-init.js}"></script>
 
+
+<script type="text/javascript">
+    $(document).ready(function() {
+      $('#bootstrap-data-table-export').DataTable();
+  } );
+</script>
+
+<script>
+
+    function grantPermission() {
+        var selectedUserIds = $("[name='selectedUser']:checked").map(function () {
+            return $(this).closest('tr').find('.user-id').text();
+        }).get();
+
+        if (selectedUserIds.length === 0) {
+            alert('선택된 사용자가 없습니다.');
+            console.log('No users selected');
+            return;
+        }
+
+        // 체크박스가 비활성화 된 경우, 체크 안되게 처리
+        $("[name='selectedUser']:checked").prop("checked", false);
+
+        var newRole = confirm("권한을 부여하시겠습니까?");
+
+        var requestData = {
+            userIds: selectedUserIds.map(Number),
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/admin/user/changeRole',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            success: function (response) {
+                console.log('서버 응답:', response);
+                if (response === '권한 부여 성공') {
+                    alert('권한 부여 성공!!');
+                    window.location.href = '/admin/user';
+                } else {
+                    alert('권한 부여 실패');
+                }
+            },
+            error: function (error) {
+                console.error('에러 발생:', error);
+                alert('에러!!');
+            }
+        });
+    }
+</script>
 
 </body>
 </html>
