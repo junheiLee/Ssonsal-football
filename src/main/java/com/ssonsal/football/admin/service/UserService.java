@@ -92,5 +92,12 @@ public class UserService {
                     user.updateRole(newRole);
                 });
         }
+
+    public boolean isAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND));
+
+        return user.getRole() == 1;
+    }
     }
 

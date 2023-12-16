@@ -4,6 +4,7 @@ import com.ssonsal.football.admin.dto.response.ResponseMessageDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
+import com.ssonsal.football.admin.service.UserService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Message", description = "Message API")
 public class MessageController {
     private final AlarmService alarmService;
+    private final UserService userService;
 
     @PostMapping("/subscribeMessage")
     public ResponseEntity<ResponseBodyFormatter> subscribe() {
@@ -28,7 +30,7 @@ public class MessageController {
 
         Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -45,9 +47,9 @@ public class MessageController {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
 
-        Long userId= 2L;
+        Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -65,9 +67,9 @@ public class MessageController {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
 
-        Long userId= 2L;
+        Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {

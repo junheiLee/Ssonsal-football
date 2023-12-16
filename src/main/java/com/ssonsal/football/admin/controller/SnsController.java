@@ -4,6 +4,7 @@ import com.ssonsal.football.admin.dto.response.ResponseEmailDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
+import com.ssonsal.football.admin.service.UserService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class SnsController {
 
     private final AlarmService alarmService;
+    private final UserService userService;
+
 
     private ResponseStatusException getResponseStatusException(SnsResponse response) {
         return new ResponseStatusException(
@@ -72,7 +75,7 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -98,7 +101,7 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -130,7 +133,7 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -157,7 +160,7 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (userId == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {

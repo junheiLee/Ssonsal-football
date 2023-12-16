@@ -47,10 +47,9 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> updateUserRole(@RequestBody Map<String, Object> requestData) {
 
         List<Integer> userIds = (List<Integer>) requestData.get("userIds");
-        Long user = 1L;
+        Long userId = 2L;
 
-
-        if (user == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         } else if (userIds == null) {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
@@ -71,9 +70,9 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> deleteGames(@RequestBody Map<String, Object> requestData) {
         List<Integer> gameIds = (List<Integer>) requestData.get("gameIds");
 
-        Long user = 1L;
+        Long userId = 2L;
 
-        if (user == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         } else if (gameIds == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
@@ -81,7 +80,7 @@ public class AdminManagementController {
 
         gameService.deleteGames(gameIds);
 
-        return ResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED);
+        return DataResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED,gameIds);
 
     }
 
@@ -97,9 +96,9 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> updateMonth(@RequestBody UpdateMonthDto selectedDate) {
         log.info(selectedDate + " 날짜데이터");
 
-        Long user = 1L;
+        Long userId = 2L;
 
-        if (user == null) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -111,21 +110,10 @@ public class AdminManagementController {
 
             LocalDateTime selectedDateTime = LocalDateTime.parse(selectedDate.getSelectedDate(), DateTimeFormatter.ISO_DATE_TIME);
 
-            log.info("aaaaaa" + selectedDateTime);
-
             LocalDate currentDate = selectedDateTime.toLocalDate();
-            log.info("bbb" + currentDate);
 
-            // 이후에는 필요에 따라 로직을 처리합니다.
             StatsDTO monthStats =statsService.monthStats(currentDate);
             Map<LocalDate, StatsDTO>  monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
-
-            log.info("서비스"+statsService.monthlyDailyStats(currentDate));
-            log.info("서비스"+statsService.monthStats(currentDate));
-
-            log.info(monthlyDailyStats+"날짜데이터");
-
-            log.info(currentDate + " 일별 데이터");
 
             return DataResponseBodyFormatter.put(
                     AdminSuccessCode.PAGE_ALTER_SUCCESS,

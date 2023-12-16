@@ -13,6 +13,8 @@ import java.util.List;
 
 public interface GameManagementRepository extends JpaRepository<Game, Long> {
 
+    List<Game> findByCreatedAtBetween(LocalDateTime yesterday, LocalDateTime today);
+
     List<Game> findByScheduleBetween(LocalDateTime startDate, LocalDateTime endDate);
 
     // 스케줄 날짜가 지나면 deleteCode변환
