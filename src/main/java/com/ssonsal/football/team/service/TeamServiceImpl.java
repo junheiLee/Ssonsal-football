@@ -129,7 +129,7 @@ public class TeamServiceImpl implements TeamService {
         String key = "";
         String url = "";
 
-        if (!teamCreateDto.getLogo().isEmpty()) {
+        if (teamCreateDto.getLogo() != null && !teamCreateDto.getLogo().isEmpty()) {
             try {
                 key = amazonS3Util.upload(teamCreateDto.getLogo(), "teamLogo");
             } catch (IOException e) {
@@ -194,7 +194,7 @@ public class TeamServiceImpl implements TeamService {
         String key = team.getLogoKey();
         String url = team.getLogoUrl();
 
-        if (!teamEditDto.getLogo().isEmpty()) {
+        if (teamEditDto.getLogo() != null && !teamEditDto.getLogo().isEmpty()) {
             try {
                 key = amazonS3Util.upload(teamEditDto.getLogo(), "teamLogo");
             } catch (IOException e) {
