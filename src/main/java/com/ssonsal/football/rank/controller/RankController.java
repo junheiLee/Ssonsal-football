@@ -16,14 +16,14 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/ranks")
+@RequestMapping("/api/ranks")
 public class RankController {
 
     private final RankService rankService;
 
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> ranks() {
-        return null;
+        return DataResponseBodyFormatter.put(SUCCESS, rankService.findRankList());
     }
 
     @PostMapping
