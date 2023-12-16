@@ -22,7 +22,6 @@ import java.util.Map;
 
 import static com.ssonsal.football.game.util.Transfer.objectToMap;
 import static com.ssonsal.football.team.util.TeamConstant.*;
-import static com.ssonsal.football.team.util.Transfer.objectToMap;
 
 
 @RestController
@@ -43,18 +42,7 @@ public class TeamController {
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> findAllTeams() {
 
-        // 추후 토큰값으로 교체할 부분임
-        Long user = 1L;
-
-        String userLevel = "";
-
-        if (user == null) {
-            userLevel = Role.GUEST.getRole();
-        } else {
-            userLevel = memberService.isUserLevel(user).getRole();
-        }
-
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, USER_LEVEL, teamService.findAllTeams(), userLevel));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findAllTeams()));
     }
 
     /**
@@ -65,18 +53,7 @@ public class TeamController {
     @GetMapping("/recruit")
     public ResponseEntity<ResponseBodyFormatter> findAllRecruitTeams() {
 
-        // 추후 토큰값으로 교체할 부분임
-        Long user = 1L;
-
-        String userLevel = "";
-
-        if (user == null) {
-            userLevel = Role.GUEST.getRole();
-        } else {
-            userLevel = memberService.isUserLevel(user).getRole();
-        }
-
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, USER_LEVEL, teamService.findRecruitList(), userLevel));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findRecruitList()));
     }
 
     /**
@@ -88,18 +65,7 @@ public class TeamController {
     @GetMapping("/search")
     public ResponseEntity<ResponseBodyFormatter> findAllSearchTeams(@RequestParam String keyword) {
 
-        // 추후 토큰값으로 교체할 부분임
-        Long user = 1L;
-
-        String userLevel = "";
-
-        if (user == null) {
-            userLevel = Role.GUEST.getRole();
-        } else {
-            userLevel = memberService.isUserLevel(user).getRole();
-        }
-
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, USER_LEVEL, teamService.findSearchList(keyword), userLevel));
+        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findSearchList(keyword)));
     }
 
     /**
