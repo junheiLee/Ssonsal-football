@@ -27,23 +27,6 @@ public class MemberServiceImpl implements MemberService {
     private final TeamRejectRepository teamRejectRepository;
     private final UserRepository userRepository;
 
-    /**
-     * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
-     *
-     * @param userId 유저 아이디
-     * @return 유저 권한
-     */
-    @Override
-    public Role isUserLevel(Long userId) {
-
-        if (isUserOtherApply(userId)) {
-            return Role.TEAM_APPLY;
-        } else if (hasAnyTeam(userId)) {
-            return Role.TEAM_MEMBER;
-        }
-
-        return Role.USER;
-    }
 
     /**
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
