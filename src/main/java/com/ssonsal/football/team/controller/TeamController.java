@@ -28,7 +28,6 @@ import static com.ssonsal.football.team.util.TeamConstant.*;
 @RequestMapping("/api/teams")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin("*")
 public class TeamController {
 
     private final TeamService teamService;
