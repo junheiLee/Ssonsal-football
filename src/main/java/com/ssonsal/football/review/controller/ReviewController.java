@@ -29,7 +29,11 @@ public class ReviewController {
     public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto) {
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto));
+        //토큰값 작성자아이디
+        Long user = 1L;
+        System.out.println(reviewRequestDto);
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto,user));
     }
 
     /**

@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/reports")
+@RequestMapping("/api/reports")
 public class ReportController {
 
     private final ReportService reportService;
@@ -35,13 +35,16 @@ public class ReportController {
     /**
      * 신고글 생성 시, 호출 되는 api
      *
-     * @param  reportRequestDto 산고 생성에 필요한 정보
+     * @param reportRequestDto 산고 생성에 필요한 정보
      * @return 성공 코드와 생성된 신고를 ResponseBody 에 담아 반환
      */
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReport(
             @RequestBody ReportRequestDto reportRequestDto) {
-        ReportResponseDto createdReport = reportService.createReport(reportRequestDto);
+        //토큰값으로 교체해야함
+        Long user = 1L;
+
+        ReportResponseDto createdReport = reportService.createReport(reportRequestDto, user);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, createdReport);
     }
 
