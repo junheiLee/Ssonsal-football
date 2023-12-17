@@ -1,13 +1,16 @@
 package com.ssonsal.football.review.service;
 
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.review.dto.request.ReportRequestDto;
 import com.ssonsal.football.review.dto.response.ReportResponseDto;
-import com.ssonsal.football.review.etity.Report;
-import com.ssonsal.football.review.etity.Review;
+import com.ssonsal.football.review.entity.Report;
+import com.ssonsal.football.review.entity.Review;
 import com.ssonsal.football.review.exception.ReviewErrorCode;
 import com.ssonsal.football.review.repository.ReportRepository;
 import com.ssonsal.football.review.repository.ReviewRepository;
+import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,7 +44,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public ReportResponseDto createReport(ReportRequestDto reportRequestDto) {
+    public ReportResponseDto createReport(ReportRequestDto reportRequestDto, Long userId) {
+
+        User user =userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Review review = reviewRepository.findById(reportRequestDto.getReviewId())
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
@@ -48,6 +55,7 @@ public class ReportServiceImpl implements ReportService {
         Report report = Report.builder()
                 .review(review)
                 .reason(reportRequestDto.getReason())
+                .user(user)
                 .build();
 
         reportRepository.save(report);

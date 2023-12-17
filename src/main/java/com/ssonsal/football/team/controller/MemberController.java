@@ -23,7 +23,6 @@ import static com.ssonsal.football.team.util.TeamConstant.USER_NAME;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/members")
-@CrossOrigin("*")
 @Tag(name = "Member", description = "Member API")
 public class MemberController {
 

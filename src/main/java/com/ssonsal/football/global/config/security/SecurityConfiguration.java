@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -44,7 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception { // SecurityFilter 으로 변경 필요함
         httpSecurity.httpBasic().disable() // REST API는 UI를 사용하지 않으므로 기본설정을 비활성화
 
-                .csrf().disable() // REST API는 csrf 보안이 필요 없으므로 비활성화ㅂ
+                .csrf().disable() // REST API는 csrf 보안이 필요 없으므로 비활성화
 
                 .sessionManagement()
                 .sessionCreationPolicy(
@@ -72,5 +71,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 }
 /**
  * Swagger 페이지 접근에 대한 예외 처리
- *
  */

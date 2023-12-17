@@ -1,6 +1,6 @@
 package com.ssonsal.football.review.repository;
 
-import com.ssonsal.football.review.etity.Report;
+import com.ssonsal.football.review.entity.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

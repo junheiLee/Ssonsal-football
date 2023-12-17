@@ -1,4 +1,4 @@
-package com.ssonsal.football.review.etity;
+package com.ssonsal.football.review.entity;
 
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.global.entity.BaseEntity;

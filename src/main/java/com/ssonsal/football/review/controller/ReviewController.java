@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -29,7 +29,11 @@ public class ReviewController {
     public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto) {
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto));
+        //토큰값 작성자아이디
+        Long user = 1L;
+        System.out.println(reviewRequestDto);
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto,user));
     }
 
     /**
