@@ -33,6 +33,7 @@ public class GameManagementServiceImpl implements GameManagementService {
                         .matchStatus(game.getMatchStatus())
                         .vsFormat(game.getVsFormat())
                         .stadium(game.getStadium())
+                        .schedule(game.getSchedule())
                         .build()
                 )
                 .collect(Collectors.toList());

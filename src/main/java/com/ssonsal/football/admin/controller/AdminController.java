@@ -1,11 +1,10 @@
 package com.ssonsal.football.admin.controller;
 
+import com.ssonsal.football.admin.dto.request.GameDTO;
 import com.ssonsal.football.admin.dto.request.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.GameManagementServiceImpl;
-import com.ssonsal.football.admin.service.StatsServiceImpl;
-import com.ssonsal.football.admin.service.UserManagementServiceImpl;
+import com.ssonsal.football.admin.service.*;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import static com.ssonsal.football.game.util.Transfer.objectToMap;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,11 +29,11 @@ import java.util.Map;
 @Tag(name = "AdminView", description = "Admin View")
 public class AdminController {
 
-    private final GameManagementServiceImpl gameServiceImpl;
+    private final GameManagementService gameService;
 
-    private final StatsServiceImpl statsServiceImpl;
+    private final StatsService statsService;
 
-    private final UserManagementServiceImpl userServiceImpl;
+    private final UserManagementService userService;
 
     /**
      * 관리자 페이지에서 모든 회원 리스트를 가져온다
@@ -45,11 +45,12 @@ public class AdminController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("userList",userServiceImpl.userList()));
+        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("userList",userService.userList()));
 
     }
 
@@ -61,18 +62,20 @@ public class AdminController {
     @GetMapping("/game")
     public ResponseEntity<ResponseBodyFormatter> adminGame() {
 
-        Long userId = 2L;
+      Long userId= 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
+        List<GameDTO> gameList = gameService.gameList();
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("gameList",gameServiceImpl.gameList()));
+        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("gameList",gameService.gameList()));
     }
 
 /*    *//**
      * 관리자 페이지에서 모든 용병 글 리스트를 가져온다
-     *
      * @param model
      * @return 용병 글 리스트
      *//*
@@ -93,21 +96,44 @@ public class AdminController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-
         // 현재 날짜 가져오기
         LocalDate currentDate = LocalDate.now();
 
-        StatsDTO monthStats = statsServiceImpl.monthStats(currentDate);
-        Map<LocalDate, StatsDTO> monthlyDailyStats = statsServiceImpl.monthlyDailyStats(currentDate);
-
+        StatsDTO monthStats = statsService.monthStats(currentDate);
+        Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
         return DataResponseBodyFormatter.put(
                 AdminSuccessCode.PAGE_ALTER_SUCCESS,
                 Map.of("monthStats", monthStats, "monthlyDailyStats", monthlyDailyStats)
         );
+    }
+
+    /**
+     * 메인 홈페이지 이동
+     * 당일 통계들을 구해 메인에 출력한다
+     * @return
+     * 전체 회원 수
+     * 신규 가입자
+     * 예정 매치수
+     * 올라온 매치글 수 의 당일 통계를 출력
+     */
+    @GetMapping("/main")
+    public ResponseEntity<ResponseBodyFormatter> getUserAndGameStats() {
+
+        Long userId = 2L;
+
+        if (userId == null) {
+            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
+        }
+        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_COUNT_SUCCESS, objectToMap("dailyStats",statsService.getAdminStats()));
+
     }
 
 
@@ -122,24 +148,13 @@ public class AdminController {
     public ResponseEntity<ResponseBodyFormatter> isAdmin() {
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
         return ResponseBodyFormatter.put(AdminSuccessCode.ADMIN_AUTH_SUCCESS);
     }
 
-    @GetMapping("/main")
-    public ResponseEntity<ResponseBodyFormatter> getUserAndGameStats() {
 
-        Long userId = 2L;
-
-        if (!userServiceImpl.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-
-        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_COUNT_SUCCESS, objectToMap("dailyStats",statsServiceImpl.getAdminStats()));
-
-    }
 
 }

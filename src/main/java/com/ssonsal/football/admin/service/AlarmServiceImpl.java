@@ -321,6 +321,7 @@ public class AlarmServiceImpl implements AlarmService{
     @Override
     public String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO) {
         Long confirmedGameId = responseMessageDTO.getConfirmedGameId();
+
         if (confirmedGameId == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
         }

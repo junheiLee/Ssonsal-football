@@ -84,7 +84,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     public boolean isAdmin(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(AdminErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED));
 
         return user.getRole() == 1;
     }

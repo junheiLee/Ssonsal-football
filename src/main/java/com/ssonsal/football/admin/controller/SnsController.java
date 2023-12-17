@@ -2,7 +2,9 @@ package com.ssonsal.football.admin.controller;
 
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
+import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.admin.service.AlarmServiceImpl;
+import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.admin.service.UserManagementServiceImpl;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -21,12 +23,12 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
+@RequestMapping("/api")
 @Tag(name = "Email", description = "Email API")
 public class SnsController {
 
-    private final AlarmServiceImpl alarmServiceImpl;
-    private final UserManagementServiceImpl userServiceImpl;
+    private final AlarmService alarmService;
+    private final UserManagementService userService;
 
 
     private ResponseStatusException getResponseStatusException(SnsResponse response) {
@@ -53,7 +55,7 @@ public class SnsController {
             throw new CustomException(AdminErrorCode.TOPIC_CREATE_FAILED);
         }
 
-        alarmServiceImpl.createTopic(topicName);
+        alarmService.createTopic(topicName);
         return ResponseBodyFormatter.put(AdminSuccessCode.TOPIC_CREATE_SUCCESS);
 
     }
@@ -74,13 +76,13 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            alarmServiceImpl.subscribeEmail(topicArn, userId);
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmServiceImpl.subscribeEmail(topicArn, userId));
+            alarmService.subscribeEmail(topicArn, userId);
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeEmail(topicArn, userId));
         } catch (CustomException e) {
             log.error("이메일 구독 에러", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -100,12 +102,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmServiceImpl.confirmSubscription(topicArn, userId));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmService.confirmSubscription(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 확인 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
@@ -118,7 +120,7 @@ public class SnsController {
      * 구독이 안된 사용자는 이메일이 전송이 안된다
      * 관리자가 작성한 text 내용이 이메일로 보내진다
      *
-     * @param text 생성된 주제로 보내야 한다
+     * @param emailText 생성된 주제로 보내야 한다
      *                      관리자가 작성한 text(이메일에 보내질 내용)
      * @return 해당 주제로 본낸다
      */
@@ -132,12 +134,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmServiceImpl.publishEmail(topicArn,emailText));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn,emailText));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
@@ -159,11 +161,11 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmServiceImpl.unsubscribe(topicArn, userId));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmService.unsubscribe(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

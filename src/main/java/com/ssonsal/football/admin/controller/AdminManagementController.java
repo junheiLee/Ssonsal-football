@@ -4,12 +4,11 @@ import com.ssonsal.football.admin.dto.request.StatsDTO;
 import com.ssonsal.football.admin.dto.request.UpdateMonthDto;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.GameManagementServiceImpl;
-import com.ssonsal.football.admin.service.StatsServiceImpl;
-import com.ssonsal.football.admin.service.UserManagementServiceImpl;
+import com.ssonsal.football.admin.service.*;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import com.ssonsal.football.team.exception.TeamErrorCode;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +34,9 @@ import static com.ssonsal.football.game.util.Transfer.objectToMap;
 @Tag(name = "Admin", description = "Admin API")
 public class AdminManagementController {
 
-    private final StatsServiceImpl statsServiceImpl;
-    private final GameManagementServiceImpl gameServiceImpl;
-    private final UserManagementServiceImpl userServiceImpl;
+    private final StatsService statsService;
+    private final GameManagementService gameService;
+    private final UserManagementService userService;
 
     /**
      * 관리자 권한 부여시 호출되는 api
@@ -51,13 +50,15 @@ public class AdminManagementController {
         List<Integer> userIds = (List<Integer>) requestData.get("userIds");
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (userIds == null) {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
-        userServiceImpl.updateRoles(userIds);
+        userService.updateRoles(userIds);
         return DataResponseBodyFormatter.put(AdminSuccessCode.AMDIN_RECOGNIZE_SUCCESS, objectToMap("recognizeAdmin", userIds));
 
     }
@@ -74,13 +75,15 @@ public class AdminManagementController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (gameIds == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
         }
 
-        gameServiceImpl.deleteGames(gameIds);
+        gameService.deleteGames(gameIds);
 
         return DataResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED,objectToMap("deletePost",gameIds));
 
@@ -100,11 +103,11 @@ public class AdminManagementController {
 
         Long userId = 2L;
 
-        if (!userServiceImpl.isAdmin(userId)) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }
-
-        if (selectedDate.getSelectedDate() == null) {
+        }else if (!userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
+        }else if (selectedDate.getSelectedDate() == null) {
             throw new CustomException(AdminErrorCode.MONTH_UPDATE_FAILED);
         }
 
@@ -114,8 +117,8 @@ public class AdminManagementController {
 
             LocalDate currentDate = selectedDateTime.toLocalDate();
 
-            StatsDTO monthStats = statsServiceImpl.monthStats(currentDate);
-            Map<LocalDate, StatsDTO>  monthlyDailyStats = statsServiceImpl.monthlyDailyStats(currentDate);
+            StatsDTO monthStats = statsService.monthStats(currentDate);
+            Map<LocalDate, StatsDTO>  monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
             return DataResponseBodyFormatter.put(
                     AdminSuccessCode.PAGE_ALTER_SUCCESS,

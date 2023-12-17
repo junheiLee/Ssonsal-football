@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum AdminErrorCode implements ResponseCode {
-    ADMIN_AUTH_FAILED(HttpStatus.UNAUTHORIZED,"관리자 권한이 없습니다"),
+    ADMIN_AUTH_FAILED(HttpStatus.FORBIDDEN,"관리자 권한이 없습니다"),
     USER_NOT_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     USER_FAILED_Authorization(HttpStatus.FORBIDDEN, "권한 부여 실패."),
     USER_SELECTED_FAILED(HttpStatus.BAD_REQUEST, "선택된 유저가 없습니다."),

@@ -25,16 +25,22 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class StatsServiceImpl implements StatsService{
+public class StatsServiceImpl implements StatsService {
 
     private final GameManagementRepository gameManagementRepository;
     private final UserManagementRepository userManagementRepository;
 
     public StatsDTO statsDTO(List<Game> monthlyGames) {
-        long confirmedGameCount = monthlyGames.stream().filter(game -> game.getMatchStatus() == 1).count();
-        long cancelledGameCount = monthlyGames.stream().filter(game -> game.getMatchStatus() == 0).count();
+        long confirmedGameCount = monthlyGames.stream()
+                .filter(game -> game.getMatchStatus() == 1)
+                .filter(game -> game.getDeleteCode() ==2)
+                .count();
+        long cancelledGameCount = monthlyGames.stream()
+                .filter(game -> game.getMatchStatus() == 0)
+                .filter(game -> game.getDeleteCode() ==2)
+                .count();
 
-        long totalGameCount = cancelledGameCount + confirmedGameCount;
+        long totalGameCount = monthlyGames.size();
 
         log.info("달별 성사 경기" + confirmedGameCount);
         log.info("달별 취소 경기" + cancelledGameCount);
@@ -149,18 +155,18 @@ public class StatsServiceImpl implements StatsService{
     }
 
     public long getNewUserCount() {
-        LocalDate today = LocalDate.now();
-        LocalDate yesterday = today.minusDays(1);
+        LocalDateTime today = LocalDateTime.now();
+        LocalDateTime startOfDay = today.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        List<User> newUsers = userManagementRepository.findByCreatedAtBetween(yesterday.atStartOfDay(), today.atStartOfDay());
+        List<User> newUsers = userManagementRepository.findByCreatedAtBetween(startOfDay, today);
         return newUsers.size();
     }
 
     public long getNewPostCount() {
         LocalDateTime today = LocalDateTime.now();
-        LocalDateTime yesterday = today.minusDays(1);
+        LocalDateTime startOfDay = today.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        List<Game> newPosts = gameManagementRepository.findByCreatedAtBetween(yesterday, today);
+        List<Game> newPosts = gameManagementRepository.findByCreatedAtBetween(startOfDay, today);
         return newPosts.size();
     }
 
