@@ -7,7 +7,7 @@ import com.ssonsal.football.review.dto.request.ReviewRequestDto;
 import com.ssonsal.football.review.dto.response.ReviewListResponseDto;
 import com.ssonsal.football.review.dto.response.ReviewResponseDto;
 import com.ssonsal.football.review.dto.response.ScoreResponseDto;
-import com.ssonsal.football.review.etity.Review;
+import com.ssonsal.football.review.entity.Review;
 import com.ssonsal.football.review.exception.ReviewErrorCode;
 import com.ssonsal.football.review.repository.ReviewRepository;
 import com.ssonsal.football.user.entity.User;

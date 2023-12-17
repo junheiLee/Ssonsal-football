@@ -1,6 +1,6 @@
 package com.ssonsal.football.review.dto.response;
 
-import com.ssonsal.football.review.etity.Report;
+import com.ssonsal.football.review.entity.Report;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

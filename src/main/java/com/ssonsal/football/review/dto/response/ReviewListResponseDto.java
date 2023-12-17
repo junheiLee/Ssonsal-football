@@ -1,6 +1,6 @@
 package com.ssonsal.football.review.dto.response;
 
-import com.ssonsal.football.review.etity.Review;
+import com.ssonsal.football.review.entity.Review;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,8 +24,8 @@ public class ReviewListResponseDto {
                 .reviewId(review.getId())
                 .name(review.getUser().getName())
                 .userId(review.getUser().getId())
-                .mannerScore((float)review.getMannerScore())
-                .skillScore((float)review.getSkillScore())
+                .mannerScore((float) review.getMannerScore())
+                .skillScore((float) review.getSkillScore())
                 .comment(review.getComment())
                 .createdAt(LocalDate.from(review.getCreatedAt()))
                 .build();
