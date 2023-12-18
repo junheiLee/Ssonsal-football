@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,11 +29,10 @@ public class ReviewController {
      */
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReview(
-            @RequestBody ReviewRequestDto reviewRequestDto) {
+            @RequestBody ReviewRequestDto reviewRequestDto, HttpServletRequest request) {
 
-        //토큰값 작성자아이디
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
-        System.out.println(reviewRequestDto);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto, user));
     }
@@ -89,29 +90,4 @@ public class ReviewController {
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.getReview(reviewId));
     }
 
-    /**
-     * 해당 유저의 스킬 및 매너 평균 점수 반환 api
-     *
-     * @param userId 팀 아이디
-     * @return 해당 유저의 스킬 및 매너 평균 점수 반환
-     */
-    @GetMapping("/subReviewScore/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> subReviewScore(@PathVariable("userId") Long userId) {
-        log.info(String.valueOf(userId));
-
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.subAvgScore(userId));
-    }
-
-    /**
-     * 해당 팀의 스킬 및 매너 평균 점수 반환 api
-     *
-     * @param teamId 팀 아이디
-     * @return 해당 팀의 스킬 및 매너 평균 점수 반환
-     */
-    @GetMapping("/teamReviewScore/{teamId}")
-    public ResponseEntity<ResponseBodyFormatter> teamReviewScore(@PathVariable("teamId") Long teamId) {
-        log.info(String.valueOf(teamId));
-
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.teamAvgScore(teamId));
-    }
 }

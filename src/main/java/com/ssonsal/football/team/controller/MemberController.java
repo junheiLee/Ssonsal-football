@@ -15,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 import static com.ssonsal.football.game.util.Transfer.objectToMap;
 import static com.ssonsal.football.team.util.TeamConstant.TEAM_NAME;
 import static com.ssonsal.football.team.util.TeamConstant.USER_NAME;
@@ -37,17 +39,15 @@ public class MemberController {
      * @return 성공 여부
      */
     @PostMapping("/{teamId}/application")
-    public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId, HttpServletRequest request) {
 
-        // 추후 토큰값으로 교체할 부분임
+//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamRecruit(teamId)) {
+       if (!memberService.isTeamRecruit(teamId)) {
             throw new CustomException(TeamErrorCode.TEAM_NOT_RECRUIT);
         } else if (memberService.isUserOtherApply(user)) {
-            throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
+            throw new CustomException(TeamErrorCode.HAS_OTHER_APPLY);
         } else if (teamRejectService.isUserRejected(user, teamId)) {
             throw new CustomException(TeamErrorCode.BANNED_USER);
         } else if (memberService.hasAnyTeam(user)) {
@@ -64,14 +64,12 @@ public class MemberController {
      * @return 성공 여부
      */
     @DeleteMapping("/{teamId}/application")
-    public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId, HttpServletRequest request) {
 
-        // 추후 토큰값으로 교체할 부분임
+//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isUserApply(user, teamId)) {
+      if (!memberService.isUserApply(user, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
         }
 
@@ -87,14 +85,12 @@ public class MemberController {
      * @return 성공 여부
      */
     @DeleteMapping("/{teamId}/team")
-    public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-        // 추후 토큰값으로 교체할 부분임
+//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (memberService.isTeamLeader(teamId, user)) {
+         if (memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.LEADER_IN_GROUP);
         } else if (!memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.USER_NOT_TEAM);
@@ -113,13 +109,12 @@ public class MemberController {
      * @return 신청자 닉네임
      */
     @PostMapping("/{teamId}/application/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (!memberService.isUserApply(userId, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
@@ -137,13 +132,12 @@ public class MemberController {
      * @return 신청자 닉네임
      */
     @DeleteMapping("/{teamId}/application/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (!memberService.isUserApply(userId, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
@@ -160,13 +154,12 @@ public class MemberController {
      * @return 위임받은 팀장 닉네임
      */
     @PatchMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (!memberService.isUserTeamMember(teamId, userId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_MEMBER);
@@ -183,13 +176,12 @@ public class MemberController {
      * @return 퇴출당한 회원의 닉네임
      */
     @PostMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (memberService.isTeamLeader(teamId, userId)) {
             throw new CustomException(TeamErrorCode.CANNOT_REMOVE_LEADER);
@@ -212,13 +204,12 @@ public class MemberController {
      * @return 밴이 풀린 회원의 닉네임
      */
     @DeleteMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId) {
+    public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (!teamRejectService.isUserRejected(userId, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_REJECT);

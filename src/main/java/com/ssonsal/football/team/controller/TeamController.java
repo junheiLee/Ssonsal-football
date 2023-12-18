@@ -1,13 +1,13 @@
 package com.ssonsal.football.team.controller;
 
 import com.ssonsal.football.game.util.Transfer;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.team.dto.request.TeamCreateDto;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
-import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.exception.TeamSuccessCode;
 import com.ssonsal.football.team.service.MemberService;
@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class TeamController {
 
     private final TeamService teamService;
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 모든 팀 리스트를 반환한다.
@@ -75,18 +77,13 @@ public class TeamController {
      * @return 팀 아이디에 맞는 팀 정보
      */
     @GetMapping("/{teamId}")
-    public ResponseEntity<ResponseBodyFormatter> findDetailOfTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> findDetailOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-        // 추후 토큰값으로 교체할 부분임
+//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        String userLevel = "";
+        String userLevel = memberService.isUserLevel(teamId, user).getRole();
 
-        if (user == null) {
-            userLevel = Role.GUEST.getRole();
-        } else {
-            userLevel = memberService.isUserLevel(teamId, user).getRole();
-        }
 
         Map<String, Object> details = new HashMap<>();
         details.put(USER_LEVEL, userLevel);
@@ -103,18 +100,16 @@ public class TeamController {
      * @return 팀 아이디에 맞는 회원 정보와 팀 신청자 정보와 밴 유저 목록
      */
     @GetMapping("/{teamId}/managers")
-    public ResponseEntity<ResponseBodyFormatter> findManageListOfTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> findManageListOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-        // 추후 토큰값으로 교체할 부분임
+//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else {
-            if (!memberService.isTeamLeader(teamId, user)) {
-                throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
-            }
+
+        if (!memberService.isTeamLeader(teamId, user)) {
+            throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         }
+
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, teamService.findManageList(teamId));
     }
@@ -127,16 +122,15 @@ public class TeamController {
      */
     @PostMapping
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto) {
+    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, HttpServletRequest request) {
 
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (memberService.hasAnyTeam(user)) {
+        if (memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.ALREADY_IN_TEAM);
         } else if (memberService.isUserOtherApply(user)) {
-            throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
+            throw new CustomException(TeamErrorCode.HAS_OTHER_APPLY);
         } else if (teamService.checkNameDuplicate(teamCreateDto.getName())) {
             throw new CustomException(TeamErrorCode.DUPLICATE_TEAM_NAME);
         }
@@ -151,13 +145,12 @@ public class TeamController {
      * @return teamEditFormDto 기존 팀 정보 DTO
      */
     @GetMapping("/{teamId}/edit")
-    public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
+//                Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         }
 
@@ -172,14 +165,12 @@ public class TeamController {
      */
     @PatchMapping("/{teamId}")
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId, HttpServletRequest request) {
 
-        System.out.println(teamEditDto.toString());
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
-        if (user == null) {
-            throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (teamService.checkNameDuplicate(teamEditDto.getName(), teamId)) {
             throw new CustomException(TeamErrorCode.DUPLICATE_TEAM_NAME);

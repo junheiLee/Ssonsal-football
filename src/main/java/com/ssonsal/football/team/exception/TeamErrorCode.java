@@ -11,11 +11,10 @@ import org.springframework.http.HttpStatus;
 public enum TeamErrorCode implements ResponseCode {
 
     MEMBER_NOT_LEADER(HttpStatus.FORBIDDEN, "팀장이 아닙니다."),
-    USER_NOT_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     ALREADY_IN_TEAM(HttpStatus.CONFLICT, "이미 팀이 있습니다."),
     LEADER_IN_GROUP(HttpStatus.BAD_REQUEST, "팀장은 탈퇴할 수 없습니다."),
     CANNOT_REMOVE_LEADER(HttpStatus.BAD_REQUEST, "팀장은 밴할 수 없습니다."),
-    USER_ALREADY_APPLY(HttpStatus.CONFLICT, "신청 중인 팀이 있습니다."),
+    HAS_OTHER_APPLY(HttpStatus.CONFLICT, "신청 중인 팀이 있습니다."),
     USER_NOT_TEAM(HttpStatus.NOT_FOUND, "소속 팀이 없습니다."),
     USER_NOT_APPLY(HttpStatus.NOT_FOUND, "신청 정보가 없습니다."),
     USER_OTHER_TEAM(HttpStatus.NOT_FOUND, "다른 팀 소속입니다."),
