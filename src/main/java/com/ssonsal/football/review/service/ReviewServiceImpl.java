@@ -26,6 +26,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -67,9 +68,14 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReviewListResponseDto> teamReviewList(Long teamId) {
+
+        teamRepository.findById(teamId).orElseThrow(
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND)
+        );
+
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+
 
         List<ReviewListResponseDto> teamReviews = new ArrayList<>();
         for (Review review : reviews) {
@@ -80,8 +86,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReviewListResponseDto> userReviewList(Long userId) {
+
+        userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
+
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
 
         List<ReviewListResponseDto> userReviews = new ArrayList<>();
@@ -105,12 +115,11 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ReviewResponseDto getReview(Long reviewId) {
-        reviewRepository.findById(reviewId)
+        Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
-        return ReviewResponseDto.fromEntity(reviewRepository.findReviewById(reviewId));
+        return ReviewResponseDto.fromEntity(review);
     }
 
     @Override

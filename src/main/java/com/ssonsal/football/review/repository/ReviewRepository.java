@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    @Query("SELECT r FROM Review r WHERE (r.reviewCode = 0 OR r.reviewCode = 2) AND r.targetId = :teamId AND r.deleteCode = 0")
+    @Query("SELECT r FROM Review r WHERE r.reviewCode = 0 AND r.targetId = :teamId AND r.deleteCode = 0")
     List<Review> findReviewsByTeamId(@Param("teamId") Long teamId);
 
     @Query("SELECT r FROM Review r WHERE r.reviewCode = 1 AND r.targetId = :userId AND r.deleteCode = 0")
@@ -22,6 +22,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("UPDATE Review r SET r.deleteCode = :deleteCode WHERE r.id = :reviewId")
     void updateDeleteCode(@Param("reviewId") Long reviewId, @Param("deleteCode") Integer deleteCode);
 
-    @Query("SELECT r FROM Review r WHERE r.id = :reviewId")
-    Review findReviewById(@Param("reviewId") Long reviewId);
 }

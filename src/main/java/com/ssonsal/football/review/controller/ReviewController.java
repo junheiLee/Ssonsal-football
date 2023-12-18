@@ -22,7 +22,7 @@ public class ReviewController {
     /**
      * 리뷰 생성 시, 호출되는 api
      *
-     * @param  reviewRequestDto 리뷰 생성에 필요한 정보
+     * @param reviewRequestDto 리뷰 생성에 필요한 정보
      * @return 성공 코드와 생성된 리뷰를 ResponseBody 에 담아 반환
      */
     @PostMapping
@@ -33,7 +33,7 @@ public class ReviewController {
         Long user = 1L;
         System.out.println(reviewRequestDto);
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto,user));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto, user));
     }
 
     /**
@@ -68,7 +68,7 @@ public class ReviewController {
      * @param reviewId 리뷰 아이디
      * @return 성공 메시지 반환
      */
-    @PutMapping("/{reviewId}/update")
+    @PatchMapping("/{reviewId}")
     public ResponseEntity<ResponseBodyFormatter> updateDeleteCode(
             @PathVariable Long reviewId,
             @RequestParam(name = "deleteCode", required = false) Integer deleteCode) {
@@ -82,7 +82,7 @@ public class ReviewController {
      * @param reviewId 리뷰 아이디
      * @return reviewId에 해당 하는 리뷰 반환
      */
-    @GetMapping("/review/{reviewId}")
+    @GetMapping("/{reviewId}")
     public ResponseEntity<ResponseBodyFormatter> getReview(@PathVariable("reviewId") Long reviewId) {
         log.info(String.valueOf(reviewId));
 
