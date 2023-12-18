@@ -50,8 +50,8 @@ public class ReportServiceImpl implements ReportService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        Review review = reviewRepository.findById(reportRequestDto.getReviewId())
-                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+        Review review = reviewRepository.findById(reportRequestDto.getReviewId()).orElseThrow(
+                () -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
         Report report = Report.builder()
                 .review(review)

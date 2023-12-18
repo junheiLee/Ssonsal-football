@@ -42,9 +42,7 @@ public class TeamApplyServiceImpl implements TeamApplyService {
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
-        TeamApply teamApply = new TeamApply(user, team);
-
-        teamApplyRepository.save(teamApply);
+        teamApplyRepository.save(new TeamApply(user, team));
 
         return team.getName();
     }

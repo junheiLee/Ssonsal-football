@@ -1,13 +1,13 @@
 package com.ssonsal.football.admin.controller;
 
-import com.ssonsal.football.admin.dto.request.StatsDTO;
 import com.ssonsal.football.admin.dto.request.UpdateMonthDto;
+import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
-import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.GameService;
+import com.ssonsal.football.admin.service.GameManagementService;
 import com.ssonsal.football.admin.service.StatsService;
-import com.ssonsal.football.admin.service.UserService;
+import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,16 +26,18 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
+import static com.ssonsal.football.game.util.Transfer.objectToMap;
+
 @RestController
 @Slf4j
-@RequestMapping("/admin")
+@RequestMapping("/api/management")
 @RequiredArgsConstructor
 @Tag(name = "Admin", description = "Admin API")
 public class AdminManagementController {
 
     private final StatsService statsService;
-    private final GameService gameService;
-    private final UserService userService;
+    private final GameManagementService gameService;
+    private final UserManagementService userService;
 
     /**
      * 관리자 권한 부여시 호출되는 api
@@ -47,17 +49,18 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> updateUserRole(@RequestBody Map<String, Object> requestData) {
 
         List<Integer> userIds = (List<Integer>) requestData.get("userIds");
-        Long user = 1L;
+        Long userId = 2L;
 
-
-        if (user == null) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (userIds == null) {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
         userService.updateRoles(userIds);
-        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_ALTER_ROLE, userIds);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("recognizeAdmin", userIds));
 
     }
 
@@ -71,17 +74,19 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> deleteGames(@RequestBody Map<String, Object> requestData) {
         List<Integer> gameIds = (List<Integer>) requestData.get("gameIds");
 
-        Long user = 1L;
+        Long userId = 2L;
 
-        if (user == null) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        } else if (userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (gameIds == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
         }
 
         gameService.deleteGames(gameIds);
 
-        return ResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("deletePost", gameIds));
 
     }
 
@@ -97,13 +102,13 @@ public class AdminManagementController {
     public ResponseEntity<ResponseBodyFormatter> updateMonth(@RequestBody UpdateMonthDto selectedDate) {
         log.info(selectedDate + " 날짜데이터");
 
-        Long user = 1L;
+        Long userId = 2L;
 
-        if (user == null) {
+        if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }
-
-        if (selectedDate.getSelectedDate() == null) {
+        } else if (userService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
+        } else if (selectedDate.getSelectedDate() == null) {
             throw new CustomException(AdminErrorCode.MONTH_UPDATE_FAILED);
         }
 
@@ -111,24 +116,15 @@ public class AdminManagementController {
 
             LocalDateTime selectedDateTime = LocalDateTime.parse(selectedDate.getSelectedDate(), DateTimeFormatter.ISO_DATE_TIME);
 
-            log.info("aaaaaa" + selectedDateTime);
-
             LocalDate currentDate = selectedDateTime.toLocalDate();
-            log.info("bbb" + currentDate);
 
-            // 이후에는 필요에 따라 로직을 처리합니다.
+
             StatsDTO monthStats = statsService.monthStats(currentDate);
             Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
-            log.info("서비스" + statsService.monthlyDailyStats(currentDate));
-            log.info("서비스" + statsService.monthStats(currentDate));
-
-            log.info(monthlyDailyStats + "날짜데이터");
-
-            log.info(currentDate + " 일별 데이터");
 
             return DataResponseBodyFormatter.put(
-                    AdminSuccessCode.PAGE_ALTER_SUCCESS,
+                    SuccessCode.SUCCESS,
                     Map.of("monthStats", monthStats, "monthlyDailyStats", monthlyDailyStats)
             );
         } catch (DateTimeParseException e) {

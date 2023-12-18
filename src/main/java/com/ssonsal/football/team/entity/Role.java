@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public enum Role {
 
-    GUEST("게스트"),
     USER("유저"),
     TEAM_LEADER("팀장"),
     TEAM_MEMBER("팀원"),

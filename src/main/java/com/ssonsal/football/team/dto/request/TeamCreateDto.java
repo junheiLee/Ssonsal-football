@@ -1,6 +1,5 @@
 package com.ssonsal.football.team.dto.request;
 
-import com.ssonsal.football.team.entity.Team;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,13 +32,5 @@ public class TeamCreateDto {
     private Float skillScore;
 
     private Float mannerScore;
-
-    public Team toEntity(TeamCreateDto teamCreateDto, String url, String key) {
-        return Team.builder()
-                .teamCreateDto(teamCreateDto)
-                .logoUrl(url)
-                .logoKey(key)
-                .build();
-    }
 
 }

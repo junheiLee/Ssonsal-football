@@ -6,8 +6,6 @@ import lombok.Getter;
 @Getter
 public class TeamEditFormDto {
 
-    private Long id;
-
     private String logoUrl;
 
     private String name;
@@ -17,7 +15,6 @@ public class TeamEditFormDto {
     private Integer recruit;
 
     public TeamEditFormDto(Team team) {
-        this.id = team.getId();
         this.logoUrl = team.getLogoUrl();
         this.name = team.getName();
         this.intro = team.getIntro();

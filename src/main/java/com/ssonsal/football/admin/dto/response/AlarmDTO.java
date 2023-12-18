@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

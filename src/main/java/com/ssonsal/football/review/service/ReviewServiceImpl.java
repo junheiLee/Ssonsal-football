@@ -20,8 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,8 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Transactional
     public ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto, Long userId) {
-        // 해당하는 게임ID와 유저ID 가져오기
-        System.out.println("여긴서비스임플->" + reviewRequestDto.toString());
+
         reviewRequestDto.setWriterId(userId);
 
         Game game = gameRepository.findById(reviewRequestDto.getGameId())
@@ -60,7 +59,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (reviewRequestDto.getReviewCode() == 1) {
             updateSubAvgScore(subAvgScore(reviewRequestDto.getTargetId()), reviewRequestDto.getTargetId());
-        } else if (reviewRequestDto.getReviewCode() == 2) {
+        } else if (reviewRequestDto.getReviewCode() == 0) {
             updateTeamAvgScore(teamAvgScore(reviewRequestDto.getTargetId()), reviewRequestDto.getTargetId());
         }
 
@@ -71,39 +70,31 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewListResponseDto> teamReviewList(Long teamId) {
 
         teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND)
-        );
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
 
-
-        List<ReviewListResponseDto> teamReviews = new ArrayList<>();
-        for (Review review : reviews) {
-            teamReviews.add(ReviewListResponseDto.fromEntity(review));
-        }
-
-        return teamReviews;
+        return reviews.stream()
+                .map(ReviewListResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ReviewListResponseDto> userReviewList(Long userId) {
 
         userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(ErrorCode.USER_NOT_FOUND)
-        );
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
 
-        List<ReviewListResponseDto> userReviews = new ArrayList<>();
-        for (Review review : reviews) {
-            userReviews.add(ReviewListResponseDto.fromEntity(review));
-        }
-
-        return userReviews;
+        return reviews.stream()
+                .map(ReviewListResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @Transactional
     public void updateDeleteCode(Long reviewId, Integer deleteCode) {
+
         reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
 
@@ -131,16 +122,15 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
         }
 
-        float totalMannerScore = 0.0f;
-        float totalSkillScore = 0.0f;
+        float avgMannerScore = (float) reviews.stream()
+                .mapToDouble(Review::getMannerScore)
+                .average()
+                .orElse(0.0);
 
-        for (Review review : reviews) {
-            totalMannerScore += review.getMannerScore();
-            totalSkillScore += review.getSkillScore();
-        }
-
-        float avgMannerScore = totalMannerScore / reviews.size();
-        float avgSkillScore = totalSkillScore / reviews.size();
+        float avgSkillScore = (float) reviews.stream()
+                .mapToDouble(Review::getSkillScore)
+                .average()
+                .orElse(0.0);
 
         ScoreResponseDto subScore = new ScoreResponseDto();
         subScore.setAvgMannerScore(avgMannerScore);
@@ -158,16 +148,15 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
         }
 
-        float totalMannerScore = 0.0f;
-        float totalSkillScore = 0.0f;
+        float avgMannerScore = (float) reviews.stream()
+                .mapToDouble(Review::getMannerScore)
+                .average()
+                .orElse(0.0);
 
-        for (Review review : reviews) {
-            totalMannerScore += review.getMannerScore();
-            totalSkillScore += review.getSkillScore();
-        }
-
-        float avgMannerScore = totalMannerScore / reviews.size();
-        float avgSkillScore = totalSkillScore / reviews.size();
+        float avgSkillScore = (float) reviews.stream()
+                .mapToDouble(Review::getSkillScore)
+                .average()
+                .orElse(0.0);
 
         ScoreResponseDto teamScore = new ScoreResponseDto();
         teamScore.setAvgMannerScore(avgMannerScore);
