@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class GameRequestDto{
+public class GameRequestDto {
 
     private String date;
     private String time;

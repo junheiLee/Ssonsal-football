@@ -14,9 +14,9 @@ public class AlarmDTO {
     private String subscriptionArn;
     private String userEmail;
 
-    public AlarmDTO(String subscriptionArn,String userEmail) {
+    public AlarmDTO(String subscriptionArn, String userEmail) {
         this.subscriptionArn = subscriptionArn;
-        this.userEmail=userEmail;
+        this.userEmail = userEmail;
     }
 
 

@@ -1,6 +1,5 @@
 package com.ssonsal.football.team.controller;
 
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;

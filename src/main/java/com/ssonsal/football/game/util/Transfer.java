@@ -7,8 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
 import static com.ssonsal.football.game.util.GameConstant.LOGIN_USER;
+import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
 
 public class Transfer {
 

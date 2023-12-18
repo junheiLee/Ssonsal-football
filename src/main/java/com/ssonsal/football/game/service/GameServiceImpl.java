@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
@@ -54,10 +53,10 @@ public class GameServiceImpl implements GameService {
                 .orElse(null);
 
         Long awayId, awayApplicationId;
-        if(game.getAway() == null) {
+        if (game.getAway() == null) {
             awayId = null;
             awayApplicationId = null;
-        } else{
+        } else {
             MatchApplication awayApplication =
                     matchApplicationRepository.findByTeamIdAndGameId(game.getAway().getId(), gameId).get();
             awayId = awayApplication.getTeam().getId();
@@ -68,7 +67,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
-    public Long createGame(Long loginUserId, GameRequestDto gameDto ) {
+    public Long createGame(Long loginUserId, GameRequestDto gameDto) {
 
         MatchApplicationRequestDto homeDto = new MatchApplicationRequestDto(gameDto);
         validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());

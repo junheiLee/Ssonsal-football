@@ -117,13 +117,13 @@ public class AdminManagementController {
             log.info("bbb" + currentDate);
 
             // 이후에는 필요에 따라 로직을 처리합니다.
-            StatsDTO monthStats =statsService.monthStats(currentDate);
-            Map<LocalDate, StatsDTO>  monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
+            StatsDTO monthStats = statsService.monthStats(currentDate);
+            Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
-            log.info("서비스"+statsService.monthlyDailyStats(currentDate));
-            log.info("서비스"+statsService.monthStats(currentDate));
+            log.info("서비스" + statsService.monthlyDailyStats(currentDate));
+            log.info("서비스" + statsService.monthStats(currentDate));
 
-            log.info(monthlyDailyStats+"날짜데이터");
+            log.info(monthlyDailyStats + "날짜데이터");
 
             log.info(currentDate + " 일별 데이터");
 

@@ -37,13 +37,12 @@ public class ProfileResultDto {
 
     private String preferredArea;
 
-    private  float skillScore;
+    private float skillScore;
 
-    private  float mannerScore;
+    private float mannerScore;
 
 
-
-    public ProfileResultDto(User user){
+    public ProfileResultDto(User user) {
 
         this.email = user.getEmail();
         this.teamId = (user.getTeam() != null) ? user.getTeam().getId() : 0L; // 혹은 다른 기본값으로 설정
@@ -54,12 +53,14 @@ public class ProfileResultDto {
         this.nickname = user.getNickname();
         this.position = user.getPosition();
         this.phone = user.getPhone();
-        this.intro = user.getIntro();;
+        this.intro = user.getIntro();
+        ;
         this.preferredArea = user.getPreferredArea();
         this.preferredTime = user.getPreferredTime();
         this.skillScore = user.getSkillScore();
         this.mannerScore = user.getMannerScore();
     }
+
     public static int calculateAge(LocalDate birth) {
         if (birth == null) {
             return 0; // 혹은 다른 기본값을 반환하도록 처리

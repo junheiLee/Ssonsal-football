@@ -99,7 +99,7 @@ public class Team extends BaseEntity {
         this.leaderId = userId;
     }
 
-    public void updateScore(Float mannerScore,Float skillScore){
+    public void updateScore(Float mannerScore, Float skillScore) {
         this.mannerScore = mannerScore;
         this.skillScore = skillScore;
     }

@@ -33,7 +33,7 @@ public class MessageController {
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS,alarmService.subscribeMessage(topicArn, userId));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeMessage(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 생성 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -45,14 +45,14 @@ public class MessageController {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
 
-        Long userId= 2L;
+        Long userId = 2L;
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.MESSAGE_SEND_SUCCESS,alarmService.publishMessage(topicArn, responseMessageDTO));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.MESSAGE_SEND_SUCCESS, alarmService.publishMessage(topicArn, responseMessageDTO));
         } catch (CustomException e) {
             log.error("메세지 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.MESSAGE_SEND_FAILED);
@@ -65,19 +65,19 @@ public class MessageController {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
 
-        Long userId= 2L;
+        Long userId = 2L;
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
-            alarmService.unsubscribeMessage(topicArn,userId);
+            alarmService.unsubscribeMessage(topicArn, userId);
             return ResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
         } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }
-        }
+    }
 
 
 }
