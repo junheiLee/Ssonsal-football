@@ -49,7 +49,7 @@ public class RedisServiceImpl implements RedisService {
     }
 
     // get AccessToken
-    public String getAccessToken(String accessToken) {
+    public String getTokens(String accessToken) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return valueOperations.get(accessToken);
     }

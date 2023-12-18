@@ -4,7 +4,9 @@ import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.review.dto.request.ReviewRequestDto;
+import com.ssonsal.football.review.dto.response.ReviewListResponseDto;
 import com.ssonsal.football.review.dto.response.ReviewResponseDto;
+import com.ssonsal.football.review.dto.response.ScoreResponseDto;
 import com.ssonsal.football.review.etity.Review;
 import com.ssonsal.football.review.exception.ReviewErrorCode;
 import com.ssonsal.football.review.repository.ReviewRepository;
@@ -53,7 +55,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponseDto> teamReviewList(Long teamId) {
+    public List<ReviewListResponseDto> teamReviewList(Long teamId) {
         List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
 
         if (reviews.isEmpty()) {
@@ -61,9 +63,9 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
         }
 
-        List<ReviewResponseDto> teamReviews = new ArrayList<>();
+        List<ReviewListResponseDto> teamReviews = new ArrayList<>();
         for (Review review : reviews) {
-            teamReviews.add(ReviewResponseDto.fromEntity(review));
+            teamReviews.add(ReviewListResponseDto.fromEntity(review));
         }
 
         return teamReviews;
@@ -71,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewResponseDto> userReviewList(Long userId) {
+    public List<ReviewListResponseDto> userReviewList(Long userId) {
         List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
 
         if (reviews.isEmpty()) {
@@ -79,9 +81,9 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
         }
 
-        List<ReviewResponseDto> userReviews = new ArrayList<>();
+        List<ReviewListResponseDto> userReviews = new ArrayList<>();
         for (Review review : reviews) {
-            userReviews.add(ReviewResponseDto.fromEntity(review));
+            userReviews.add(ReviewListResponseDto.fromEntity(review));
         }
 
         return userReviews;
@@ -107,5 +109,59 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponseDto review = ReviewResponseDto.fromEntity(reviewRepository.findReviewById(reviewId));
         return review;
+    }
+
+    @Override
+    public ScoreResponseDto subAvgScore(Long userId) {
+        List<Review> reviews = reviewRepository.findReviewsByUserId(userId);
+
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        float totalMannerScore = 0.0f;
+        float totalSkillScore = 0.0f;
+
+        for (Review review : reviews) {
+            totalMannerScore += review.getMannerScore();
+            totalSkillScore += review.getSkillScore();
+        }
+
+        float avgMannerScore = totalMannerScore / reviews.size();
+        float avgSkillScore = totalSkillScore / reviews.size();
+
+        ScoreResponseDto subScore = new ScoreResponseDto();
+        subScore.setAvgMannerScore(avgMannerScore);
+        subScore.setAvgSkillScore(avgSkillScore);
+
+        return subScore;
+    }
+
+    @Override
+    public ScoreResponseDto teamAvgScore(Long teamId) {
+        List<Review> reviews = reviewRepository.findReviewsByTeamId(teamId);
+
+        if (reviews.isEmpty()) {
+            log.error("해당하는 리뷰가 없습니다.");
+            throw new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND);
+        }
+
+        float totalMannerScore = 0.0f;
+        float totalSkillScore = 0.0f;
+
+        for (Review review : reviews) {
+            totalMannerScore += review.getMannerScore();
+            totalSkillScore += review.getSkillScore();
+        }
+
+        float avgMannerScore = totalMannerScore / reviews.size();
+        float avgSkillScore = totalSkillScore / reviews.size();
+
+        ScoreResponseDto teamScore = new ScoreResponseDto();
+        teamScore.setAvgMannerScore(avgMannerScore);
+        teamScore.setAvgSkillScore(avgSkillScore);
+
+        return teamScore;
     }
 }
