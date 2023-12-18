@@ -34,7 +34,6 @@ public enum AdminErrorCode implements ResponseCode {
     CONTENT_WRITING_FAILED(HttpStatus.BAD_REQUEST, " 내용 작성 실패.");
 
 
-
     private final HttpStatus httpStatus;
     private final String message;
 

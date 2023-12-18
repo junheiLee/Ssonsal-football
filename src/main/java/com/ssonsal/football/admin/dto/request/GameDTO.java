@@ -1,7 +1,6 @@
 package com.ssonsal.football.admin.dto.request;
 
 import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -25,7 +24,7 @@ public class GameDTO {
                    Integer vsFormat, String stadium, LocalDateTime schedule) {
         this.id = id;
         this.createdAt = createdAt;
-        this.writer=writer;
+        this.writer = writer;
         this.matchStatus = matchStatus;
         this.vsFormat = vsFormat;
         this.stadium = stadium;

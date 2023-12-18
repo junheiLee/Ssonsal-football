@@ -22,6 +22,7 @@ public enum TeamErrorCode implements ResponseCode {
     TEAM_NOT_RECRUIT(HttpStatus.FORBIDDEN, "모집중인 팀이 아닙니다."),
     USER_NOT_MEMBER(HttpStatus.NOT_FOUND, "팀원이 아닙니다."),
     DUPLICATE_TEAM_NAME(HttpStatus.CONFLICT, "팀 이름이 중복입니다."),
+
     USER_NOT_REJECT(HttpStatus.NOT_FOUND, "거절 정보가 없습니다.");
 
 

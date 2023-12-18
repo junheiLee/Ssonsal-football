@@ -17,8 +17,8 @@ public class CookieUtil {
         log.info("[addCookie] 쿠키에 토큰을 저장합니다 name : {}, value : {}", name, value);
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
-        cookie.setMaxAge(60*60*6);
-        log.info("[addCookie] 저장된 토큰 확인 : {}",cookie.toString());
+        cookie.setMaxAge(60 * 60 * 6);
+        log.info("[addCookie] 저장된 토큰 확인 : {}", cookie.toString());
         response.addCookie(cookie);
     }
 

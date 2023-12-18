@@ -8,7 +8,8 @@ import lombok.ToString;
 @Getter
 public class GameRequestDto {
 
-    private String schedule;//
+    private String date;
+    private String time;
     private int gameTime;
     private String region;
     private String stadium;
@@ -17,5 +18,7 @@ public class GameRequestDto {
     private String rule;
     private Integer account;
     private boolean findAway;
+    private String uniform;
+    private int subCount;
 
 }

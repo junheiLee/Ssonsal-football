@@ -5,14 +5,14 @@ import lombok.*;
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LoginUserInfoDto {
+public class LoginUser {
 
-    private Long userId;
+    private Long id;
     private Long teamId;
 
     @Builder
-    public LoginUserInfoDto(Long userId, Long teamId) {
-        this.userId = userId;
+    public LoginUser(Long userId, Long teamId) {
+        this.id = userId;
         this.teamId = teamId;
     }
 }
