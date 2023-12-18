@@ -1,5 +1,6 @@
 package com.ssonsal.football.review.controller;
 
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ReportController {
 
     private final ReportService reportService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 신고글 목록 조회 api
@@ -40,8 +42,7 @@ public class ReportController {
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReport(@RequestBody ReportRequestDto reportRequestDto, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reportService.createReport(reportRequestDto, user));
     }
