@@ -1,5 +1,6 @@
 package com.ssonsal.football.review.controller;
 
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 리뷰 생성 시, 호출되는 api
@@ -31,8 +33,7 @@ public class ReviewController {
     public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+                Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto, user));
     }
