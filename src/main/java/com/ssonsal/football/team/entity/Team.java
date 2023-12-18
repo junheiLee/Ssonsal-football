@@ -98,4 +98,9 @@ public class Team extends BaseEntity {
     public void delegateLeader(Long userId) {
         this.leaderId = userId;
     }
+
+    public void updateScore(Float mannerScore,Float skillScore){
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
+    }
 }

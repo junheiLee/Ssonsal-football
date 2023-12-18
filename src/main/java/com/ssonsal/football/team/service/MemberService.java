@@ -4,8 +4,6 @@ import com.ssonsal.football.team.entity.Role;
 
 public interface MemberService {
 
-    Role isUserLevel(Long userId);
-
     Role isUserLevel(Long teamId, Long userId);
 
     boolean isUserOtherApply(Long userId);

@@ -1,5 +1,6 @@
 package com.ssonsal.football.rank.service;
 
+import com.ssonsal.football.rank.dto.RankListResponseDto;
 import com.ssonsal.football.rank.dto.UpdatedRankDto;
 import com.ssonsal.football.rank.entity.Rank;
 import com.ssonsal.football.rank.repository.RankRepository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +34,15 @@ public class RankServiceImpl implements RankService {
 
         saveRank(results);
         return new UpdatedRankDto(1L, LocalDateTime.now());
+    }
+
+    @Override
+    public List<RankListResponseDto> findRankList() {
+        List<TeamRecord> teamRecord = teamRecordRepository.findRank();
+
+        return teamRecord.stream()
+                .map(rank -> new RankListResponseDto(rank.getTeam(), rank))
+                .collect(Collectors.toList());
     }
 
     @Transactional

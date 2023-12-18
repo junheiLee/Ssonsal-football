@@ -7,4 +7,6 @@ import java.util.List;
 public interface TeamRecordRepositoryCustom {
 
     List<TeamRecord> determineRank();
+
+    List<TeamRecord> findRank();
 }

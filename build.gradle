@@ -53,6 +53,12 @@ dependencies {
 	testCompileOnly 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
 
+	implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.17'
+
+	implementation platform('software.amazon.awssdk:bom:2.17.58') // BOM for AWS SDK For Java
+	implementation 'software.amazon.awssdk:sns:2.17.58' // SNS SDK
+	implementation 'org.springframework.cloud:spring-cloud-aws-messaging:2.2.6.RELEASE'
+
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
