@@ -9,6 +9,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
@@ -58,7 +59,7 @@ public class Game extends BaseEntity {
     private String awayteamResult;
 
     @OneToMany(mappedBy = "game")
-    private List<MatchApplication> matchApplications;
+    private List<MatchApplication> matchApplications = new ArrayList<>();
 
     @Builder
     public Game(User writer, Team home,

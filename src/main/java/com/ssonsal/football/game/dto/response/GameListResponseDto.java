@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import static com.ssonsal.football.game.util.Transfer.toStringSchedule;
+
 @ToString
 @Getter
 @NoArgsConstructor
@@ -24,7 +26,7 @@ public class GameListResponseDto {
     public GameListResponseDto(Game game) {
 
         this.id = game.getId();
-        this.schedule = game.getSchedule().toString();
+        this.schedule = toStringSchedule(game.getSchedule());
         this.region = game.getRegion();
         this.stadium = game.getStadium();
         this.vsFormat = game.getVsFormat();

@@ -13,6 +13,6 @@ public interface SubRepository extends JpaRepository<Sub, Long> {
 
     List<Sub> findByGameIdAndTeamId(Long teamId, Long gameId);
 
-    boolean existsByTeamIdAndGameId(Long teamId, Long gameId);
+    int countByTeamIdAndGameId(Long teamId, Long gameId);
 
 }

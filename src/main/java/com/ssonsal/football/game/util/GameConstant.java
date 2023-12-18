@@ -11,9 +11,10 @@ public final class GameConstant {
     public static final String HOME = "home";
     public static final String MATCH_TEAM = "matchTeam";
 
-    public static final String USER_INFO = "userInfo";
+    public static final String LOGIN_USER = "loginUser";
 
-    public static final String GAMES = "games";
+    public static final String GAME_INFO = "gameInfo";
+
     public static final String MATCH_APPLICATIONS = "matchApplications";
     public static final String SUB_APPLICANTS = "subApplicants";
     public static final String SUBS = "subs";
@@ -40,6 +41,6 @@ public final class GameConstant {
     public static final int ZERO = 0;
 
     /* LocalDateTime 관련 */
-    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
     public static final String SCHEDULE_FORMAT = "yy년 M월 d일 HH시";
 }

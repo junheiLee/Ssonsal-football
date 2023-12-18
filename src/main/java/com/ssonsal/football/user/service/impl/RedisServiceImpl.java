@@ -1,6 +1,5 @@
 package com.ssonsal.football.user.service.impl;
 
-import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.user.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,9 @@ public class RedisServiceImpl implements RedisService {
     // key-value = id- refreshToken
     public void setRefreshToken(String refreshToken, String id, long expiration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-
+        log.info("[RedisServiceImpl] setRefreshToken 호출 refreshToken={}, id={}, expiration={}", refreshToken, id, Duration.ofSeconds(expiration));
         // 만료시간 이후 삭제
-        valueOperations.set(refreshToken, id, Duration.ofMinutes(expiration));
+        valueOperations.set(id, refreshToken, Duration.ofSeconds(expiration));
         log.info("만료 시간, 분: {}", Duration.ofMinutes(expiration));
     }
 
@@ -31,8 +30,8 @@ public class RedisServiceImpl implements RedisService {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
         // 만료시간 이후 삭제
-        valueOperations.set(accessToken,refreshToken, Duration.ofMinutes(expiration));
-        log.info("만료 시간, 분: {}", Duration.ofMinutes(expiration));
+        valueOperations.set(accessToken, refreshToken, Duration.ofSeconds(expiration));
+        log.info("만료 시간, 분: {}", Duration.ofSeconds(expiration));
     }
 
     // AccessToken 로그아웃
@@ -50,11 +49,12 @@ public class RedisServiceImpl implements RedisService {
 
     // get RefreshToken
     public String getRefreshToken(String userId) {
+        log.info("[RedisServiceImpl] 호출 userId={}", userId);
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         log.info("[getRefreshToken] : redis 에서 email로 조회한 refreshToken : {}", valueOperations.get(userId));
         // RefreshToken 없으면 null 반환
         String result = valueOperations.get(userId);
-        log.info("getRefreshToken : {}",result.getClass().getName());
+        log.info("getRefreshToken : {}", result.getClass().getName());
         return result;
     }
 

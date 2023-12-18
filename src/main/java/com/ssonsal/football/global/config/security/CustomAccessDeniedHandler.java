@@ -17,10 +17,9 @@ import java.io.IOException;
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
 
-
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
-        AccessDeniedException exception) throws IOException {
+                       AccessDeniedException exception) throws IOException {
         log.info("[handle] 접근이 막혔을 경우 경로 리다이렉트");
         response.sendRedirect("/sign-api/exception");
     }

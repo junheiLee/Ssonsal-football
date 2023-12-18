@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -14,9 +14,9 @@ public class AlarmDTO {
     private String subscriptionArn;
     private String userEmail;
 
-    public AlarmDTO(String subscriptionArn,String userEmail) {
+    public AlarmDTO(String subscriptionArn, String userEmail) {
         this.subscriptionArn = subscriptionArn;
-        this.userEmail=userEmail;
+        this.userEmail = userEmail;
     }
 
 

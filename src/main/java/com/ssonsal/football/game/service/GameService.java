@@ -14,7 +14,7 @@ public interface GameService {
 
     GameDetailResponseDto getDetail(Long gameId);
 
-    Long createGame(Long loginUserId, GameRequestDto gameRequestDto, MatchApplicationRequestDto homeTeamDto);
+    Long createGame(Long loginUserId, GameRequestDto gameRequestDto);
 
     Long updateGame(Long loginUserId, Long gameId,
                     GameRequestDto updateGameRequestDto, MatchApplicationRequestDto updateHomeTeamDto);

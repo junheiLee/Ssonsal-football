@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.response;
+package com.ssonsal.football.admin.dto.request;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -15,12 +15,12 @@ public class ResponseEmailDTO {
     private String userEmail;
 
     public ResponseEmailDTO(String topicArn, String subscriptionArn, String userEmail) {
-        this.topicArn=topicArn;
-        this.subscriptionArn=subscriptionArn;
-        this.userEmail=userEmail;
+        this.topicArn = topicArn;
+        this.subscriptionArn = subscriptionArn;
+        this.userEmail = userEmail;
     }
 
-    public ResponseEmailDTO build(){
+    public ResponseEmailDTO build() {
         ResponseEmailDTO responseEmailDTO = new ResponseEmailDTO();
         responseEmailDTO.setTopicArn(topicArn);
         responseEmailDTO.setSubscriptionArn(subscriptionArn);

@@ -5,7 +5,7 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.*;
+import javax.persistence.Id;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -33,7 +33,7 @@ public class RefreshToken {
         this.refreshToken = refreshToken;
     }
 
-    public RefreshToken update(String newRefreshToken,Long ttl) {
+    public RefreshToken update(String newRefreshToken, Long ttl) {
         this.refreshToken = newRefreshToken;
         this.ttl = ttl;
         return this;

@@ -5,6 +5,8 @@ import com.ssonsal.football.user.entity.User;
 
 public interface UserService {
     public Long save(SignInRequestDto dto);
+
     public User findById(Long userId);
+
     public User findByEmail(String email);
 }

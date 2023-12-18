@@ -17,7 +17,7 @@ public class MatchTeamResponseDto {
     private Float skillScore;
     private String uniform;
     private int subCount;
-    private boolean hasSub;
+    private int havingSubCount;
 
     @QueryProjection
     public MatchTeamResponseDto(Long teamId, String logoUrl, String name, Float skillScore,
@@ -31,7 +31,7 @@ public class MatchTeamResponseDto {
         this.subCount = subCount;
     }
 
-    public void isHavingSub(boolean hasSub) {
-        this.hasSub = hasSub;
+    public void countHavingSub(int havingSubCount) {
+        this.havingSubCount = havingSubCount;
     }
 }

@@ -3,7 +3,6 @@ package com.ssonsal.football.user.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.ssonsal.football.global.entity.BaseEntity;
-import com.ssonsal.football.review.dto.response.ScoreResponseDto;
 import com.ssonsal.football.team.entity.Team;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -166,7 +165,7 @@ public class User extends BaseEntity implements UserDetails {
         team.getUsers().add(this);
     }
 
-    public void updateScore(Float mannerScore,Float skillScore){
+    public void updateScore(Float mannerScore, Float skillScore) {
         this.mannerScore = mannerScore;
         this.skillScore = skillScore;
     }

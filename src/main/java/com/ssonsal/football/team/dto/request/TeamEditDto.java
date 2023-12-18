@@ -13,8 +13,6 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 public class TeamEditDto {
 
-    private Long id;
-
     @NotEmpty(message = "팀명은 필수 입력값입니다.")
     @Pattern(regexp = "^[a-zA-Z0-9가-힣]{2,12}$", message = "팀명은 2자리 이상, 12자리 이하여야 합니다.")
     private String name;

@@ -13,7 +13,9 @@ public final class TeamConstant {
     public static final String MEMBERS = "members";
     public static final String APPLIES = "applies";
     public static final String REJECTS = "rejects";
+    public static final String TEAM_LOGO = "teamLogo";
 
+    public static final Integer RECRUIT = 1;
     public static final String FORM = "form";
     public static final String DETAIL = "detail";
 

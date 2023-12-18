@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -36,8 +38,9 @@ public class ReportController {
      * @return 성공 코드와 생성된 신고를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createReport(@RequestParam ReportRequestDto reportRequestDto) {
-        //토큰값으로 교체해야함
+    public ResponseEntity<ResponseBodyFormatter> createReport(@RequestBody ReportRequestDto reportRequestDto, HttpServletRequest request) {
+
+        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long user = 1L;
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reportService.createReport(reportRequestDto, user));
