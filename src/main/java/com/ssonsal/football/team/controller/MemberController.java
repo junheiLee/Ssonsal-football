@@ -1,5 +1,6 @@
 package com.ssonsal.football.team.controller;
 
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -31,6 +32,7 @@ public class MemberController {
     private final TeamRejectService teamRejectService;
     private final TeamApplyService teamApplyService;
     private final MemberService memberService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 팀에 가입 신청을 보냅니다.
@@ -41,8 +43,7 @@ public class MemberController {
     @PostMapping("/{teamId}/application")
     public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId, HttpServletRequest request) {
 
-//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
        if (!memberService.isTeamRecruit(teamId)) {
             throw new CustomException(TeamErrorCode.TEAM_NOT_RECRUIT);
@@ -66,8 +67,7 @@ public class MemberController {
     @DeleteMapping("/{teamId}/application")
     public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId, HttpServletRequest request) {
 
-//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
       if (!memberService.isUserApply(user, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
@@ -87,8 +87,7 @@ public class MemberController {
     @DeleteMapping("/{teamId}/team")
     public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
          if (memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.LEADER_IN_GROUP);
@@ -111,8 +110,7 @@ public class MemberController {
     @PostMapping("/{teamId}/application/{userId}")
     public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -134,8 +132,7 @@ public class MemberController {
     @DeleteMapping("/{teamId}/application/{userId}")
     public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -156,8 +153,7 @@ public class MemberController {
     @PatchMapping("/{teamId}/manager/{userId}")
     public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
          if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -178,8 +174,7 @@ public class MemberController {
     @PostMapping("/{teamId}/manager/{userId}")
     public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -206,8 +201,7 @@ public class MemberController {
     @DeleteMapping("/{teamId}/manager/{userId}")
     public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);

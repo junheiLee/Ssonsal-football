@@ -79,8 +79,7 @@ public class TeamController {
     @GetMapping("/{teamId}")
     public ResponseEntity<ResponseBodyFormatter> findDetailOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         String userLevel = memberService.isUserLevel(teamId, user).getRole();
 
@@ -102,9 +101,7 @@ public class TeamController {
     @GetMapping("/{teamId}/managers")
     public ResponseEntity<ResponseBodyFormatter> findManageListOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-//        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
-
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -124,8 +121,7 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.ALREADY_IN_TEAM);
@@ -147,8 +143,7 @@ public class TeamController {
     @GetMapping("/{teamId}/edit")
     public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId, HttpServletRequest request) {
 
-//                Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -167,8 +162,7 @@ public class TeamController {
     @ResponseBody
     public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId, HttpServletRequest request) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
