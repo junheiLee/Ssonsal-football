@@ -45,13 +45,11 @@ public class StatsServiceImpl implements StatsService {
         log.info("달별 성사 경기" + confirmedGameCount);
         log.info("달별 취소 경기" + cancelledGameCount);
 
-        StatsDTO statsDTO = StatsDTO.builder()
+        return StatsDTO.builder()
                 .cancelledGameCount(cancelledGameCount)
                 .confirmedGameCount(confirmedGameCount)
                 .totalGameCount(totalGameCount)
                 .build();
-
-        return statsDTO;
 
     }
 
@@ -92,13 +90,11 @@ public class StatsServiceImpl implements StatsService {
         long confirmedGameCount = calculateGameCount(date, date.plusDays(1), dailyGames, 1);
         long cancelledGameCount = calculateGameCount(date, date.plusDays(1), dailyGames, 0);
 
-        StatsDTO statsDTO = StatsDTO.builder()
+        return StatsDTO.builder()
                 .cancelledGameCount(cancelledGameCount)
                 .confirmedGameCount(confirmedGameCount)
                 .totalGameCount(cancelledGameCount + confirmedGameCount)
                 .build();
-
-        return statsDTO;
     }
 
     @Transactional
@@ -151,7 +147,7 @@ public class StatsServiceImpl implements StatsService {
     }
 
     public long getTotalUserCount() {
-        return userManagementRepository.findAll().stream().count();
+        return userManagementRepository.findAll().size();
     }
 
     public long getNewUserCount() {

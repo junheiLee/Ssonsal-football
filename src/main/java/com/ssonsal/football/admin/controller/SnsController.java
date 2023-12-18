@@ -5,16 +5,14 @@ import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import software.amazon.awssdk.services.sns.model.SnsResponse;
 
 import java.util.Map;
 
@@ -28,12 +26,6 @@ public class SnsController {
     private final AlarmService alarmService;
     private final UserManagementService userService;
 
-
-    private ResponseStatusException getResponseStatusException(SnsResponse response) {
-        return new ResponseStatusException(
-                HttpStatus.INTERNAL_SERVER_ERROR, response.sdkHttpResponse().statusText().get()
-        );
-    }
 
     /**
      * 주제 생성
@@ -74,7 +66,7 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -100,12 +92,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CHECK_SUCCESS, alarmService.confirmSubscription(topicArn, userId));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.confirmSubscription(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 확인 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
@@ -132,12 +124,12 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn, emailText));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.publishEmail(topicArn, emailText));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
@@ -159,11 +151,11 @@ public class SnsController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS, alarmService.unsubscribe(topicArn, userId));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.unsubscribe(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

@@ -6,6 +6,7 @@ import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +31,7 @@ public class MessageController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
@@ -49,12 +50,12 @@ public class MessageController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.MESSAGE_SEND_SUCCESS, alarmService.publishMessage(topicArn, responseMessageDTO));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.publishMessage(topicArn, responseMessageDTO));
         } catch (CustomException e) {
             log.error("메세지 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.MESSAGE_SEND_FAILED);
@@ -69,12 +70,12 @@ public class MessageController {
 
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
             alarmService.unsubscribeMessage(topicArn, userId);
-            return ResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
+            return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
         } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

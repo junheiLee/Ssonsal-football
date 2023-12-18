@@ -6,16 +6,6 @@ import java.util.List;
 
 public interface UserManagementService {
 
-    /**
-     * 나이 구하는 로직
-     * 출생년도를 통해 나이를 구하는 로직
-     * 현재 년도에서 출생 년도를 빼서 만 나이로 계산
-     * 생일이 지나지 않은 사람도 현재 시간을 비교해 지나지 않으면 -1(만 나이)
-     *
-     * @param userId
-     * @return
-     */
-    Integer calculateAge(Long userId);
 
     /**
      * 유저 리스트
@@ -42,6 +32,6 @@ public interface UserManagementService {
      * @param userId
      * @return 관리자 확인 체크
      */
-    public boolean isAdmin(Long userId);
+    boolean isAdmin(Long userId);
 
 }

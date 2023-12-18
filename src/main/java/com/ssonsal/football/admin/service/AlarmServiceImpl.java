@@ -52,12 +52,11 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public AlarmDTO saveAlarmInfo(String subscriptionArn, String userEmail) {
-        AlarmDTO alarmDTO = AlarmDTO.builder()
+
+        return AlarmDTO.builder()
                 .subscriptionArn(subscriptionArn)
                 .userEmail(userEmail)
                 .build();
-
-        return alarmDTO;
     }
 
     @Override
@@ -82,7 +81,7 @@ public class AlarmServiceImpl implements AlarmService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
 
-            String message = "" + gameInfo.getHometeamId().getName() + " 팀과의 매치가 확정되었습니다.\n" +
+            String message = gameInfo.getHometeamId().getName() + " 팀과의 매치가 확정되었습니다.\n" +
                     "매치 날짜: " + gameInfo.getSchedule() + "\n" +
                     "매치 시간: " + gameInfo.getGameTime() + " 시간\n" +
                     "경기장: " + gameInfo.getStadium() + "\n" +
@@ -106,10 +105,9 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public String createTopic(String topicName) {
-        SnsClient snsClient = credentialServiceImpl.getSnsClient();
+    public void createTopic(String topicName) {
 
-        try {
+        try (SnsClient snsClient = credentialServiceImpl.getSnsClient()) {
             final CreateTopicRequest createTopicRequest = CreateTopicRequest.builder()
                     .name(topicName)
                     .build();
@@ -122,9 +120,6 @@ public class AlarmServiceImpl implements AlarmService {
             log.info("주제 이름 = " + createTopicResponse.topicArn());
             log.info("주제 list = " + snsClient.listTopics());
 
-            return "주제 생성 성공";
-        } finally {
-            snsClient.close();
         }
     }
 
@@ -224,7 +219,7 @@ public class AlarmServiceImpl implements AlarmService {
 
             snsClient.close();
 
-            return "이메일 전송 성공";
+            return publishResponse + "이메일 전송 성공";
         } catch (Exception e) {
             log.error("메세지 전송 에러: " + e.getMessage(), e);
             return "이메일 전송 실패";
@@ -289,12 +284,9 @@ public class AlarmServiceImpl implements AlarmService {
     public String subscribeMessage(String topicArn, Long userId) {
         log.info("메세지");
 
-        String userPhone = getUserByPhone(userId);
-        String memberPhone = userPhone;
+        String memberPhone = getUserByPhone(userId);
 
-        SnsClient snsClient = credentialServiceImpl.getSnsClient();
-
-        try {
+        try (SnsClient snsClient = credentialServiceImpl.getSnsClient()) {
             final SubscribeRequest subscribeRequest = SubscribeRequest.builder()
                     .protocol("SMS")  // SMS 프로토콜
                     .topicArn(topicArn)
@@ -311,8 +303,6 @@ public class AlarmServiceImpl implements AlarmService {
             log.info("구독 리시트 = " + snsClient.listSubscriptions());
 
             return "메시지 구독 성공";
-        } finally {
-            snsClient.close();
         }
     }
 
@@ -361,7 +351,7 @@ public class AlarmServiceImpl implements AlarmService {
 
                     snsClient.close();
 
-                    return "메시지 전송 성공";
+                    return publishResponse + "메시지 전송 성공";
                 }
             }
 

@@ -60,9 +60,8 @@ public interface AlarmService {
      * 만들어진다고 생각하면 된다
      *
      * @param topicName 생성한 주제 이름
-     * @return 성공 메시지와 주제 성공 응답 반환
      */
-    String createTopic(String topicName);
+    void createTopic(String topicName);
 
     // ------------------------------------------이메일----------------------------------------------------------
 
@@ -134,7 +133,7 @@ public interface AlarmService {
      * @param html
      * @return
      */
-    public String removePTags(String html);
+    String removePTags(String html);
 
     /**
      * 메세지 수신 취소

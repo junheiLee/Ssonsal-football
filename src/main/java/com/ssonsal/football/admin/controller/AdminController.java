@@ -3,11 +3,11 @@ package com.ssonsal.football.admin.controller;
 import com.ssonsal.football.admin.dto.response.GameDTO;
 import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
-import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.GameManagementService;
 import com.ssonsal.football.admin.service.StatsService;
 import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,10 +49,10 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("userList", userService.userList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("userList", userService.userList()));
 
     }
 
@@ -68,12 +68,12 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
         List<GameDTO> gameList = gameService.gameList();
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("gameList", gameService.gameList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("gameList", gameService.gameList()));
     }
 
     /*    *//**
@@ -90,7 +90,6 @@ public class AdminController {
 
     /**
      * 통계 데이터를 가져와 보여준다
-     *
      * @return 이번달 통계와 이번달의 하루 통계를 보여준다
      */
     @GetMapping("/stats")
@@ -100,7 +99,7 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
         // 현재 날짜 가져오기
@@ -110,7 +109,7 @@ public class AdminController {
         Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
         return DataResponseBodyFormatter.put(
-                AdminSuccessCode.PAGE_ALTER_SUCCESS,
+                SuccessCode.SUCCESS,
                 Map.of("monthStats", monthStats, "monthlyDailyStats", monthlyDailyStats)
         );
     }
@@ -131,10 +130,10 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_COUNT_SUCCESS, objectToMap("dailyStats", statsService.getAdminStats()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("dailyStats", statsService.getAdminStats()));
 
     }
 
@@ -150,11 +149,11 @@ public class AdminController {
     public ResponseEntity<ResponseBodyFormatter> isAdmin() {
         Long userId = 2L;
 
-        if (!userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
-        return ResponseBodyFormatter.put(AdminSuccessCode.ADMIN_AUTH_SUCCESS);
+        return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
 
 

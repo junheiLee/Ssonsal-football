@@ -15,6 +15,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.admin.dto.response.UserDTO.userFactory;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -48,36 +50,25 @@ public class UserManagementServiceImpl implements UserManagementService {
     public List<UserDTO> userList() {
         List<User> userList = userRepository.findAll();
 
-        List<UserDTO> userDTOs = userList.stream()
+        return userList.stream()
                 .map(user -> {
                     Integer calculatedAge = calculateAge(user.getId());
-
-                    return UserDTO.builder()
-                            .id(user.getId())
-                            .name(user.getName())
-                            .nickname(user.getNickname())
-                            .gender(user.getGender())
-                            .createdAt(user.getCreatedAt())
-                            .role(user.getRole())
-                            .age(calculatedAge)  // 나이 설정
-                            .build();
+                    return userFactory(user, calculatedAge);
                 })
                 .collect(Collectors.toList());
-
-        return userDTOs;
     }
+
 
 
     @Override
     @Transactional
     public void updateRoles(List<Integer> userIds) {
-
         userIds.stream()
                 .map(userId -> userRepository.findById(Long.valueOf(userId))
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)))
                 .filter(user -> user.getRole() != 1)
                 .forEach(user -> {
-                    Integer newRole = (user.getRole() == 0) ? 1 : 0;
+                    int newRole = (user.getRole() == 0) ? 1 : 0;
                     user.updateRole(newRole);
                 });
     }
@@ -86,7 +77,7 @@ public class UserManagementServiceImpl implements UserManagementService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED));
 
-        return user.getRole() == 1;
+        return user.getRole() != 1;
     }
 
 }

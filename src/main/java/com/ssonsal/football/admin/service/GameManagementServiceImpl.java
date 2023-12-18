@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.admin.dto.response.GameDTO.gameFactory;
+
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -25,21 +27,10 @@ public class GameManagementServiceImpl implements GameManagementService {
     public List<GameDTO> gameList() {
         List<Game> games = gameManagementRepository.findAll();
 
-        List<GameDTO> gameDTOs = games.stream()
+        return games.stream()
                 .filter(game -> game.getMatchStatus() == 0)
-                .map(game -> GameDTO.builder()
-                        .id(game.getId())
-                        .writer(game.getWriter().getNickname())
-                        .createdAt(game.getCreatedAt())
-                        .matchStatus(game.getMatchStatus())
-                        .vsFormat(game.getVsFormat())
-                        .stadium(game.getStadium())
-                        .schedule(game.getSchedule())
-                        .build()
-                )
+                .map(game -> gameFactory(game))
                 .collect(Collectors.toList());
-
-        return gameDTOs;
     }
 
     @Override
@@ -49,9 +40,7 @@ public class GameManagementServiceImpl implements GameManagementService {
                 .map(gameId -> Long.valueOf(gameId))
                 .map(gameId -> gameManagementRepository.findById(gameId)
                         .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND)))
-                .forEach(game -> {
-                    gameManagementRepository.deleteById(game.getId());
-                });
+                .forEach(game -> gameManagementRepository.deleteById(game.getId()));
 
     }
 }

@@ -3,11 +3,11 @@ package com.ssonsal.football.admin.controller;
 import com.ssonsal.football.admin.dto.request.UpdateMonthDto;
 import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
-import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.GameManagementService;
 import com.ssonsal.football.admin.service.StatsService;
 import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,14 +53,14 @@ public class AdminManagementController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (userIds == null) {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
         userService.updateRoles(userIds);
-        return DataResponseBodyFormatter.put(AdminSuccessCode.AMDIN_RECOGNIZE_SUCCESS, objectToMap("recognizeAdmin", userIds));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("recognizeAdmin", userIds));
 
     }
 
@@ -78,7 +78,7 @@ public class AdminManagementController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (gameIds == null) {
             throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
@@ -86,7 +86,7 @@ public class AdminManagementController {
 
         gameService.deleteGames(gameIds);
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.GAME_POST_DELETED, objectToMap("deletePost", gameIds));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap("deletePost", gameIds));
 
     }
 
@@ -106,7 +106,7 @@ public class AdminManagementController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!userService.isAdmin(userId)) {
+        } else if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         } else if (selectedDate.getSelectedDate() == null) {
             throw new CustomException(AdminErrorCode.MONTH_UPDATE_FAILED);
@@ -122,7 +122,7 @@ public class AdminManagementController {
             Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
 
             return DataResponseBodyFormatter.put(
-                    AdminSuccessCode.PAGE_ALTER_SUCCESS,
+                    SuccessCode.SUCCESS,
                     Map.of("monthStats", monthStats, "monthlyDailyStats", monthlyDailyStats)
             );
         } catch (DateTimeParseException e) {

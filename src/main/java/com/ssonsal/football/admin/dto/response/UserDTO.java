@@ -38,7 +38,7 @@ public class UserDTO {
         return userDTO;
     }
 
-    public static UserDTO userFactory(User userdata) {
+    public static UserDTO userFactory(User userdata,Integer age) {
         return UserDTO.builder()
                 .id(userdata.getId())
                 .name(userdata.getName())
@@ -46,6 +46,7 @@ public class UserDTO {
                 .gender(userdata.getGender())
                 .createdAt(userdata.getCreatedAt())
                 .role(userdata.getRole())
+                .age(age)
                 .build();
     }
 
