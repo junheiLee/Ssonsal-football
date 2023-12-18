@@ -1,11 +1,11 @@
 package com.ssonsal.football.team.service;
 
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.team.entity.RejectId;
 import com.ssonsal.football.team.entity.Role;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.team.entity.TeamReject;
-import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
 import com.ssonsal.football.team.repository.TeamRepository;
@@ -27,23 +27,6 @@ public class MemberServiceImpl implements MemberService {
     private final TeamRejectRepository teamRejectRepository;
     private final UserRepository userRepository;
 
-    /**
-     * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
-     *
-     * @param userId 유저 아이디
-     * @return 유저 권한
-     */
-    @Override
-    public Role isUserLevel(Long userId) {
-
-        if (isUserOtherApply(userId)) {
-            return Role.TEAM_APPLY;
-        } else if (hasAnyTeam(userId)) {
-            return Role.TEAM_MEMBER;
-        }
-
-        return Role.USER;
-    }
 
     /**
      * 유저의 현재 직책에 따라 다른 값을 넘겨준다.
@@ -140,12 +123,12 @@ public class MemberServiceImpl implements MemberService {
     public String leaveTeam(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        user.deleteTeam(user);
+        user.deleteTeam();
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         return team.getName();
     }
@@ -162,11 +145,14 @@ public class MemberServiceImpl implements MemberService {
     public String delegateLeader(Long teamId, Long userId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.TEAM_NOT_FOUND));
+                () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
-        team.delegateLeader(userId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        return userRepository.findById(userId).get().getNickname();
+        team.delegateLeader(user.getId());
+
+        return user.getNickname();
     }
 
     /**
@@ -181,9 +167,9 @@ public class MemberServiceImpl implements MemberService {
     public String banUser(Long userId, Long teamId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        user.deleteTeam(user);
+        user.deleteTeam();
 
         RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);
@@ -205,7 +191,7 @@ public class MemberServiceImpl implements MemberService {
     public String banUserCancel(Long teamId, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new CustomException(TeamErrorCode.USER_NOT_FOUND));
+                () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         RejectId rejectId = new RejectId(user, teamId);
         TeamReject teamReject = new TeamReject(rejectId);

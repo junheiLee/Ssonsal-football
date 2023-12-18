@@ -35,20 +35,11 @@ public class TeamCreateDto {
     private Float mannerScore;
 
     public Team toEntity(TeamCreateDto teamCreateDto, String url, String key) {
-        Team team = Team.builder()
-                .name(teamCreateDto.getName())
+        return Team.builder()
+                .teamCreateDto(teamCreateDto)
                 .logoUrl(url)
                 .logoKey(key)
-                .preferredArea(teamCreateDto.getPreferredArea())
-                .preferredTime(teamCreateDto.getPreferredTime())
-                .recruit(teamCreateDto.getRecruit())
-                .intro(teamCreateDto.getIntro())
-                .mannerScore(teamCreateDto.getMannerScore())
-                .skillScore(teamCreateDto.getSkillScore())
-                .leaderId(teamCreateDto.getLeaderId())
                 .build();
-
-        return team;
     }
 
 }

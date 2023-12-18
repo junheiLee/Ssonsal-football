@@ -1,6 +1,7 @@
 package com.ssonsal.football.team.entity;
 
 import com.ssonsal.football.global.entity.BaseEntity;
+import com.ssonsal.football.team.dto.request.TeamCreateDto;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.user.entity.User;
 import com.sun.istack.NotNull;
@@ -59,17 +60,17 @@ public class Team extends BaseEntity {
     List<User> users = new ArrayList<>();
 
     @Builder
-    public Team(String name, String logoUrl, String logoKey, String preferredArea, String preferredTime, Integer recruit, String intro, Float mannerScore, Float skillScore, Long leaderId) {
-        this.name = name;
+    public Team(TeamCreateDto teamCreateDto, String logoUrl, String logoKey) {
+        this.name = teamCreateDto.getName();
         this.logoUrl = logoUrl;
         this.logoKey = logoKey;
-        this.preferredArea = preferredArea;
-        this.preferredTime = preferredTime;
-        this.recruit = recruit;
-        this.intro = intro;
-        this.mannerScore = mannerScore;
-        this.skillScore = skillScore;
-        this.leaderId = leaderId;
+        this.preferredArea = teamCreateDto.getPreferredArea();
+        this.preferredTime = teamCreateDto.getPreferredTime();
+        this.recruit = teamCreateDto.getRecruit();
+        this.intro = teamCreateDto.getIntro();
+        this.mannerScore = teamCreateDto.getMannerScore();
+        this.skillScore = teamCreateDto.getSkillScore();
+        this.leaderId = teamCreateDto.getLeaderId();
     }
 
     /**
@@ -96,5 +97,10 @@ public class Team extends BaseEntity {
      */
     public void delegateLeader(Long userId) {
         this.leaderId = userId;
+    }
+
+    public void updateScore(Float mannerScore,Float skillScore){
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
     }
 }

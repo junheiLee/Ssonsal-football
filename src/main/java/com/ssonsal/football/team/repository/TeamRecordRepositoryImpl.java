@@ -25,4 +25,16 @@ public class TeamRecordRepositoryImpl implements TeamRecordRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<TeamRecord> findRank() {
+        return queryFactory
+                .selectFrom(teamRecord)
+                .where(teamRecord.totalGameCount.gt(0)
+                        .and(teamRecord.rank.ne(-1))
+                        .and(teamRecord.rank.gt(0)))
+                .orderBy(teamRecord.rank.asc())
+                .fetch();
+    }
+
+
 }
