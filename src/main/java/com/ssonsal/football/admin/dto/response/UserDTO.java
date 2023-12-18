@@ -38,7 +38,7 @@ public class UserDTO {
         return userDTO;
     }
 
-    public static UserDTO userFactory(User userdata,Integer age) {
+    public static UserDTO userFactory(User userdata, Integer age) {
         return UserDTO.builder()
                 .id(userdata.getId())
                 .name(userdata.getName())

@@ -29,7 +29,6 @@ public interface StatsService {
     StatsDTO monthStats(LocalDate currentDate);
 
 
-
     // ======================================= 월간 데이터 ===========================================
 
     /**
@@ -39,12 +38,10 @@ public interface StatsService {
      * monthDayStats 맵에 추가
      * request: 특정 날짜를 가져온다
      * response:날짜에 대한 계산된 모든 통계를 반환한다
-
      */
     Map<LocalDate, StatsDTO> monthlyDailyStats(LocalDate currentDate);
 
     /**
-
      * 월간 일별 데이터 DTO 생성
      * 제공된 게임 목록 dailyGames을 기반으로
      * 해당 날짜에 대한 확정된 경기 수 및 취소된 경기 수를 계산
@@ -74,7 +71,6 @@ public interface StatsService {
     long calculateGameCount(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus);
 
     /**
-
      * 전체 회원 수 구하는 로직
      *
      * @return User테이블의 모든 id 값을 꺼내서 그 갯수를 반환

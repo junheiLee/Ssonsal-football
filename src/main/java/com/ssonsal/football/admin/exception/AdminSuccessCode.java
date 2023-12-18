@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 public enum AdminSuccessCode implements ResponseCode {
 
 
-
-
     TOPIC_CREATE_SUCCESS(HttpStatus.CREATED, "주제 생성 성공."),
     SUBSCRIBE_CREATE_SUCCESS(HttpStatus.CREATED, "구독 생성 성공."),
     CONTENT_WRITING_SUCCESS(HttpStatus.CREATED, "내용 작성 성공.");

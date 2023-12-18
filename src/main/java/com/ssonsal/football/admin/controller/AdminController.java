@@ -9,21 +9,17 @@ import com.ssonsal.football.admin.service.StatsService;
 import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
-
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-
 import java.util.List;
 import java.util.Map;
 
@@ -101,7 +97,7 @@ public class AdminController {
 
     /**
      * 통계 데이터를 가져와 보여준다
-
+     *
      * @return 이번달 통계와 이번달의 하루 통계를 보여준다
      */
     @GetMapping("/stats")
@@ -154,12 +150,10 @@ public class AdminController {
     }
 
 
-
     /**
      * 관리자 체크
      * userRole ==0 이면 에러
      * userRole==1 이면 성공
-
      *
      * @return
      */
@@ -173,7 +167,6 @@ public class AdminController {
 
         return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
-
 
 
 }
