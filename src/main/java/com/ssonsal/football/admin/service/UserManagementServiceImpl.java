@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.UserDTO;
+import com.ssonsal.football.admin.dto.response.UserDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
@@ -15,10 +15,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.ssonsal.football.admin.dto.response.UserDTO.userFactory;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserManagementServiceImpl implements UserManagementService {
 
     private final UserRepository userRepository;
 
@@ -44,53 +46,38 @@ public class UserService {
 
     }
 
-    /**
-     * 유저 리스트
-     * 회원들의 정보 전체를 꺼내온다
-     * 이름, 닉네임, 성별, 가입일자, 나이들을 관리자 페이지에서 볼 수 있다.
-     */
-
+    @Override
     public List<UserDTO> userList() {
         List<User> userList = userRepository.findAll();
 
-        List<UserDTO> userDTOs = userList.stream()
+        return userList.stream()
                 .map(user -> {
                     Integer calculatedAge = calculateAge(user.getId());
-
-                    return UserDTO.builder()
-                            .id(user.getId())
-                            .name(user.getName())
-                            .nickname(user.getNickname())
-                            .gender(user.getGender())
-                            .createdAt(user.getCreatedAt())
-                            .role(user.getRole())
-                            .age(calculatedAge)  // 나이 설정
-                            .build();
+                    return userFactory(user, calculatedAge);
                 })
                 .collect(Collectors.toList());
-
-        return userDTOs;
     }
 
-    /**
-     * 유저 권한 변경
-     * 유저를 관리자로 변경해 주는 기능이다
-     * 이미 관리자인 경우는 일반 회원으로 변경이 불가능하다
-     * request: userIds는 체크된 회원 id들
-     * response: role을 1로 변경
-     */
+
     @Transactional
     public void updateRoles(List<Integer> userIds) {
-        log.info("서비스");
-
         userIds.stream()
                 .map(userId -> userRepository.findById(Long.valueOf(userId))
                         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND)))
                 .filter(user -> user.getRole() != 1)
                 .forEach(user -> {
-                    Integer newRole = (user.getRole() == 0) ? 1 : 0;
+                    int newRole = (user.getRole() == 0) ? 1 : 0;
                     user.updateRole(newRole);
                 });
     }
+
+
+    public boolean isAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED));
+
+        return user.getRole() != 1;
+    }
+
 }
 

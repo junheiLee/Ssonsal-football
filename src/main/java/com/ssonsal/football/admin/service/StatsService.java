@@ -1,32 +1,15 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.StatsDTO;
-import com.ssonsal.football.admin.exception.AdminErrorCode;
-import com.ssonsal.football.admin.repository.GameManagementRepository;
+import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.game.entity.Game;
-import com.ssonsal.football.global.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
-public class StatsService {
+public interface StatsService {
 
-    private final GameManagementRepository gameManagementRepository;
-
-    //--------------------------- 한달 데이터 -----------------------------------
+    // =======================================일간 데이터 ===========================================
 
     /**
      * 확정된 경기와 취소된 경기 데이터를 DTO에 저장하는 로직
@@ -34,24 +17,7 @@ public class StatsService {
      * request: game.getMatchStatus의 0 또는 1 을 가져온다
      * response: statsDTO에 저장
      */
-    private StatsDTO statsDTO(List<Game> monthlyGames) {
-        long confirmedGameCount = monthlyGames.stream().filter(game -> game.getMatchStatus() == 1).count();
-        long cancelledGameCount = monthlyGames.stream().filter(game -> game.getMatchStatus() == 0).count();
-
-        long totalGameCount = cancelledGameCount + confirmedGameCount;
-
-        log.info("달별 성사 경기" + confirmedGameCount);
-        log.info("달별 취소 경기" + cancelledGameCount);
-
-        StatsDTO statsDTO = StatsDTO.builder()
-                .cancelledGameCount(cancelledGameCount)
-                .confirmedGameCount(confirmedGameCount)
-                .totalGameCount(totalGameCount)
-                .build();
-
-        return statsDTO;
-
-    }
+    StatsDTO statsDTO(List<Game> monthlyGames);
 
     /**
      * 날짜 데이터(한달 구하는 로직)
@@ -60,39 +26,20 @@ public class StatsService {
      * request: game.getMatchStatus의 0 또는 1 을 가져온다
      * response: statsDTO에 저장
      */
-    @Transactional
-    public StatsDTO monthStats(LocalDate currentDate) {
-
-        if (currentDate == null) {
-            throw new CustomException(AdminErrorCode.DATE_NOT_FOUND);
-        }
-
-        int year = currentDate.getYear();
+    StatsDTO monthStats(LocalDate currentDate);
 
 
-        int month = currentDate.getMonthValue();
+    // ======================================= 월간 데이터 ===========================================
 
-        LocalDate startDate = LocalDate.of(year, month, 1);
-
-        log.info("시작날" + startDate);
-
-        LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
-        log.info("마지막날" + endDate);
-
-        List<Game> monthlyGames = gameManagementRepository.findByScheduleBetween(
-                startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
-
-
-        if (monthlyGames == null) {
-            throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
-        }
-
-
-        // StatsDTO를 활용하여 DTO 생성
-        return statsDTO(monthlyGames);
-    }
-
-    //--------------------------- 하루 데이터 -----------------------------------
+    /**
+     * 현재 달의 일별 통계를 계산
+     * 해당 날짜의 게임 목록을 가져오고,
+     * 그 후에 dayStats를 사용하여 해당 날짜에 대한 통계를 계산하고
+     * monthDayStats 맵에 추가
+     * request: 특정 날짜를 가져온다
+     * response:날짜에 대한 계산된 모든 통계를 반환한다
+     */
+    Map<LocalDate, StatsDTO> monthlyDailyStats(LocalDate currentDate);
 
     /**
      * 월간 일별 데이터 DTO 생성
@@ -101,20 +48,7 @@ public class StatsService {
      * request: 지정한 날짜를 가져온다
      * response: 지정된 날짜의 확정 경기와 취소 경기를 DTO에 담는다
      */
-
-
-    private StatsDTO dayStats(LocalDate date, List<Game> dailyGames) {
-        long confirmedGameCount = calculateGameCount(date, date.plusDays(1), dailyGames, 1);
-        long cancelledGameCount = calculateGameCount(date, date.plusDays(1), dailyGames, 0);
-
-        StatsDTO statsDTO = StatsDTO.builder()
-                .cancelledGameCount(cancelledGameCount)
-                .confirmedGameCount(confirmedGameCount)
-                .totalGameCount(cancelledGameCount + confirmedGameCount)
-                .build();
-
-        return statsDTO;
-    }
+    StatsDTO dayStats(LocalDate date, List<Game> dailyGames);
 
 
     /**
@@ -126,16 +60,7 @@ public class StatsService {
      * request: 하루 데이터를 가져온다
      * response: 하루가 지나면 deleteCode는 2로 변경된다
      */
-
-    @Transactional
-    public void updateDeleteCodeForPastGames() {
-        try {
-            LocalDateTime currentDate = LocalDateTime.now();
-            gameManagementRepository.updateDeleteCode(currentDate);
-        } catch (CustomException e) {
-            throw new CustomException(AdminErrorCode.DELETEDCODE_UPDATE_FAILED, e);
-        }
-    }
+    void updateDeleteCodeForPastGames();
 
     /**
      * 하루의 게임 수 계산
@@ -143,49 +68,46 @@ public class StatsService {
      * request: 해당 경기와 기간을 가져온다
      * response: 검증을 통해 해당 기간의 확정경기와 취소 경기 수를 뽑는다
      */
-    @Transactional
-    private long calculateGameCount(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus) {
+    long calculateGameCount(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus);
 
-        return dailyGames.stream()
-                .filter(game -> game.getDeleteCode() == 2 && game.getModifiedAt() != null &&
-                        game.getModifiedAt().isAfter(startDate.atStartOfDay()) &&
-                        game.getModifiedAt().isBefore(endDate.atTime(LocalTime.MAX)) &&
-                        game.getMatchStatus() == matchStatus)
-                .count();
-    }
+    /**
+     * 전체 회원 수 구하는 로직
+     *
+     * @return User테이블의 모든 id 값을 꺼내서 그 갯수를 반환
+     */
+    long getTotalUserCount();
 
 
     /**
-     * 현재 달의 일별 통계를 계산
-     * 해당 날짜의 게임 목록을 가져오고,
-     * 그 후에 dayStats를 사용하여 해당 날짜에 대한 통계를 계산하고
-     * monthDayStats 맵에 추가
-     * request: 특정 날짜를 가져온다
-     * response:날짜에 대한 계산된 모든 통계를 반환한다
+     * 신규 회원자 수 구하는 로직
+     * 하루 동안 사용자가 회원가입을 하면 +1
+     *
+     * @return 신규 회원 수를 반환
      */
-    @Transactional
-    public Map<LocalDate, StatsDTO> monthlyDailyStats(LocalDate currentDate) {
+    long getNewUserCount();
 
-        if (currentDate == null) {
-            throw new CustomException(AdminErrorCode.DATE_NOT_FOUND);
-        }
+    /**
+     * 신규 매치 글
+     * 오늘 하루 동안 올라온 매치 글
+     *
+     * @return 매치 글 갯수를 반환
+     */
+    long getNewPostCount();
 
-        LocalDate startDate = currentDate.withDayOfMonth(1);
-        LocalDate endDate = currentDate.withDayOfMonth(currentDate.lengthOfMonth());
-        Map<LocalDate, StatsDTO> monthDayStats = new HashMap<>();
+    /**
+     * 오늘 하루 동안 게임수 구하는 로직
+     * matchStatus==1 이며 schedule이 오늘 하루동안 이뤄진 경기
+     *
+     * @return 오늘 경기 수를 반환
+     */
+    long getTodayGamesCount();
 
-        updateDeleteCodeForPastGames();
 
-        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            List<Game> dailyGames = gameManagementRepository.findByScheduleBetween(
-                    date.atStartOfDay(), date.with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59));
-
-            StatsDTO dailyStats = dayStats(date, dailyGames);
-            monthDayStats.put(date, dailyStats);
-        }
-
-        log.info(monthDayStats + "일별 데이터");
-
-        return monthDayStats;
-    }
+    /**
+     * Admin Main 페이지에 전달할 데이터들을 각 변수로 반환
+     *
+     * @return 총 회원 수, 신규 회원 수 , 오늘 경기 수, 오늘 올라 온 글
+     */
+    Map<String, Long> getAdminStats();
 }
+
