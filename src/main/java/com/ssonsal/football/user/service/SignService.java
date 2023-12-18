@@ -15,8 +15,7 @@ public interface SignService {
     SignInResultDto signIn(SignInRequestDto signInRequestDto) throws RuntimeException;
 
     Optional<User> signUp(SignUpRequestDto signUpRequestDto);
-
-    LogOutResultDto logOut(String email) throws RuntimeException;
+    String logOut(String email) throws RuntimeException;
 
     ProfileResultDto viewProfile(String token) throws RuntimeException;
 

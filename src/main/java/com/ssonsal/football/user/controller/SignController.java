@@ -11,7 +11,9 @@ import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.user.dto.*;
 
 import com.ssonsal.football.user.entity.User;
+import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.SignService;
+import io.jsonwebtoken.Jwt;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +24,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -41,6 +45,8 @@ public class SignController {
 
 
     private final SignService signService;
+    private final RedisService redisService;
+    private final JwtTokenProvider jwtTokenProvider;
     private final CookieUtil cookieUtil;
 
     /**
@@ -101,21 +107,57 @@ public class SignController {
      * @return 성공 메세지
      * @throws RuntimeException
      */
-    @DeleteMapping(value = "/logout")
+            @PostMapping(value = "/logout")
             @Operation(summary = "로그아웃", description = "redis 에서 해당 유저의 refreshToken을 삭제합니다.")
-            public   ResponseEntity<ResponseBodyFormatter> logOut(@Parameter(description = "Email", required = true) @RequestParam String email
-    )throws RuntimeException {
+            public   ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest requset, HttpServletResponse response)throws RuntimeException {
                 // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
 
-                log.info("[logOut] 로그아웃을 시도하고 있습니다. email : {}",email);
-                LogOutResultDto logOutResultDto = signService.logOut(email);
+                log.info("[logOut] 로그아웃을 시도하고 있습니다.");
+                String token = requset.getHeader("ssonToken");
+                log.info("[logout] 로그아웃 요청에 포함되어있는 토큰정보 : {}", token);
+                String logoutResult = signService.logOut(token);
+                log.info("[logout] 로그아웃 결과 : {}", logoutResult);
+                if (logoutResult.equals("success")) {
+                    log.info("[logOut] 정상적으로 refreshToken이 제거 되었습니다.");
+                    log.info("[logOut] 정상적으로 쿠키의 accessToken을 제거합니다.");
+                    cookieUtil.deleteCookie(requset,response,"ssonToken");
 
-                if (logOutResultDto.getCode() == 0) {
-                    log.info("[logOut] 정상적으로 로그아웃 되었습니다. email : {}", email);
-                    log.info("[logOut] logOutResultDto가 가지고 있는 정보 : {} ",logOutResultDto);
-                }
-                return  DataResponseBodyFormatter.put(SuccessCode.SUCCESS,  logOutResultDto);
+                    return  DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "success");
+                }else
+                return  DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "fail");
             }
+
+    @PostMapping("/user/refresh-token")
+    public ResponseEntity<ResponseBodyFormatter> refreshToken(HttpServletRequest request,HttpServletResponse response) {
+
+        log.info("[refresh-token] accessToken 만료 재발급 시작");
+        log.info("[doFilterInternal] accessToken으로 refreshToken 조회 ");
+        String token = request.getHeader("ssonToken");
+        String refreshToken = redisService.getTokens(token);
+        log.info("[doFilterInternal] redis에서 가져온 refreshToken : {}", refreshToken);
+
+        if(jwtTokenProvider.validateToken(refreshToken)){
+            log.info("[doFilterInternal] redis에서 가져온 refreshToken 값 유효성 체크 완료");
+            log.info("[doFilterInternal] 새로운 accessToken발급후 인증객체 등록");
+            String newAccessToken = jwtTokenProvider.reissue(jwtTokenProvider.getUserId(refreshToken), jwtTokenProvider.getTeamId(refreshToken));
+            Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
+            // 토큰이 유효하면 인증객체를 SecurityContestHolder에 저장한다
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            // 새로운 accessToken을 클라이언트에게 전달
+            ResponseEntity<ResponseBodyFormatter> responseEntity = DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
+            response.setHeader("ssonToken",newAccessToken);
+            // 리다이렉트 URL을 클라이언트에게 전달
+
+            responseEntity.getHeaders().set("Location", "/user/logout"); // "/path-to-redirect"는 실제 리다이렉트할 URL로 변경해야 합니다.
+
+            return responseEntity;
+
+        } else {
+            // refreshToken이 유효하지 않으면 401 Unauthorized 응답을 보냄
+            return  DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "fail");
+        }
+    }
 
     /**
      *

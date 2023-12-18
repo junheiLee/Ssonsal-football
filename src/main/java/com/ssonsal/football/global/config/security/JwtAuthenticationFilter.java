@@ -56,16 +56,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }else{
             //accessToken값이 유효하지 않기때문에 redis에 저장되어있는 refreshToken의 이 유효한지를 확인한다.
             //먼저 레디스에 저장되어있는 토큰값을 들고와야함
-            Long userId = jwtTokenProvider.getUserId(token);
-            Long teamId = jwtTokenProvider.getTeamId(token);
-            String refreshToken = redisService.getRefreshToken(String.valueOf(userId));
+            log.info("[doFilterInternal] accessToken 만료 재발급 시작");
+            log.info("[doFilterInternal] accessToken으로 refreshToken 조회 ");
+            String refreshToken = redisService.getTokens(token);
+            log.info("[doFilterInternal] redis에서 가져온 refreshToken : {}", refreshToken);
             if(jwtTokenProvider.validateToken(refreshToken)){
-
-
-            Authentication authentication = jwtTokenProvider.getAuthentication(jwtTokenProvider.reissue(userId,teamId));
+                log.info("[doFilterInternal] redis에서 가져온 refreshToken 값 유효성 체크 완료");
+                log.info("[doFilterInternal] 새로운 accessToken발급후 인증객체 등록");
+                String newAccessToken = jwtTokenProvider.reissue(jwtTokenProvider.getUserId(refreshToken), jwtTokenProvider.getTeamId(refreshToken));
+                servletResponse.setHeader("ssonToken",newAccessToken);
+            Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
             // 토큰이 유효하면 인증객체를 SecurityContestHolder에 저장한다
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("[doFilterInternal] 새로발급한 reAccessToken 값 유효성 체크 완료");
+            log.info("[doFilterInternal] 새로운 accessToken발급후 인증객체 등록완료");
             }
         }
 
