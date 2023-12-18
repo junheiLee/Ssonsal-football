@@ -39,5 +39,9 @@ public class Report extends BaseEntity {
         this.reason = reason;
         this.reportCode = reportCode;
     }
+
+    public void updateReport(int reportCode) {
+        this.reportCode = reportCode;
+    }
 }
 

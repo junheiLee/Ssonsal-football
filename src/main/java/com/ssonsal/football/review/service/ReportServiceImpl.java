@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ReportServiceImpl implements ReportService {
 
     private final ReportRepository reportRepository;
@@ -29,7 +30,6 @@ public class ReportServiceImpl implements ReportService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public List<ReportResponseDto> getAllReports() {
         List<Report> reports = reportRepository.findAll();
 
@@ -44,9 +44,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
+    @Transactional
     public ReportResponseDto createReport(ReportRequestDto reportRequestDto, Long userId) {
 
-        User user =userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findById(userId).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Review review = reviewRepository.findById(reportRequestDto.getReviewId())
@@ -58,19 +59,20 @@ public class ReportServiceImpl implements ReportService {
                 .user(user)
                 .build();
 
-        reportRepository.save(report);
+        Report newReport = reportRepository.save(report);
 
-        return ReportResponseDto.fromEntity(report);
+        return ReportResponseDto.fromEntity(newReport);
     }
 
     @Transactional
     public void updateDeleteCode(Long reportId, Integer reportCode) {
-        reportRepository.findById(reportId)
+        Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.ID_NOT_FOUND));
+
         if (!(reportCode == 0 || reportCode == 1)) {
             throw new CustomException(ReviewErrorCode.STATUS_ERROR);
         }
 
-        reportRepository.updateReportCode(reportId, reportCode);
+        report.updateReport(reportCode);
     }
 }
