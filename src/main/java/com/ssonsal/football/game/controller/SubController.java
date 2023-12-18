@@ -52,7 +52,7 @@ public class SubController {
     public ResponseEntity<ResponseBodyFormatter> SubAccept(@RequestBody ApprovalSubRequestDto approvalSubDto,
                                                            @PathVariable Long matchApplicationId) {
 
-        Long loginUserId = 1L;
+        Long loginUserId = 8L;
         Long createdSubId = subService.acceptSub(loginUserId, matchApplicationId, approvalSubDto);
 
         return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CREATED_SUB_ID, createdSubId));

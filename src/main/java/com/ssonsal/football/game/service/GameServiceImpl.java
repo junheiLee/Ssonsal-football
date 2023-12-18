@@ -68,8 +68,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     @Transactional
-    public Long createGame(Long loginUserId, GameRequestDto gameDto, MatchApplicationRequestDto homeDto) {
+    public Long createGame(Long loginUserId, GameRequestDto gameDto ) {
 
+        MatchApplicationRequestDto homeDto = new MatchApplicationRequestDto(gameDto);
         validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());
         User loginUser = getUser(loginUserId);
         Team home = getUserTeam(loginUser);
@@ -79,7 +80,7 @@ public class GameServiceImpl implements GameService {
                         .writer(loginUser)
                         .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
-                        .schedule(stringToLocalDateTime(gameDto.getSchedule()))
+                        .schedule(stringToLocalDateTime(gameDto.getDate() + " " + gameDto.getTime()))
                         .gameRequestDto(gameDto)
                         .build());
 
@@ -223,7 +224,7 @@ public class GameServiceImpl implements GameService {
         // 게임 정보 변경
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
-        game.update(stringToLocalDateTime(updateGameDto.getSchedule()), updateGameDto);
+        game.update(stringToLocalDateTime(updateGameDto.getDate() + " " + updateGameDto.getTime()), updateGameDto);
 
         MatchApplication homeTeam
                 = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), game.getId())

@@ -41,29 +41,19 @@ public class GameController {
     /**
      * 게임 생성 시, 호출되는 api
      *
-     * @param obj 게임 생성에 필요한 정보
+     * @param gameDto 게임 생성에 필요한 정보
      * @return 성공 코드와 생성된 게임 아이디를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody ObjectNode obj) {
+    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody GameRequestDto gameDto) {
 
         Long loginUserId = 3L;
         Map<String, Long> createGameResponseDto;
 
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            GameRequestDto gameDto
-                    = mapper.treeToValue(obj.get(GAME), GameRequestDto.class);
-            MatchApplicationRequestDto homeTeamDto
-                    = mapper.treeToValue(obj.get(HOME), MatchApplicationRequestDto.class);
+        log.info("아니 이게 무슨 일 ={}", gameDto.toString());
 
-            Long gameId = gameService.createGame(loginUserId, gameDto, homeTeamDto);
-            createGameResponseDto = longIdToMap("createdGameId", gameId);
-
-        } catch (JsonProcessingException e) {
-            log.error("찾을 수 없는 key : value 입니다.");
-            throw new CustomException(e, ErrorCode.WRONG_JSON_FORMAT);
-        }
+        Long gameId = gameService.createGame(loginUserId, gameDto);
+        createGameResponseDto = longIdToMap("createdGameId", gameId);
 
         return DataResponseBodyFormatter.put(SUCCESS, createGameResponseDto);
     }
