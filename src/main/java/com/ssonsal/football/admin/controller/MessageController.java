@@ -55,7 +55,9 @@ public class MessageController {
         }
 
         try {
+
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.publishMessage(topicArn, responseMessageDTO));
+
         } catch (CustomException e) {
             log.error("메세지 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.MESSAGE_SEND_FAILED);
@@ -75,7 +77,9 @@ public class MessageController {
         }
         try {
             alarmService.unsubscribeMessage(topicArn, userId);
+
             return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
+
         } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

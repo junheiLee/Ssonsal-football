@@ -8,7 +8,7 @@ import com.ssonsal.football.review.dto.response.ScoreResponseDto;
 import java.util.List;
 
 public interface ReviewService {
-    ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto);
+    ReviewResponseDto createReview(ReviewRequestDto reviewRequestDto, Long userId);
 
     List<ReviewListResponseDto> userReviewList(Long userId);
 
@@ -21,4 +21,8 @@ public interface ReviewService {
     ScoreResponseDto subAvgScore(Long userId);
 
     ScoreResponseDto teamAvgScore(Long teamId);
+
+    void updateSubAvgScore(ScoreResponseDto scoreResponseDto, Long userId);
+
+    void updateTeamAvgScore(ScoreResponseDto scoreResponseDto, Long teamId);
 }

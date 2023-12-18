@@ -1,12 +1,15 @@
 package com.ssonsal.football.user.service.impl;
 
-import com.ssonsal.football.global.config.CommonResponse;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
-import com.ssonsal.football.user.dto.*;
+import com.ssonsal.football.user.dto.ProfileResultDto;
+import com.ssonsal.football.user.dto.SignInRequestDto;
+import com.ssonsal.football.user.dto.SignInResultDto;
+import com.ssonsal.football.user.dto.SignUpRequestDto;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
+import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.SignService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +31,7 @@ public class SignServiceImpl implements SignService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final RedisService redisService;
 
 
     @Value("${spring.jwt.token.access-expiration-time}")
@@ -54,43 +58,46 @@ public class SignServiceImpl implements SignService {
             String accessToken = jwtTokenProvider.generateToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
                     accessTokenValid,
-                    existUser.getRole(),"accessToken");
+                    existUser.getRole(), "accessToken");
             log.info("[accessToken] accessToken 토큰 확인 : {}", accessToken);
             log.info("[refreshToken] refreshToken 토큰 생성");
             String refreshToken = jwtTokenProvider.generateToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
                     refreshTokenValid,
-                    existUser.getRole(),"refreshToken");
+                    existUser.getRole(), "refreshToken");
             log.info("[refreshToken] refreshToken 토큰 확인 : {}", refreshToken);
+            log.info("[saveTokens] 재발행을 위한 토큰 저장 만료일은 refresh와 동일 ");
+            redisService.setTokens(accessToken, refreshToken, refreshTokenValid);
             log.info("[signInResultDto] 작성 시작");
-            SignInResultDto signInResultDto = new SignInResultDto(existUser,accessToken,refreshToken);
+            SignInResultDto signInResultDto = new SignInResultDto(existUser, accessToken, refreshToken);
             log.info("[signInResultDto] 확인 : {}", signInResultDto);
-            return  signInResultDto;
+            return signInResultDto;
         } else {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
 
     }
+
     @Override
     @Transactional
     public Optional<User> signUp(SignUpRequestDto signUpRequestDto) {
-        log.info("[signUpService] 회원가입을 수행합니다. 입력값 확인 : {}",signUpRequestDto);
+        log.info("[signUpService] 회원가입을 수행합니다. 입력값 확인 : {}", signUpRequestDto);
 
         try {
             User user = User.builder()
-                        .email(signUpRequestDto.getEmail())
-                        .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
-                        .name(signUpRequestDto.getName())
-                        .birth(signUpRequestDto.getBirth())
-                        .gender(signUpRequestDto.getGender())
-                        .nickname(signUpRequestDto.getNickname())
-                        .position(signUpRequestDto.getPosition())
-                        .phone(signUpRequestDto.getPhone())
-                        .intro(signUpRequestDto.getIntro())
-                        .preferredTime(signUpRequestDto.getPreferredTime())
-                        .preferredArea(signUpRequestDto.getPreferredArea())
-                        .role(signUpRequestDto.getRole())
-                        .build();
+                    .email(signUpRequestDto.getEmail())
+                    .password(passwordEncoder.encode(signUpRequestDto.getPassword()))
+                    .name(signUpRequestDto.getName())
+                    .birth(signUpRequestDto.getBirth())
+                    .gender(signUpRequestDto.getGender())
+                    .nickname(signUpRequestDto.getNickname())
+                    .position(signUpRequestDto.getPosition())
+                    .phone(signUpRequestDto.getPhone())
+                    .intro(signUpRequestDto.getIntro())
+                    .preferredTime(signUpRequestDto.getPreferredTime())
+                    .preferredArea(signUpRequestDto.getPreferredArea())
+                    .role(signUpRequestDto.getRole())
+                    .build();
 
 
             log.info("[signUpService] User 객체 생성 확인 - {}", user.toString());
@@ -110,33 +117,44 @@ public class SignServiceImpl implements SignService {
     }
 
     @Override
-    public LogOutResultDto logOut(String email) throws RuntimeException{
-        log.info("[logOut] signDataHandler로 회원 정보 요청 ");
-        //User user = userRepository.getByEmail(email);
-        log.info("[logOut] Email : {}", email);
-        log.info("[logOut] Email 정보로 redis에서 토큰 블랙리스트 처리");
-        log.info("[removeRefreshToken] ");
-        log.info("[logOut] Email 정보로 redis에서 토큰 제거");
-        log.info("[BlackedToken] ");
-        LogOutResultDto logOutResultDto = new LogOutResultDto();
+    @Transactional
+    public String logOut(String token) throws RuntimeException {
+        log.info("[logOut] signDataHandler로 회원 정보 요청 하기 위한 토큰 : {}", token);
+        Long userId = jwtTokenProvider.getUserId(token);
+        log.info("[logOut] userId : {}", userId);
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()) {
+            log.info("[logout] 유저ID로 검색한 유저 정보 : {}", user.get().getId());
+            log.info("[logOut] Email 정보로 redis에서 토큰 블랙리스트 처리");
+            log.info("[removeRefreshToken] ");
+            log.info("[logOut] Email 정보로 redis에서 토큰 제거");
+            Boolean deleteResult = redisService.deleteRefreshToken(user.get().getId().toString());
+            if (deleteResult) {
+                log.info("[removeToken] 정상 처리 완료");
+                log.info("[logOut] 작업 완료");
+                return "success";
+            } else {
+                log.info("[Logout] Error");
+                return "fail";
+            }
 
-//        if (!redis.getRefreshToken().isEmpty()) {
-//            log.info("[removeToken] 정상 처리 완료");
-//            setSuccessResult(logOutResultDto);
-//        } else {
-//            log.info("[removeToken] 실패 처리 완료");
-//            setFailResult(logOutResultDto);
-//        }
-        log.info("[logOut] 작업 완료");
-        return logOutResultDto;
+        } else {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
+        //User user = userRepository.getByEmail(email);
     }
 
     @Override
-    public ProfileResultDto viewProfile(String token) throws RuntimeException{
+    public ProfileResultDto viewProfile(String token) throws RuntimeException {
         Long userId = jwtTokenProvider.getUserId(token);
+        log.info("[viewPofile] : 토큰에서 유저ID가져옴 : {}", userId);
+        log.info("[viewPofile] 유저 정보 검색 시작");
         Optional<User> user = userRepository.findById(userId);
+        log.info("[viewPofile] 유저ID로 검색한 유저 정보 Optional : {}", user);
         if (user.isPresent()) {
-            return  new ProfileResultDto(user.get());
+            log.info("[viewPofile] 유저ID로 검색한 유저 정보 : {}", user.get());
+            log.info("[viewPofile] Dto 생성결과 : {}", new ProfileResultDto(user.get()));
+            return new ProfileResultDto(user.get());
         } else {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }

@@ -118,8 +118,10 @@ public class AdminManagementController {
 
             LocalDate currentDate = selectedDateTime.toLocalDate();
 
+
             StatsDTO monthStats = statsService.monthStats(currentDate);
             Map<LocalDate, StatsDTO> monthlyDailyStats = statsService.monthlyDailyStats(currentDate);
+
 
             return DataResponseBodyFormatter.put(
                     SuccessCode.SUCCESS,

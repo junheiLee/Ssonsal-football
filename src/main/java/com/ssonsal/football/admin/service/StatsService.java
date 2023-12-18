@@ -29,6 +29,7 @@ public interface StatsService {
     StatsDTO monthStats(LocalDate currentDate);
 
 
+
     // ======================================= 월간 데이터 ===========================================
 
     /**
@@ -38,10 +39,12 @@ public interface StatsService {
      * monthDayStats 맵에 추가
      * request: 특정 날짜를 가져온다
      * response:날짜에 대한 계산된 모든 통계를 반환한다
+
      */
     Map<LocalDate, StatsDTO> monthlyDailyStats(LocalDate currentDate);
 
     /**
+
      * 월간 일별 데이터 DTO 생성
      * 제공된 게임 목록 dailyGames을 기반으로
      * 해당 날짜에 대한 확정된 경기 수 및 취소된 경기 수를 계산
@@ -49,6 +52,7 @@ public interface StatsService {
      * response: 지정된 날짜의 확정 경기와 취소 경기를 DTO에 담는다
      */
     StatsDTO dayStats(LocalDate date, List<Game> dailyGames);
+
 
     /**
      * 날짜가 지나면 deleteCode 변경
@@ -70,11 +74,13 @@ public interface StatsService {
     long calculateGameCount(LocalDate startDate, LocalDate endDate, List<Game> dailyGames, int matchStatus);
 
     /**
+
      * 전체 회원 수 구하는 로직
      *
      * @return User테이블의 모든 id 값을 꺼내서 그 갯수를 반환
      */
     long getTotalUserCount();
+
 
     /**
      * 신규 회원자 수 구하는 로직
@@ -100,6 +106,7 @@ public interface StatsService {
      */
     long getTodayGamesCount();
 
+
     /**
      * Admin Main 페이지에 전달할 데이터들을 각 변수로 반환
      *
@@ -107,3 +114,4 @@ public interface StatsService {
      */
     Map<String, Long> getAdminStats();
 }
+

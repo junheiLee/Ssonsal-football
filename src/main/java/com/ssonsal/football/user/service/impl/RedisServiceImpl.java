@@ -1,6 +1,5 @@
 package com.ssonsal.football.user.service.impl;
 
-import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.user.service.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +17,21 @@ public class RedisServiceImpl implements RedisService {
     private final RedisTemplate<String, String> redisTemplate;
 //    private final JwtTokenProvider jwtTokenProvider;
 
-    // key-value = RefrshToken-Email
-    public void setRefreshToken(String refreshToken, String email, long expiration) {
+    // key-value = id- refreshToken
+    public void setRefreshToken(String refreshToken, String id, long expiration) {
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
+        log.info("[RedisServiceImpl] setRefreshToken 호출 refreshToken={}, id={}, expiration={}", refreshToken, id, Duration.ofSeconds(expiration));
+        // 만료시간 이후 삭제
+        valueOperations.set(id, refreshToken, Duration.ofSeconds(expiration));
+        log.info("만료 시간, 분: {}", Duration.ofMinutes(expiration));
+    }
+
+    public void setTokens(String accessToken, String refreshToken, long expiration) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
         // 만료시간 이후 삭제
-        valueOperations.set(refreshToken, email, Duration.ofMinutes(expiration));
-        log.info("만료 시간, 분: {}", Duration.ofMinutes(expiration));
+        valueOperations.set(accessToken, refreshToken, Duration.ofSeconds(expiration));
+        log.info("만료 시간, 분: {}", Duration.ofSeconds(expiration));
     }
 
     // AccessToken 로그아웃
@@ -41,22 +48,26 @@ public class RedisServiceImpl implements RedisService {
 
 
     // get RefreshToken
-    public String getRefreshToken(String refreshToken) {
+    public String getRefreshToken(String userId) {
+        log.info("[RedisServiceImpl] 호출 userId={}", userId);
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        log.info("[getRefreshToken] : redis 에서 email로 조회한 refreshToken : {}", valueOperations.get(refreshToken));
+        log.info("[getRefreshToken] : redis 에서 email로 조회한 refreshToken : {}", valueOperations.get(userId));
         // RefreshToken 없으면 null 반환
-        return valueOperations.get(refreshToken);
+        String result = valueOperations.get(userId);
+        log.info("getRefreshToken : {}", result.getClass().getName());
+        return result;
     }
 
     // get AccessToken
-    public String getAccessToken(String accessToken) {
+    public String getTokens(String accessToken) {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
         return valueOperations.get(accessToken);
     }
 
     // delete RefreshToken
-    public void deleteRefreshToken(String refreshToken) {
+    public boolean deleteRefreshToken(String userId) {
         // delete 메서드 삭제 시 true 반환
-        redisTemplate.delete(refreshToken);
+        log.info("[deleteRefreshToken] 요청된 값을 제거합니다 : {}", userId);
+        return redisTemplate.delete(userId);
     }
 }

@@ -10,11 +10,9 @@
 package com.ssonsal.football.global.config.security;
 
 import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.CookieUtil;
 import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
-import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.impl.RedisServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -33,20 +31,17 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * JWT 토큰을 생성하고 유효성을 검증하는 컴포넌트 클래스 JWT 는 여러 암호화 알고리즘을 제공하고 알고리즘과 비밀키를 가지고 토큰을 생성
  * 유저 정보로 JWT access/refresh 토큰을 생성하고 발급받음
  * claim 정보에는 토큰에 부가적으로 정보를 추가할 수 있음 claim 정보에 회원을 구분할 수 있는 값을 세팅하였다가 토큰이 들어오면 해당 값으로 회원을 구분하여 리소스
  * 제공
- *
+ * <p>
  * JWT 토큰에 expire time을 설정할 수 있음
  */
 
@@ -58,7 +53,7 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService; // Spring Security 에서 제공하는 서비스 레이어
     private final RedisServiceImpl redisServiceimpl;
-    private  final RedisTemplate<String,String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
     @Value("${springboot.jwt.secret}")
     private String secretKey;
@@ -76,19 +71,20 @@ public class JwtTokenProvider {
     @PostConstruct
     protected void init() {
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 시작");
-        log.info("[init] @Value 로 주입받은 secretKey : {}",secretKey);
+        log.info("[init] @Value 로 주입받은 secretKey : {}", secretKey);
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
-        log.info("[init] 복호화 된 secretKey : {}",secretKey);
+        log.info("[init] 복호화 된 secretKey : {}", secretKey);
         log.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
     }
-    public String generateToken(Long id,Long teamId, long expirationTime, int role, String tokenType) {
+
+    public String generateToken(Long id, Long teamId, long expirationTime, int role, String tokenType) {
         Date now = new Date();
         return createToken(id, teamId, new Date(now.getTime() + expirationTime), role, tokenType);
     }//지금은 email로 설정해 뒀는데 토큰에 이메일을 넣는건 보안상 좋지 않은것 같음 => pk인 id값으로 변경예정
 
 
     // JWT 토큰 생성
-    public String createToken(Long id,Long teamId,Date expiry ,int role, String tokenType) {
+    public String createToken(Long id, Long teamId, Date expiry, int role, String tokenType) {
         log.info("[createToken] 토큰 생성 시작");
         Claims claims = Jwts.claims().setSubject("userInfo");
         claims.put("id", id);
@@ -106,27 +102,27 @@ public class JwtTokenProvider {
 
 
         log.info("[createToken] 토큰 생성 완료 : {}", token);
-        if (tokenType.equals("refreshToken")){// redis에 저장
+        if (tokenType.equals("refreshToken")) {// redis에 저장
             log.info("[saveRefreshToken] redis에 refresh 토큰 저장 ");
-            redisServiceimpl.setRefreshToken(String.valueOf(id),token,refreshExpirationTime);
+            redisServiceimpl.setRefreshToken(token, String.valueOf(id), refreshExpirationTime);
         }
         return token;
     }
 
 
     // JWT 토큰으로 인증 정보 조회
-    public Authentication getAuthentication(String token) throws RuntimeException{
+    public Authentication getAuthentication(String token) throws RuntimeException {
         log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
         Optional<User> user = userRepository.findById(this.getUserId(token));
-        if(user.isPresent()){
+        if (user.isPresent()) {
             String email = user.get().getEmail();
-            log.info("[findEmailById] 제댜로 값을 불러옴 : {}",email);
+            log.info("[findEmailById] 제댜로 값을 불러옴 : {}", email);
             UserDetails userDetails = userDetailsService.loadUserByUsername(email);
             log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}",
                     userDetails.getUsername());
             return new UsernamePasswordAuthenticationToken(userDetails, "",
                     userDetails.getAuthorities());
-        }else {
+        } else {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     }
@@ -135,6 +131,7 @@ public class JwtTokenProvider {
         Claims claims = getClaims(token);
         return claims.get("id", Long.class);
     }
+
     public Long getTeamId(String token) {
         Claims claims = getClaims(token);
         return claims.get("teamId", Long.class);
@@ -146,6 +143,7 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
     // JWT 토큰에서 회원 구별 정보 추출, getUserEmail로 변경필요
     public String getUsername(String token) {
         log.info("[getUsername] 토큰 기반 회원 구별 정보 추출");
@@ -173,7 +171,7 @@ public class JwtTokenProvider {
 //        log.info("[resolveToken] HTTP 헤더에서 Token 값 추출 3 : {}", request.getHeader("Cookie"));
 
 //        return token;
-        log.info("[resloveToken] 헤더에서 값을 제대로 가져오는지 ssonToken : {}",request.getHeader("ssonToken"));//대소문자안먹음
+        log.info("[resloveToken] 헤더에서 값을 제대로 가져오는지 ssonToken : {}", request.getHeader("ssonToken"));//대소문자안먹음
         return request.getHeader("ssonToken");
     }
 
@@ -190,20 +188,21 @@ public class JwtTokenProvider {
         }
     }
 
-    public String reissue(Long userId, Long teamId){
-        log.info("[reissue] : 토큰 재발급 시작" );
+    public String reissue(Long userId, Long teamId) {
+        log.info("[reissue] : 토큰 재발급 시작");
         int role = 1;//role 정보도 가져와야 함
-        String reAccessToken = generateToken(userId,teamId,accessExpirationTime,role,"accessToken");
+        String reAccessToken = generateToken(userId, teamId, accessExpirationTime, role, "accessToken");
+        log.info("[reissue] : 토큰 재발급 완료 : {}", reAccessToken);
         return reAccessToken;
     }
 
-    public String getCookieValue(Cookie[]cookies,String cookieName){
-        for(Cookie cookie : cookies){
-            if(cookie.getName().equals(cookieName)){
+    public String getCookieValue(Cookie[] cookies, String cookieName) {
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(cookieName)) {
                 return cookie.getValue();
             }
         }
-        return"";
+        return "";
     }
 
 

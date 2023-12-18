@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,11 +13,11 @@ import lombok.ToString;
 public class LogOutResultDto {
 
 
-        private boolean success;
+    private boolean success;
 
-        private int code;
+    private int code;
 
-        private String msg;
+    private String msg;
 
 
 }

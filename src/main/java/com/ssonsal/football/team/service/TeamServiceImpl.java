@@ -7,7 +7,6 @@ import com.ssonsal.football.team.dto.request.TeamCreateDto;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.team.dto.response.*;
 import com.ssonsal.football.team.entity.*;
-import com.ssonsal.football.team.exception.TeamErrorCode;
 import com.ssonsal.football.team.repository.TeamApplyRepository;
 import com.ssonsal.football.team.repository.TeamRecordRepository;
 import com.ssonsal.football.team.repository.TeamRejectRepository;
@@ -69,7 +68,7 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<TeamListDto> findRecruitList() {
 
-        List<Team> teamList = teamRepository.findAllByRecruitOrderByIdDesc(1);
+        List<Team> teamList = teamRepository.findAllByRecruitOrderByIdDesc(RECRUIT);
 
         return teamList.stream()
                 .map(team -> new TeamListDto(team, findRank(team.getId()), findAgeAverage(team.getId())))
@@ -131,10 +130,10 @@ public class TeamServiceImpl implements TeamService {
 
         if (teamCreateDto.getLogo() != null && !teamCreateDto.getLogo().isEmpty()) {
             try {
-                key = amazonS3Util.upload(teamCreateDto.getLogo(), "teamLogo");
+                key = amazonS3Util.upload(teamCreateDto.getLogo(), TEAM_LOGO);
             } catch (IOException e) {
                 log.error("S3에 이미지 저장 실패");
-                throw new CustomException(TeamErrorCode.AMAZONS3_ERROR);
+                throw new CustomException(ErrorCode.AMAZONS3_ERROR);
             }
 
             url = amazonS3Util.getFileUrl(key);
@@ -143,17 +142,22 @@ public class TeamServiceImpl implements TeamService {
             url = DEFAULT_IMAGE;
         }
 
-        User userInfo = userRepository.findById(user).orElseThrow(
+        User loginUser = userRepository.findById(user).orElseThrow(
                 () -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         teamCreateDto.setLeaderId(user);
 
-        Team team = teamRepository.save(teamCreateDto.toEntity(teamCreateDto, url, key));
+        Team team = teamRepository.save(
+                Team.builder()
+                        .teamCreateDto(teamCreateDto)
+                        .logoUrl(url)
+                        .logoKey(key)
+                        .build());
 
         TeamRecord teamRecord = new TeamRecord(team);
         teamRecordRepository.save(teamRecord);
 
-        userInfo.joinTeam(team);
+        loginUser.joinTeam(team);
 
         Map<String, Object> newTeam = new HashMap<>();
         newTeam.put(TEAM_ID, team.getId());
@@ -169,7 +173,7 @@ public class TeamServiceImpl implements TeamService {
      * @return TeamEditFormDto 수정할 수 있는 값
      */
     @Override
-    public TeamEditFormDto findTeamInfo(Long teamId) {
+    public TeamEditFormDto loadEditTeam(Long teamId) {
 
         Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
@@ -186,9 +190,9 @@ public class TeamServiceImpl implements TeamService {
      */
     @Override
     @Transactional
-    public Long editTeam(TeamEditDto teamEditDto) {
+    public Long editTeam(TeamEditDto teamEditDto, Long teamId) {
 
-        Team team = teamRepository.findById(teamEditDto.getId()).orElseThrow(
+        Team team = teamRepository.findById(teamId).orElseThrow(
                 () -> new CustomException(ErrorCode.TEAM_NOT_FOUND));
 
         String key = team.getLogoKey();
@@ -199,7 +203,7 @@ public class TeamServiceImpl implements TeamService {
                 key = amazonS3Util.upload(teamEditDto.getLogo(), "teamLogo");
             } catch (IOException e) {
                 log.error("S3에 이미지 저장 실패");
-                throw new CustomException(TeamErrorCode.AMAZONS3_ERROR);
+                throw new CustomException(ErrorCode.AMAZONS3_ERROR);
             }
 
             url = amazonS3Util.getFileUrl(key);
@@ -209,7 +213,7 @@ public class TeamServiceImpl implements TeamService {
             }
         }
 
-        team.TeamUpdate(teamEditDto, url, key);
+        team.updateInfo(teamEditDto, url, key);
 
         return team.getId();
     }

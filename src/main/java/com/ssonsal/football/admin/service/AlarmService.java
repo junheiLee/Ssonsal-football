@@ -51,7 +51,9 @@ public interface AlarmService {
      * @param gameInfo 경기 정보를 가져온다
      * @return 성공 메세지와 경기 정보들을 jsonMessage로 한 객체에 저장한다
      */
+
     String buildConfirmationMessage(MessageDTO gameInfo);
+
 
     /**
      * 주제 생성
@@ -92,7 +94,9 @@ public interface AlarmService {
      *                 메세지 내용을 가지고와 그 text로 이메일이 보내진다
      * @return 메세지와 메시지id
      */
+
     String publishEmail(String topicArn, Map<String, String> payload);
+
 
     /**
      * 이메일 구독 취소
@@ -104,7 +108,9 @@ public interface AlarmService {
      *                 userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
      * @return
      */
+
     String unsubscribe(String topicArn, Long userId);
+
 
     // ------------------------------------------메시지----------------------------------------------------------
 
@@ -126,6 +132,7 @@ public interface AlarmService {
      */
     String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO);
 
+
     /**
      * <p> </p> 이거 같은 태그 제거
      * dependency 추가함
@@ -134,6 +141,7 @@ public interface AlarmService {
      * @return
      */
     String removePTags(String html);
+
 
     /**
      * 메세지 수신 취소
@@ -144,5 +152,6 @@ public interface AlarmService {
      *                 userId의 번호은 고유값이니
      *                 userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
      */
+
     String unsubscribeMessage(String topicArn, Long userId);
 }

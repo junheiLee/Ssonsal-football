@@ -165,4 +165,8 @@ public class User extends BaseEntity implements UserDetails {
         team.getUsers().add(this);
     }
 
+    public void updateScore(Float mannerScore, Float skillScore) {
+        this.mannerScore = mannerScore;
+        this.skillScore = skillScore;
+    }
 }

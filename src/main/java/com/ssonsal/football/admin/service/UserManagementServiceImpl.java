@@ -59,8 +59,6 @@ public class UserManagementServiceImpl implements UserManagementService {
     }
 
 
-
-    @Override
     @Transactional
     public void updateRoles(List<Integer> userIds) {
         userIds.stream()
@@ -72,6 +70,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                     user.updateRole(newRole);
                 });
     }
+
 
     public boolean isAdmin(Long userId) {
         User user = userRepository.findById(userId)

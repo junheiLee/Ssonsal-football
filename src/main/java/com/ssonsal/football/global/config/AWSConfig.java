@@ -1,24 +1,24 @@
 package com.ssonsal.football.global.config;
 
 import lombok.Getter;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
- @Getter
-    @Configuration
-    public class AWSConfig {
 
-     @Value("${sns.topic.snsTopicARN}")
-     private String snsTopicARN;
+@Getter
+@Configuration
+public class AWSConfig {
 
-     @Value("${aws.awsAccessKey}")
-     private String awsAccessKey;
+    @Value("${sns.topic.snsTopicARN}")
+    private String snsTopicARN;
 
-     @Value("${aws.awsSecretKey}")
-     private String awsSecretKey;
+    @Value("${aws.awsAccessKey}")
+    private String awsAccessKey;
 
-     @Value("${aws.awsRegion}")
-     private String awsRegion;
+    @Value("${aws.awsSecretKey}")
+    private String awsSecretKey;
 
-    }
+    @Value("${aws.awsRegion}")
+    private String awsRegion;
+
+}
 
