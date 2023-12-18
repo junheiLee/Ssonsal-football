@@ -30,7 +30,7 @@ public interface TeamService {
 
     public String findAgeGroup(char second);
 
-    Long editTeam(TeamEditDto teamEditDto);
+    Long editTeam(TeamEditDto teamEditDto, Long teamId);
 
     Map<String, Object> createTeam(TeamCreateDto teamCreateDto, Long user);
 
@@ -38,6 +38,6 @@ public interface TeamService {
 
     boolean checkNameDuplicate(String name);
 
-    TeamEditFormDto findTeamInfo(Long teamId);
+    TeamEditFormDto loadEditTeam(Long teamId);
 
 }

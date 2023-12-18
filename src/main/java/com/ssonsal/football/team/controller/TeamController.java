@@ -2,6 +2,7 @@ package com.ssonsal.football.team.controller;
 
 import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.team.dto.request.TeamCreateDto;
@@ -41,7 +42,7 @@ public class TeamController {
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> findAllTeams() {
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findAllTeams()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findAllTeams()));
     }
 
     /**
@@ -52,7 +53,7 @@ public class TeamController {
     @GetMapping("/recruit")
     public ResponseEntity<ResponseBodyFormatter> findAllRecruitTeams() {
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findRecruitList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findRecruitList()));
     }
 
     /**
@@ -64,7 +65,7 @@ public class TeamController {
     @GetMapping("/search")
     public ResponseEntity<ResponseBodyFormatter> findAllSearchTeams(@RequestParam String keyword) {
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(TEAMS, teamService.findSearchList(keyword)));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findSearchList(keyword)));
     }
 
     /**
@@ -92,7 +93,7 @@ public class TeamController {
         details.put(DETAIL, teamService.findTeamDetail(teamId));
         details.put(MEMBERS, teamService.findMemberList(teamId));
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, details);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, details);
     }
 
     /**
@@ -115,7 +116,7 @@ public class TeamController {
             }
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, teamService.findManageList(teamId));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, teamService.findManageList(teamId));
     }
 
     /**
@@ -133,7 +134,7 @@ public class TeamController {
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
         } else if (memberService.hasAnyTeam(user)) {
-            throw new CustomException(TeamErrorCode.MEMBER_ALREADY_TEAM);
+            throw new CustomException(TeamErrorCode.ALREADY_IN_TEAM);
         } else if (memberService.isUserOtherApply(user)) {
             throw new CustomException(TeamErrorCode.USER_ALREADY_APPLY);
         } else if (teamService.checkNameDuplicate(teamCreateDto.getName())) {
@@ -150,7 +151,7 @@ public class TeamController {
      * @return teamEditFormDto 기존 팀 정보 DTO
      */
     @GetMapping("/{teamId}/edit")
-    public ResponseEntity<ResponseBodyFormatter> editForm(@PathVariable Long teamId) {
+    public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId) {
 
         Long user = 1L;
 
@@ -160,7 +161,7 @@ public class TeamController {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.DATA_TRANSFER_SUCCESS, objectToMap(FORM, teamService.findTeamInfo(teamId)));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(FORM, teamService.loadEditTeam(teamId)));
     }
 
     /**
@@ -169,20 +170,21 @@ public class TeamController {
      * @param teamEditDto 팀 수정 form 데이터
      * @return 팀 아이디 값
      */
-    @PatchMapping
+    @PatchMapping("/{teamId}")
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto) {
+    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId) {
 
+        System.out.println(teamEditDto.toString());
         Long user = 1L;
 
         if (user == null) {
             throw new CustomException(TeamErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (!memberService.isTeamLeader(teamEditDto.getId(), user)) {
+        } else if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
-        } else if (teamService.checkNameDuplicate(teamEditDto.getName(), teamEditDto.getId())) {
+        } else if (teamService.checkNameDuplicate(teamEditDto.getName(), teamId)) {
             throw new CustomException(TeamErrorCode.DUPLICATE_TEAM_NAME);
         }
 
-        return DataResponseBodyFormatter.put(TeamSuccessCode.LEADER_EDIT_SUCCESS, Transfer.longIdToMap(TEAM_ID, teamService.editTeam(teamEditDto)));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, Transfer.longIdToMap(TEAM_ID, teamService.editTeam(teamEditDto, teamId)));
     }
 }

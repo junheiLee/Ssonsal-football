@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.ssonsal.football.team.util.TeamConstant.RECRUIT;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -208,6 +210,6 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public boolean isTeamRecruit(Long teamId) {
 
-        return teamRepository.existsByIdAndRecruit(teamId, 1);
+        return teamRepository.existsByIdAndRecruit(teamId, RECRUIT);
     }
 }

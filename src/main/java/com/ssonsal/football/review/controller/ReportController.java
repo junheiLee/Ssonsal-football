@@ -36,7 +36,7 @@ public class ReportController {
      * @return 성공 코드와 생성된 신고를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createReport(@RequestParam ReportRequestDto reportRequestDto) {
+    public ResponseEntity<ResponseBodyFormatter> createReport(@RequestBody ReportRequestDto reportRequestDto) {
         //토큰값으로 교체해야함
         Long user = 1L;
 

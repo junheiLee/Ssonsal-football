@@ -80,7 +80,7 @@ public class Team extends BaseEntity {
      * @param logoUrl     바뀐 로고 URL
      * @param logoKey     바뀐 로고 키
      */
-    public void TeamUpdate(TeamEditDto teamEditDto, String logoUrl, String logoKey) {
+    public void updateInfo(TeamEditDto teamEditDto, String logoUrl, String logoKey) {
         this.name = teamEditDto.getName();
         this.logoUrl = logoUrl;
         this.logoKey = logoKey;
@@ -99,7 +99,7 @@ public class Team extends BaseEntity {
         this.leaderId = userId;
     }
 
-    public void updateScore(Float mannerScore,Float skillScore){
+    public void updateScore(Float mannerScore, Float skillScore) {
         this.mannerScore = mannerScore;
         this.skillScore = skillScore;
     }
