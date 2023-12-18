@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.configuration.AWSConfig;
+import com.ssonsal.football.global.config.AWSConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import software.amazon.awssdk.services.sns.SnsClient;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CredentialServiceImpl implements CredentialService{
+public class CredentialServiceImpl implements CredentialService {
 
     private final AWSConfig awsConfig;
 

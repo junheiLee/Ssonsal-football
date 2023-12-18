@@ -3,9 +3,7 @@ package com.ssonsal.football.admin.controller;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
-import com.ssonsal.football.admin.service.AlarmServiceImpl;
 import com.ssonsal.football.admin.service.UserManagementService;
-import com.ssonsal.football.admin.service.UserManagementServiceImpl;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -121,7 +119,7 @@ public class SnsController {
      * 관리자가 작성한 text 내용이 이메일로 보내진다
      *
      * @param emailText 생성된 주제로 보내야 한다
-     *                      관리자가 작성한 text(이메일에 보내질 내용)
+     *                  관리자가 작성한 text(이메일에 보내질 내용)
      * @return 해당 주제로 본낸다
      */
 
@@ -129,7 +127,7 @@ public class SnsController {
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody Map<String, String> emailText) {
 
         log.info("컨트롤러 시작");
-        
+
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail";
 
         Long userId = 2L;
@@ -139,7 +137,7 @@ public class SnsController {
         }
 
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn,emailText));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.EMAIL_SEND_SUCCESS, alarmService.publishEmail(topicArn, emailText));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);

@@ -1,8 +1,8 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.AlarmDTO;
-import com.ssonsal.football.admin.dto.request.MessageDTO;
-import com.ssonsal.football.admin.dto.response.ResponseMessageDTO;
+import com.ssonsal.football.admin.dto.request.ResponseMessageDTO;
+import com.ssonsal.football.admin.dto.response.AlarmDTO;
+import com.ssonsal.football.admin.dto.response.MessageDTO;
 
 import java.util.Map;
 
@@ -65,10 +65,12 @@ public interface AlarmService {
     String createTopic(String topicName);
 
     // ------------------------------------------이메일----------------------------------------------------------
+
     /**
      * 이메일 구독 생성 기능
      * 구독을 생성하면
      * subscriptionArn와 userEmail을 저장한다
+     *
      * @param topicArn
      * @param userId
      * @return 성공 메세지와 구독 응답
@@ -77,18 +79,18 @@ public interface AlarmService {
 
     /**
      * 구독 이메일 인증 확인
+     *
      * @param topicArn
-     * @param userId
-     * 가져온 정보들로 aws sns에 저장된 값과 비교하여 구독 확인을 진행한다
+     * @param userId   가져온 정보들로 aws sns에 저장된 값과 비교하여 구독 확인을 진행한다
      * @return
      */
     String confirmSubscription(String topicArn, Long userId);
 
     /**
      * 이메일 보내기
-     * @param topicArn
-     * 이메일은 구독된 전체 회원에게 이메일이 보내진다
-     * 메세지 내용을 가지고와 그 text로 이메일이 보내진다
+     *
+     * @param topicArn 이메일은 구독된 전체 회원에게 이메일이 보내진다
+     *                 메세지 내용을 가지고와 그 text로 이메일이 보내진다
      * @return 메세지와 메시지id
      */
     String publishEmail(String topicArn, Map<String, String> payload);
@@ -96,18 +98,20 @@ public interface AlarmService {
     /**
      * 이메일 구독 취소
      * 이메일 수신을 원하지 않는 사용자들의 구독을 취소시킨다
+     *
      * @param topicArn
-     * @param userId
-     * userId로 해당 유저의 이메일을 가지고와
-     * userId의 이메일은 고유값이니
-     * userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
+     * @param userId   userId로 해당 유저의 이메일을 가지고와
+     *                 userId의 이메일은 고유값이니
+     *                 userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
      * @return
      */
     String unsubscribe(String topicArn, Long userId);
 
     // ------------------------------------------메시지----------------------------------------------------------
+
     /**
      * 메세지 구독
+     *
      * @param topicArn
      * @param userId
      * @return
@@ -116,6 +120,7 @@ public interface AlarmService {
 
     /**
      * 메세지 전송
+     *
      * @param topicArn
      * @param responseMessageDTO
      * @return
@@ -123,8 +128,9 @@ public interface AlarmService {
     String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO);
 
     /**
-     *  <p> </p> 이거 같은 태그 제거
-     *  dependency 추가함
+     * <p> </p> 이거 같은 태그 제거
+     * dependency 추가함
+     *
      * @param html
      * @return
      */
@@ -133,11 +139,11 @@ public interface AlarmService {
     /**
      * 메세지 수신 취소
      * 이메일 수신을 원하지 않는 사용자들의 구독을 취소시킨다
+     *
      * @param topicArn
-     * @param userId
-     * userId로 해당 유저의 번호을 가지고와
-     * userId의 번호은 고유값이니
-     * userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
+     * @param userId   userId로 해당 유저의 번호을 가지고와
+     *                 userId의 번호은 고유값이니
+     *                 userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
      */
     String unsubscribeMessage(String topicArn, Long userId);
 }

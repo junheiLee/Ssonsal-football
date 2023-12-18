@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.team.entity.Team;
@@ -30,15 +30,15 @@ public class MessageDTO {
     @Builder
     public MessageDTO(Long id, Team hometeamId, LocalDateTime schedule, Integer gameTime, String stadium,
                       Integer vsFormat, Integer account, User awayApplicantId, String phone, Integer matchStatus) {
-        this.id=id;
-        this.hometeamId=hometeamId;
+        this.id = id;
+        this.hometeamId = hometeamId;
         this.schedule = schedule;
-        this.gameTime= gameTime;
-        this.stadium= stadium;
-        this.vsFormat=vsFormat;
-        this.account=account;
-        this.awayApplicantId=awayApplicantId;
-        this.phone=phone;
+        this.gameTime = gameTime;
+        this.stadium = stadium;
+        this.vsFormat = vsFormat;
+        this.account = account;
+        this.awayApplicantId = awayApplicantId;
+        this.phone = phone;
         this.matchStatus = matchStatus;
     }
 

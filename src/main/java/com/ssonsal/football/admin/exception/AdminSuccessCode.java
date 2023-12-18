@@ -5,11 +5,11 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public enum AdminSuccessCode implements ResponseCode{
+public enum AdminSuccessCode implements ResponseCode {
 
-    ADMIN_AUTH_SUCCESS(HttpStatus.OK,"관리자 인증 성공"),
-    USER_COUNT_SUCCESS(HttpStatus.OK,"유저 카운트 성공"),
-    PAGE_ALTER_SUCCESS(HttpStatus.OK,"페이지 이동 성공"),
+    ADMIN_AUTH_SUCCESS(HttpStatus.OK, "관리자 인증 성공"),
+    USER_COUNT_SUCCESS(HttpStatus.OK, "유저 카운트 성공"),
+    PAGE_ALTER_SUCCESS(HttpStatus.OK, "페이지 이동 성공"),
     AMDIN_RECOGNIZE_SUCCESS(HttpStatus.OK, "관리자 승인 성공."),
     GAME_DELETE_SUCCESS(HttpStatus.OK, "게임이 삭제되었습니다."),
     GAME_DELETE_FAILED(HttpStatus.OK, "게임 글 삭제 성공."),
@@ -30,8 +30,8 @@ public enum AdminSuccessCode implements ResponseCode{
 
 
     AdminSuccessCode(HttpStatus httpStatus, String message) {
-        this.httpStatus=httpStatus;
-        this.message=message;
+        this.httpStatus = httpStatus;
+        this.message = message;
     }
 
     public String getCode() {

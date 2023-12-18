@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.configuration;
+package com.ssonsal.football.global.config;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.StatsDTO;
+import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
 import com.ssonsal.football.admin.repository.UserManagementRepository;
@@ -33,11 +33,11 @@ public class StatsServiceImpl implements StatsService {
     public StatsDTO statsDTO(List<Game> monthlyGames) {
         long confirmedGameCount = monthlyGames.stream()
                 .filter(game -> game.getMatchStatus() == 1)
-                .filter(game -> game.getDeleteCode() ==2)
+                .filter(game -> game.getDeleteCode() == 2)
                 .count();
         long cancelledGameCount = monthlyGames.stream()
                 .filter(game -> game.getMatchStatus() == 0)
-                .filter(game -> game.getDeleteCode() ==2)
+                .filter(game -> game.getDeleteCode() == 2)
                 .count();
 
         long totalGameCount = monthlyGames.size();

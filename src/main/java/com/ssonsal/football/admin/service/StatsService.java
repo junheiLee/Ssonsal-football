@@ -1,8 +1,7 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.StatsDTO;
+import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.game.entity.Game;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,7 +9,8 @@ import java.util.Map;
 
 public interface StatsService {
 
-  // =======================================일간 데이터 ===========================================
+    // =======================================일간 데이터 ===========================================
+
     /**
      * 확정된 경기와 취소된 경기 데이터를 DTO에 저장하는 로직
      * 전체
@@ -30,6 +30,7 @@ public interface StatsService {
 
 
     // ======================================= 월간 데이터 ===========================================
+
     /**
      * 현재 달의 일별 통계를 계산
      * 해당 날짜의 게임 목록을 가져오고,
@@ -70,6 +71,7 @@ public interface StatsService {
 
     /**
      * 전체 회원 수 구하는 로직
+     *
      * @return User테이블의 모든 id 값을 꺼내서 그 갯수를 반환
      */
     long getTotalUserCount();
@@ -77,6 +79,7 @@ public interface StatsService {
     /**
      * 신규 회원자 수 구하는 로직
      * 하루 동안 사용자가 회원가입을 하면 +1
+     *
      * @return 신규 회원 수를 반환
      */
     long getNewUserCount();
@@ -84,6 +87,7 @@ public interface StatsService {
     /**
      * 신규 매치 글
      * 오늘 하루 동안 올라온 매치 글
+     *
      * @return 매치 글 갯수를 반환
      */
     long getNewPostCount();
@@ -91,12 +95,14 @@ public interface StatsService {
     /**
      * 오늘 하루 동안 게임수 구하는 로직
      * matchStatus==1 이며 schedule이 오늘 하루동안 이뤄진 경기
+     *
      * @return 오늘 경기 수를 반환
      */
     long getTodayGamesCount();
 
     /**
      * Admin Main 페이지에 전달할 데이터들을 각 변수로 반환
+     *
      * @return 총 회원 수, 신규 회원 수 , 오늘 경기 수, 오늘 올라 온 글
      */
     Map<String, Long> getAdminStats();

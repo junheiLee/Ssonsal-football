@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import com.ssonsal.football.game.entity.Game;
 import lombok.Builder;
@@ -29,7 +29,7 @@ public class StatsDTO {
     @Builder
     public StatsDTO(Long id, Integer matchStatus, LocalDateTime schedule, LocalDateTime createdAt,
                     LocalDateTime modifiedAt, Integer deleteCode, Long cancelledGameCount, Long confirmedGameCount,
-                    Long totalGameCount,Long todayGameCount,Long newPostCount) {
+                    Long totalGameCount, Long todayGameCount, Long newPostCount) {
         this.id = id;
         this.matchStatus = matchStatus;
         this.schedule = schedule;
@@ -39,7 +39,7 @@ public class StatsDTO {
         this.cancelledGameCount = cancelledGameCount;
         this.confirmedGameCount = confirmedGameCount;
         this.totalGameCount = totalGameCount;
-        this.todayGameCount= todayGameCount;
+        this.todayGameCount = todayGameCount;
         this.newPostCount = newPostCount;
     }
 

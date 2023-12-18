@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.UserDTO;
+import com.ssonsal.football.admin.dto.response.UserDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
@@ -44,7 +44,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
     }
 
-   @Override
+    @Override
     public List<UserDTO> userList() {
         List<User> userList = userRepository.findAll();
 
@@ -80,7 +80,7 @@ public class UserManagementServiceImpl implements UserManagementService {
                     Integer newRole = (user.getRole() == 0) ? 1 : 0;
                     user.updateRole(newRole);
                 });
-        }
+    }
 
     public boolean isAdmin(Long userId) {
         User user = userRepository.findById(userId)
@@ -89,5 +89,5 @@ public class UserManagementServiceImpl implements UserManagementService {
         return user.getRole() == 1;
     }
 
-    }
+}
 

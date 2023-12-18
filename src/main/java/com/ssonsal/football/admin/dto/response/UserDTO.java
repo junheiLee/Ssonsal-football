@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import com.ssonsal.football.user.entity.User;
 import lombok.*;
@@ -48,7 +48,6 @@ public class UserDTO {
                 .role(userdata.getRole())
                 .build();
     }
-
 
 
 }

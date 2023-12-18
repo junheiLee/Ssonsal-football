@@ -1,10 +1,12 @@
 package com.ssonsal.football.admin.controller;
 
-import com.ssonsal.football.admin.dto.request.GameDTO;
-import com.ssonsal.football.admin.dto.request.StatsDTO;
+import com.ssonsal.football.admin.dto.response.GameDTO;
+import com.ssonsal.football.admin.dto.response.StatsDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
-import com.ssonsal.football.admin.service.*;
+import com.ssonsal.football.admin.service.GameManagementService;
+import com.ssonsal.football.admin.service.StatsService;
+import com.ssonsal.football.admin.service.UserManagementService;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -16,11 +18,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import static com.ssonsal.football.game.util.Transfer.objectToMap;
 
 @RestController
 @Slf4j
@@ -47,10 +49,10 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }else if (!userService.isAdmin(userId)) {
+        } else if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("userList",userService.userList()));
+        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("userList", userService.userList()));
 
     }
 
@@ -62,19 +64,19 @@ public class AdminController {
     @GetMapping("/game")
     public ResponseEntity<ResponseBodyFormatter> adminGame() {
 
-      Long userId= 2L;
+        Long userId = 2L;
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }else if (!userService.isAdmin(userId)) {
+        } else if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
         List<GameDTO> gameList = gameService.gameList();
 
-        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("gameList",gameService.gameList()));
+        return DataResponseBodyFormatter.put(AdminSuccessCode.PAGE_ALTER_SUCCESS, objectToMap("gameList", gameService.gameList()));
     }
 
-/*    *//**
+    /*    *//**
      * 관리자 페이지에서 모든 용병 글 리스트를 가져온다
      * @param model
      * @return 용병 글 리스트
@@ -98,7 +100,7 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }else if (!userService.isAdmin(userId)) {
+        } else if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
         // 현재 날짜 가져오기
@@ -116,8 +118,8 @@ public class AdminController {
     /**
      * 메인 홈페이지 이동
      * 당일 통계들을 구해 메인에 출력한다
-     * @return
-     * 전체 회원 수
+     *
+     * @return 전체 회원 수
      * 신규 가입자
      * 예정 매치수
      * 올라온 매치글 수 의 당일 통계를 출력
@@ -129,18 +131,18 @@ public class AdminController {
 
         if (userId == null) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        }else if (!userService.isAdmin(userId)) {
+        } else if (!userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_COUNT_SUCCESS, objectToMap("dailyStats",statsService.getAdminStats()));
+        return DataResponseBodyFormatter.put(AdminSuccessCode.USER_COUNT_SUCCESS, objectToMap("dailyStats", statsService.getAdminStats()));
 
     }
 
 
     /**
-     *  관리자 체크
-     *  userRole ==0 이면 에러
-     *  userRole==1 이면 성공
+     * 관리자 체크
+     * userRole ==0 이면 에러
+     * userRole==1 이면 성공
      *
      * @return
      */
@@ -154,7 +156,6 @@ public class AdminController {
 
         return ResponseBodyFormatter.put(AdminSuccessCode.ADMIN_AUTH_SUCCESS);
     }
-
 
 
 }

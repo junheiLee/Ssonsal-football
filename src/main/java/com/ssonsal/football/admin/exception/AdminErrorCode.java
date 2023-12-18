@@ -6,13 +6,14 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum AdminErrorCode implements ResponseCode {
-    ADMIN_AUTH_FAILED(HttpStatus.FORBIDDEN,"관리자 권한이 없습니다"),
+    ADMIN_AUTH_FAILED(HttpStatus.FORBIDDEN, "관리자 권한이 없습니다"),
     USER_NOT_AUTHENTICATION(HttpStatus.UNAUTHORIZED, "로그인이 필요합니다."),
     USER_FAILED_Authorization(HttpStatus.FORBIDDEN, "권한 부여 실패."),
     USER_SELECTED_FAILED(HttpStatus.BAD_REQUEST, "선택된 유저가 없습니다."),
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "선택된 유저가 없습니다."),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, "날짜 포맷 실패"),
     VISITS_COUNT_FAILED(HttpStatus.BAD_REQUEST, "방문자 카운트 실패"),
+    AWAY_APPLICANT_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "신청자 아이디를 찾을 수 없습니다"),
 
     GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "게임을 찾을 수 없습니다."),
     GAME_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 게임이 아닙니다."),
@@ -33,7 +34,6 @@ public enum AdminErrorCode implements ResponseCode {
     EMAIL_SEND_FAILED(HttpStatus.BAD_REQUEST, "이메일 전송 실패."),
     MESSAGE_SEND_FAILED(HttpStatus.BAD_REQUEST, "메시지 전송 실패."),
     CONTENT_WRITING_FAILED(HttpStatus.BAD_REQUEST, " 내용 작성 실패.");
-
 
 
     private final HttpStatus httpStatus;

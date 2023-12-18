@@ -1,4 +1,4 @@
-package com.ssonsal.football.admin.dto.request;
+package com.ssonsal.football.admin.dto.response;
 
 import com.ssonsal.football.user.entity.User;
 import lombok.*;
@@ -20,16 +20,16 @@ public class EmailDTO {
     private String phone;
 
     @Builder
-    public EmailDTO(Long id,String email,String phone, LocalDateTime createdAt) {
+    public EmailDTO(Long id, String email, String phone, LocalDateTime createdAt) {
         this.id = id;
-        this.email=email;
-        this.phone=phone;
+        this.email = email;
+        this.phone = phone;
         this.createdAt = createdAt;
     }
 
 
     // 엔티티에 없는 변수들
-    public EmailDTO build(){
+    public EmailDTO build() {
         EmailDTO emailDTO = new EmailDTO();
         emailDTO.setText(Text);
         emailDTO.setAdminWrite(adminWrite);

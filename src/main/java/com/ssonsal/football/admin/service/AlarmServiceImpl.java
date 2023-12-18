@@ -2,9 +2,9 @@ package com.ssonsal.football.admin.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssonsal.football.admin.dto.request.AlarmDTO;
-import com.ssonsal.football.admin.dto.request.MessageDTO;
-import com.ssonsal.football.admin.dto.response.ResponseMessageDTO;
+import com.ssonsal.football.admin.dto.request.ResponseMessageDTO;
+import com.ssonsal.football.admin.dto.response.AlarmDTO;
+import com.ssonsal.football.admin.dto.response.MessageDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
 import com.ssonsal.football.game.entity.Game;
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
-public class AlarmServiceImpl implements AlarmService{
+public class AlarmServiceImpl implements AlarmService {
     private final GameManagementRepository gameManagementRepository;
     private final UserRepository userRepository;
     private final CredentialServiceImpl credentialServiceImpl;
@@ -36,20 +36,19 @@ public class AlarmServiceImpl implements AlarmService{
         Game game = gameManagementRepository.findById(confirmedGameId)
                 .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND, confirmedGameId));
 
-        if (game.getMatchStatus() == 1) {
-            return MessageDTO.builder()
-                    .hometeamId(game.getHome())
-                    .schedule(game.getSchedule())
-                    .gameTime(game.getGameTime())
-                    .stadium(game.getStadium())
-                    .vsFormat(game.getVsFormat())
-                    .account(game.getAccount())
-                    .build();
-        } else {
+        // if (game.getMatchStatus() == 1) {
+        return MessageDTO.builder()
+                .hometeamId(game.getHome())
+                .schedule(game.getSchedule())
+                .gameTime(game.getGameTime())
+                .stadium(game.getStadium())
+                .vsFormat(game.getVsFormat())
+                .account(game.getAccount())
+                .build();
+        /*} else {
             throw new CustomException(AdminErrorCode.GAME_NOT_CONFIRMED, confirmedGameId);
-        }
+        }*/
     }
-
 
     @Override
     public AlarmDTO saveAlarmInfo(String subscriptionArn, String userEmail) {
@@ -88,7 +87,9 @@ public class AlarmServiceImpl implements AlarmService{
                     "매치 시간: " + gameInfo.getGameTime() + " 시간\n" +
                     "경기장: " + gameInfo.getStadium() + "\n" +
                     "플레이어: " + gameInfo.getVsFormat() + "\n" +
+                    "번호: " + gameInfo.getPhone() + "\n" +
                     "비용: " + gameInfo.getAccount();
+
 
             log.info("메세지 내용: {}", message);
 
@@ -96,7 +97,7 @@ public class AlarmServiceImpl implements AlarmService{
 
             log.info("JSON Message: {}", jsonMessage);
 
-            return  jsonMessage;
+            return jsonMessage;
 
         } catch (Exception e) {
             log.error("처리 중 오류 발생", e);
@@ -181,14 +182,12 @@ public class AlarmServiceImpl implements AlarmService{
 
         ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
 
-        // Subscription 정보 확인
         for (Subscription subscription : listResponse.subscriptions()) {
             String subscriptionArn = subscription.subscriptionArn();
             String endpoint = subscription.endpoint();
             log.info(endpoint + "엔드포인트");
             log.info(subscriptionArn + "구독 arn");
 
-            // 이메일과 endpoint 일치 여부 확인
             if (userByEmail.equals(endpoint)) {
                 if ("PendingConfirmation".equals(subscriptionArn)) {
                     return "이메일 불일치";
@@ -209,7 +208,7 @@ public class AlarmServiceImpl implements AlarmService{
             // "emailText" 키에 해당하는 값을 추출
             String emailText = payload.get("emailText");
 
-            log.info("파싱전 이메일 내용"+emailText);
+            log.info("파싱전 이메일 내용" + emailText);
 
             // HTML에서 <p> 태그를 제거하고 텍스트만 추출
             String emailContent = removePTags(emailText);
@@ -247,7 +246,7 @@ public class AlarmServiceImpl implements AlarmService{
     }
 
     @Override
-    public String unsubscribe(String topicArn,Long userId) {
+    public String unsubscribe(String topicArn, Long userId) {
 
         String userByEmail = getUserByEmail(userId);
 
@@ -304,7 +303,6 @@ public class AlarmServiceImpl implements AlarmService{
 
             final SubscribeResponse subscribeResponse = snsClient.subscribe(subscribeRequest);
 
-            log.info("회원들 번호" + memberPhone);
             if (!subscribeResponse.sdkHttpResponse().isSuccessful()) {
                 throw new CustomException(AdminErrorCode.SUBSCRIBE_RESPONSE_FAILED, subscribeResponse);
             }
@@ -323,27 +321,53 @@ public class AlarmServiceImpl implements AlarmService{
         Long confirmedGameId = responseMessageDTO.getConfirmedGameId();
 
         if (confirmedGameId == null) {
-            throw new CustomException(AdminErrorCode.GAME_NOT_FOUND);
+            throw new CustomException(AdminErrorCode.AWAY_APPLICANT_ID_NOT_FOUND);
         }
 
         try {
+            Game game = gameManagementRepository.findById(confirmedGameId)
+                    .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND, confirmedGameId));
+
+            String userPhoneNumber = game.getAwayApplicant().getPhone();
+
             MessageDTO gameInfo = getGameInfo(confirmedGameId);
 
-            // 메시지 작성
             String gameMessage = buildConfirmationMessage(gameInfo);
 
-            // SNS 클라이언트 및 전송
             SnsClient snsClient = credentialServiceImpl.getSnsClient();
-            PublishRequest publishRequest = PublishRequest.builder()
+
+            // 해당 주제에 등록된 구독자 목록 조회
+            ListSubscriptionsByTopicRequest listSubscriptionsRequest = ListSubscriptionsByTopicRequest.builder()
                     .topicArn(topicArn)
-                    .message(gameMessage)
                     .build();
 
-            PublishResponse publishResponse = snsClient.publish(publishRequest);
+            ListSubscriptionsByTopicResponse listSubscriptionsResponse = snsClient.listSubscriptionsByTopic(listSubscriptionsRequest);
 
+            for (Subscription subscription : listSubscriptionsResponse.subscriptions()) {
+
+                String subscriberPhoneNumber = subscription.endpoint();
+
+                if (subscriberPhoneNumber.equals(userPhoneNumber)) {
+                    PublishRequest publishRequest = PublishRequest.builder()
+                            .message(gameMessage)
+                            .messageStructure("json")
+                            .targetArn(subscription.subscriptionArn())  // 해당 구독자의 ARN을 명시
+                            .build();
+
+                    PublishResponse publishResponse = snsClient.publish(publishRequest);
+
+                    log.info("유저 번호 " + userPhoneNumber);
+                    log.info(gameMessage + " 회원에게 보낸 메시지");
+
+                    snsClient.close();
+
+                    return "메시지 전송 성공";
+                }
+            }
+
+            // 일치하는 휴대폰 번호를 찾지 못한 경우
             snsClient.close();
-
-           return "메시지 전송 성공";
+            return "일치하는 휴대폰 번호를 찾지 못함";
         } catch (Exception e) {
             log.error("메시지 전송 에러", e);
             return "메시지 전송 실패";
@@ -351,7 +375,7 @@ public class AlarmServiceImpl implements AlarmService{
     }
 
     @Override
-    public String unsubscribeMessage(String topicArn,Long userId) {
+    public String unsubscribeMessage(String topicArn, Long userId) {
         String userByPhone = getUserByPhone(userId);
         String userPhoneNumber = userByPhone.replaceAll("-", "");
 
@@ -365,7 +389,7 @@ public class AlarmServiceImpl implements AlarmService{
         ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
 
         for (Subscription subscription : listResponse.subscriptions()) {
-            String subscriptionEndpointWithPlus  = subscription.endpoint();
+            String subscriptionEndpointWithPlus = subscription.endpoint();
 
             // + 제외한 값 추출
             String subscriptionEndpoint = subscriptionEndpointWithPlus.replace("+", "");

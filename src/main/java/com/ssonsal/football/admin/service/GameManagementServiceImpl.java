@@ -1,6 +1,6 @@
 package com.ssonsal.football.admin.service;
 
-import com.ssonsal.football.admin.dto.request.GameDTO;
+import com.ssonsal.football.admin.dto.response.GameDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
 import com.ssonsal.football.game.entity.Game;
@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class GameManagementServiceImpl implements GameManagementService {
 
     private final GameManagementRepository gameManagementRepository;
+
     @Override
     public List<GameDTO> gameList() {
         List<Game> games = gameManagementRepository.findAll();

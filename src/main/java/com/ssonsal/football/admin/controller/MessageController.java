@@ -1,12 +1,10 @@
 package com.ssonsal.football.admin.controller;
 
-import com.ssonsal.football.admin.dto.response.ResponseMessageDTO;
+import com.ssonsal.football.admin.dto.request.ResponseMessageDTO;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
-import com.ssonsal.football.admin.service.AlarmServiceImpl;
 import com.ssonsal.football.admin.service.UserManagementService;
-import com.ssonsal.football.admin.service.UserManagementServiceImpl;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -75,13 +73,13 @@ public class MessageController {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
-            alarmService.unsubscribeMessage(topicArn,userId);
+            alarmService.unsubscribeMessage(topicArn, userId);
             return ResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CANCEL_SUCCESS);
         } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);
             return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }
-        }
+    }
 
 
 }
