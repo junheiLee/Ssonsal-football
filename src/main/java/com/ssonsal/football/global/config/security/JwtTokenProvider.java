@@ -194,6 +194,7 @@ public class JwtTokenProvider {
         log.info("[reissue] : 토큰 재발급 시작" );
         int role = 1;//role 정보도 가져와야 함
         String reAccessToken = generateToken(userId,teamId,accessExpirationTime,role,"accessToken");
+        log.info("[reissue] : 토큰 재발급 완료 : {}",reAccessToken);
         return reAccessToken;
     }
 
