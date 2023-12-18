@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface RedisRefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     Optional<RefreshToken> findByUserId(Long userId);
+
     Optional<RefreshToken> findByRefreshToken(String refreshToken);
 }
 

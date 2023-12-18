@@ -47,7 +47,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         MatchTeamResponseDto matchTeam = matchApplicationRepository.searchMatchTeamDto(matchTeamId);
         validateIsExistMatchTeam(matchTeam);
 
-        matchTeam.isHavingSub(subRepository.existsByTeamIdAndGameId(matchTeam.getTeamId(), matchTeam.getGameId()));
+        matchTeam.countHavingSub(subRepository.countByTeamIdAndGameId(matchTeam.getTeamId(), matchTeam.getGameId()));
 
         return matchTeam;
     }

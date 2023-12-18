@@ -127,7 +127,7 @@ public class AlarmService {
 
             log.info("JSON Message: {}", jsonMessage);
 
-            return  jsonMessage;
+            return jsonMessage;
 
         } catch (Exception e) {
             log.error("처리 중 오류 발생", e);
@@ -173,6 +173,7 @@ public class AlarmService {
      * 이메일 구독 생성 기능
      * 구독을 생성하면
      * subscriptionArn와 userEmail을 저장한다
+     *
      * @param topicArn
      * @param userId
      * @return 성공 메세지와 구독 응답
@@ -213,9 +214,9 @@ public class AlarmService {
 
     /**
      * 구독 이메일 인증 확인
+     *
      * @param topicArn
-     * @param userId
-     * 가져온 정보들로 aws sns에 저장된 값과 비교하여 구독 확인을 진행한다
+     * @param userId   가져온 정보들로 aws sns에 저장된 값과 비교하여 구독 확인을 진행한다
      * @return
      */
     public String confirmSubscription(String topicArn, Long userId) {
@@ -256,9 +257,9 @@ public class AlarmService {
 
     /**
      * 이메일 보내기
-     * @param topicArn
-     * 이메일은 구독된 전체 회원에게 이메일이 보내진다
-     * 메세지 내용을 가지고와 그 text로 이메일이 보내진다
+     *
+     * @param topicArn 이메일은 구독된 전체 회원에게 이메일이 보내진다
+     *                 메세지 내용을 가지고와 그 text로 이메일이 보내진다
      * @return 메세지와 메시지id
      */
     public String publishEmail(String topicArn, Map<String, String> payload) {
@@ -268,7 +269,7 @@ public class AlarmService {
             // "emailText" 키에 해당하는 값을 추출
             String emailText = payload.get("emailText");
 
-            log.info("파싱전 이메일 내용"+emailText);
+            log.info("파싱전 이메일 내용" + emailText);
 
             // HTML에서 <p> 태그를 제거하고 텍스트만 추출
             String emailContent = removePTags(emailText);
@@ -292,8 +293,9 @@ public class AlarmService {
     }
 
     /**
-     *  <p> </p> 이거 같은 태그 제거
-     *  dependency 추가함
+     * <p> </p> 이거 같은 태그 제거
+     * dependency 추가함
+     *
      * @param html
      * @return
      */
@@ -315,14 +317,14 @@ public class AlarmService {
     /**
      * 이메일 구독 취소
      * 이메일 수신을 원하지 않는 사용자들의 구독을 취소시킨다
+     *
      * @param topicArn
-     * @param userId
-     * userId로 해당 유저의 이메일을 가지고와
-     * userId의 이메일은 고유값이니
-     * userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
+     * @param userId   userId로 해당 유저의 이메일을 가지고와
+     *                 userId의 이메일은 고유값이니
+     *                 userId의 이메일과 aws 주제안에 있는 이메일이 일치하면 구독을 취소시킨다
      * @return
      */
-    public String unsubscribe(String topicArn,Long userId) {
+    public String unsubscribe(String topicArn, Long userId) {
 
         String userByEmail = getUserByEmail(userId);
 
@@ -365,6 +367,7 @@ public class AlarmService {
 
     /**
      * 메세지 구독
+     *
      * @param topicArn
      * @param userId
      * @return
@@ -402,6 +405,7 @@ public class AlarmService {
 
     /**
      * 메세지 전송
+     *
      * @param topicArn
      * @param responseMessageDTO
      * @return
@@ -429,7 +433,7 @@ public class AlarmService {
 
             snsClient.close();
 
-           return "메시지 전송 성공";
+            return "메시지 전송 성공";
         } catch (Exception e) {
             log.error("메시지 전송 에러", e);
             return "메시지 전송 실패";
@@ -439,13 +443,13 @@ public class AlarmService {
     /**
      * 메세지 수신 취소
      * 이메일 수신을 원하지 않는 사용자들의 구독을 취소시킨다
+     *
      * @param topicArn
-     * @param userId
-     * userId로 해당 유저의 번호을 가지고와
-     * userId의 번호은 고유값이니
-     * userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
+     * @param userId   userId로 해당 유저의 번호을 가지고와
+     *                 userId의 번호은 고유값이니
+     *                 userId의 번호 aws 주제안에 있는 번호이 일치하면 구독을 취소시킨다
      */
-    public String unsubscribeMessage(String topicArn,Long userId) {
+    public String unsubscribeMessage(String topicArn, Long userId) {
         String userByPhone = getUserByPhone(userId);
         String userPhoneNumber = userByPhone.replaceAll("-", "");
 
@@ -459,7 +463,7 @@ public class AlarmService {
         ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
 
         for (Subscription subscription : listResponse.subscriptions()) {
-            String subscriptionEndpointWithPlus  = subscription.endpoint();
+            String subscriptionEndpointWithPlus = subscription.endpoint();
 
             // + 제외한 값 추출
             String subscriptionEndpoint = subscriptionEndpointWithPlus.replace("+", "");

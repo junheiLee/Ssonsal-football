@@ -1,24 +1,17 @@
 package com.ssonsal.football.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
-import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.format.DateTimeFormatter;
-
-import static com.ssonsal.football.game.util.GameConstant.DATE_TIME_FORMAT;
-import static com.ssonsal.football.game.util.GameConstant.SCHEDULE_FORMAT;
 
 @Getter
 @ToString
 @NoArgsConstructor
-public class SignInResultDto{
+public class SignInResultDto {
 
     private Long id;
     private Long teamId;
@@ -39,7 +32,7 @@ public class SignInResultDto{
     private String refreshToken;
 
 
-    public SignInResultDto(User user,String accessToken,String refreshToken) {
+    public SignInResultDto(User user, String accessToken, String refreshToken) {
         this.id = user.getId();
         this.teamId = (user.getTeam() != null) ? user.getTeam().getId() : 0L; // 혹은 다른 기본값으로 설정
         this.email = user.getEmail();
@@ -49,7 +42,8 @@ public class SignInResultDto{
         this.nickname = user.getNickname();
         this.position = user.getPosition();
         this.phone = user.getPhone();
-        this.intro = user.getIntro();;
+        this.intro = user.getIntro();
+        ;
         this.preferredArea = user.getPreferredArea();
         this.preferredTime = user.getPreferredTime();
         this.skillScore = user.getSkillScore();
@@ -57,6 +51,7 @@ public class SignInResultDto{
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }
+
     public static int calculateAge(LocalDate birth) {
         if (birth == null) {
             return 0; // 혹은 다른 기본값을 반환하도록 처리
@@ -64,7 +59,6 @@ public class SignInResultDto{
         LocalDate currentDate = LocalDate.now();
         return Period.between(birth, currentDate).getYears();
     }
-
 
 
 }

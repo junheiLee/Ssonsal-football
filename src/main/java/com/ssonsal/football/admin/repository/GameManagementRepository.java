@@ -1,6 +1,5 @@
 package com.ssonsal.football.admin.repository;
 
-import com.ssonsal.football.admin.dto.request.GameDTO;
 import com.ssonsal.football.game.entity.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
