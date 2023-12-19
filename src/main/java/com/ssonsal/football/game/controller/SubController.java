@@ -35,7 +35,7 @@ public class SubController {
      * @return 승인된 용병 목록
      */
     @GetMapping("/{matchApplicationId}/subs")
-    public ResponseEntity<ResponseBodyFormatter> getTeamSubList(@PathVariable Long matchApplicationId) {
+    public ResponseEntity<ResponseBodyFormatter> findSubs(@PathVariable Long matchApplicationId) {
 
         List<SubsResponseDto> subs = subService.getTeamSubList(matchApplicationId);
         return DataResponseBodyFormatter.put(SUCCESS, objectToMap(SUBS, subs));
@@ -49,7 +49,7 @@ public class SubController {
      * @return 승인된 용병 아이디
      */
     @PostMapping("/{matchApplicationId}/subs") // 용병 수락
-    public ResponseEntity<ResponseBodyFormatter> SubAccept(@RequestBody ApprovalSubRequestDto approvalSubDto,
+    public ResponseEntity<ResponseBodyFormatter> acceptSub(@RequestBody ApprovalSubRequestDto approvalSubDto,
                                                            @PathVariable Long matchApplicationId) {
 
         Long loginUserId = 8L;

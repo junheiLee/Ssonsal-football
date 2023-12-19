@@ -29,13 +29,13 @@ public class MatchTeamController {
     private final MatchTeamService matchTeamService;
 
     /**
-     * 게임에 참여하는 팀의 신청 및 팀 정보를 반환하는 api
+     * 게임에의 신청한 팀의 신청 및 팀 정보를 반환하는 api
      *
      * @param matchApplicationId 해당 게임 신청 아이디
      * @return 게임에 참여하는 팀의 신청 및 팀 정보와 요청자의 기본 정보
      */
     @GetMapping("/{matchApplicationId}")
-    public ResponseEntity<ResponseBodyFormatter> matchTeamInfo(@PathVariable Long matchApplicationId) {
+    public ResponseEntity<ResponseBodyFormatter> readMatchTeam(@PathVariable Long matchApplicationId) {
         Long loginUserId = 1L;
         Long loginUserTeamId = 1L;
 
@@ -51,7 +51,7 @@ public class MatchTeamController {
      * @return 성공 코드와 해당 게임 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> approveAwayTeam(@RequestBody ApprovalTeamRequestDto approvalTeamDto) {
+    public ResponseEntity<ResponseBodyFormatter> acceptAwayTeam(@RequestBody ApprovalTeamRequestDto approvalTeamDto) {
 
         Long loginUserId = 6L;
         Long confirmedGameId = matchTeamService.approveAwayTeam(loginUserId, approvalTeamDto);
