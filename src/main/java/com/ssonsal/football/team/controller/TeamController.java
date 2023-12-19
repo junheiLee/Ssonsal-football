@@ -1,6 +1,8 @@
 package com.ssonsal.football.team.controller;
 
-import com.ssonsal.football.global.config.security.JwtTokenProvider;
+import com.ssonsal.football.game.util.Transfer;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -17,9 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
@@ -34,7 +34,6 @@ public class TeamController {
 
     private final TeamService teamService;
     private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 모든 팀 리스트를 반환한다.
@@ -77,17 +76,18 @@ public class TeamController {
      * @return 팀 아이디에 맞는 팀 정보
      */
     @GetMapping("/{teamId}")
-    public ResponseEntity<ResponseBodyFormatter> findDetailOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> findDetailOfTeam(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         String userLevel = memberService.isUserLevel(teamId, user).getRole();
 
 
-        Map<String, Object> details = new HashMap<>();
-        details.put(USER_LEVEL, userLevel);
-        details.put(DETAIL, teamService.findTeamDetail(teamId));
-        details.put(MEMBERS, teamService.findMemberList(teamId));
+        Map<String, Object> details = Map.of(
+                USER_LEVEL, userLevel,
+                DETAIL, teamService.findTeamDetail(teamId),
+                MEMBERS, teamService.findMemberList(teamId)
+        );
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, details);
     }
@@ -99,9 +99,9 @@ public class TeamController {
      * @return 팀 아이디에 맞는 회원 정보와 팀 신청자 정보와 밴 유저 목록
      */
     @GetMapping("/{teamId}/managers")
-    public ResponseEntity<ResponseBodyFormatter> findManageListOfTeam(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> findManageListOfTeam(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -119,9 +119,9 @@ public class TeamController {
      */
     @PostMapping
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> createTeam(@Valid @ModelAttribute TeamCreateDto teamCreateDto, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.ALREADY_IN_TEAM);
@@ -141,9 +141,9 @@ public class TeamController {
      * @return teamEditFormDto 기존 팀 정보 DTO
      */
     @GetMapping("/{teamId}/edit")
-    public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> loadEditTeam(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -160,9 +160,9 @@ public class TeamController {
      */
     @PatchMapping("/{teamId}")
     @ResponseBody
-    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> editTeam(@Valid @ModelAttribute TeamEditDto teamEditDto, @PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);

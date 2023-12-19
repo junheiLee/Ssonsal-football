@@ -25,7 +25,7 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 public class SubApplicantController {
 
     private final SubApplicantService subApplicantService;
-
+  
 
     /**
      * 로그인한 사용자가 매치 팀에 용병 신청하는 api
@@ -43,6 +43,7 @@ public class SubApplicantController {
 
     /**
      * 용병 신청을 거절하는 api
+
      *
      * @param subApplicantId 거절할 용병 신청 식별자
      * @return 거절된 용병 신청을 한 회원 아이디
