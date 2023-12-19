@@ -3,6 +3,8 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.ApprovalSubRequestDto;
 import com.ssonsal.football.game.dto.response.SubsResponseDto;
 import com.ssonsal.football.game.service.SubService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +31,23 @@ public class SubController {
     private final SubService subService;
 
     /**
+     * 신청한 용병을 승인하는 api
+     *
+     * @param approvalSubDto     subApplicantsId
+     * @param matchApplicationId 해당 신청 팀 식별자
+     * @return 승인된 용병 아이디
+     */
+    @PostMapping("/{matchApplicationId}/subs")
+    public ResponseEntity<ResponseBodyFormatter> acceptSub(@RequestBody ApprovalSubRequestDto approvalSubDto,
+                                                           @PathVariable Long matchApplicationId,
+                                                           @CurrentUser Account account) {
+
+        Long createdSubId = subService.acceptSub(account.getId(), matchApplicationId, approvalSubDto);
+
+        return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CREATED_SUB_ID, createdSubId));
+    }
+
+    /**
      * 해당 신청 팀에 대한 용병 목록 반환 api
      *
      * @param matchApplicationId 해당 신청 팀 식별자
@@ -40,23 +59,4 @@ public class SubController {
         List<SubsResponseDto> subs = subService.getTeamSubList(matchApplicationId);
         return DataResponseBodyFormatter.put(SUCCESS, toMap(SUBS, subs));
     }
-
-    /**
-     * 신청한 용병을 승인하는 api
-     *
-     * @param approvalSubDto     subApplicantsId
-     * @param matchApplicationId 해당 신청 팀 식별자
-     * @return 승인된 용병 아이디
-     */
-    @PostMapping("/{matchApplicationId}/subs") // 용병 수락
-    public ResponseEntity<ResponseBodyFormatter> acceptSub(@RequestBody ApprovalSubRequestDto approvalSubDto,
-                                                           @PathVariable Long matchApplicationId) {
-
-        Long loginUserId = 8L;
-        Long createdSubId = subService.acceptSub(loginUserId, matchApplicationId, approvalSubDto);
-
-        return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CREATED_SUB_ID, createdSubId));
-    }
-
-
 }

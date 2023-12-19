@@ -14,31 +14,31 @@ public final class GameConstant {
     public static final String GAMES = "games";
     public static final String GAME_ID = "gameId";
 
-
-    /*MatchTeam*/
+    /*Match Team*/
     public static final String MATCH_TEAM_INFO = "matchTeamInfo";
     public static final String CONFIRMED_GAME_ID = "confirmedGameId";
 
-    /*MatchApplicant*/
+    /*Match Applicant*/
     public static final String MATCH_APPLICATION_ID = "matchApplicationId";
     public static final String REJECTED_MATCH_APPLICATION_ID = "rejectedMatchApplicationId";
     public static final String MATCH_APPLICATIONS = "matchApplications";
 
-    public static final String AWAY = "away";
-    public static final String HOME = "home";
-
-    public static final String LOGIN_USER = "loginUser";
-    public static final String SUB_APPLICANTS = "subApplicants";
+    /*Sub*/
+    public static final String CREATED_SUB_ID = "createdSubId";
     public static final String SUBS = "subs";
 
+    /*Sub Applicant*/
+    public static final String SUB_APPLICANT_ID = "subApplicantId";
+    public static final String REJECTED_SUB_USER_ID = "rejectedSubUserId";
+    public static final String CLOSED_MATCH_APPLICATION_ID = "closeMatchApplicationId";
+    public static final String SUB_APPLICANTS = "subApplicants";
+
+    /*기본*/
+    public static final String AWAY = "away";
+    public static final String HOME = "home";
     public static final String USER_ID = "userId";
     public static final String TEAM_ID = "teamId";
     public static final String TEAM_RECORD_ID = "teamRecordId";
-    public static final String SUB_APPLICANT_ID = "subApplicantId";
-
-    public static final String CLOSED_MATCH_APPLICATION_ID = "closeMatchApplicationId";
-    public static final String REJECTED_SUB_USER_ID = "rejectedSubUserId";
-    public static final String CREATED_SUB_ID = "createdSubId";
 
 
     /* code */
