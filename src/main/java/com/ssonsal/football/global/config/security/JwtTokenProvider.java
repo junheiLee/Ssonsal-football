@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Date;
-import java.util.Optional;
 
 /**
  * JWT 토큰을 생성하고 유효성을 검증하는 컴포넌트 클래스 JWT 는 여러 암호화 알고리즘을 제공하고 알고리즘과 비밀키를 가지고 토큰을 생성
@@ -70,24 +69,15 @@ public class JwtTokenProvider {
      */
     @PostConstruct
     protected void init() {
-        log.info("[init] JwtTokenProvider 내 secretKey 초기화 시작");
-        log.info("[init] @Value 로 주입받은 secretKey : {}", secretKey);
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
-        log.info("[init] 복호화 된 secretKey : {}", secretKey);
-        log.info("[init] JwtTokenProvider 내 secretKey 초기화 완료");
+
+        byte[] byteSecretKey = secretKey.getBytes(StandardCharsets.UTF_8);
+        secretKey = Base64.getEncoder().encodeToString(byteSecretKey);
     }
 
-    public String generateToken(Long id, Long teamId, long expirationTime, int role, String tokenType) {
-        Date now = new Date();
-        return createToken(id, teamId, new Date(now.getTime() + expirationTime), role, tokenType);
-    }//지금은 email로 설정해 뒀는데 토큰에 이메일을 넣는건 보안상 좋지 않은것 같음 => pk인 id값으로 변경예정
-
-
-    // JWT 토큰 생성
-    public String createToken(Long id, Long teamId, Date expiry, int role, String tokenType) {
+    public String createToken(Long userId, Long teamId, int role, long expirationTime, String tokenType) {
         log.info("[createToken] 토큰 생성 시작");
         Claims claims = Jwts.claims().setSubject("userInfo");
-        claims.put("id", id);
+        claims.put("id", userId);
         claims.put("teamId", teamId);
         claims.put("role", role);
         claims.put("tokenType", tokenType);
@@ -96,35 +86,33 @@ public class JwtTokenProvider {
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
-                .setExpiration(expiry)
+                .setExpiration(new Date(now.getTime() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey) // 암호화 알고리즘, secret 값 세팅
                 .compact();
 
-
-        log.info("[createToken] 토큰 생성 완료 : {}", token);
         if (tokenType.equals("refreshToken")) {// redis에 저장
-            log.info("[saveRefreshToken] redis에 refresh 토큰 저장 ");
-            redisServiceimpl.setRefreshToken(token, String.valueOf(id), refreshExpirationTime);
+            redisServiceimpl.setRefreshToken(String.valueOf(userId), token, refreshExpirationTime);
         }
         return token;
     }
 
-
     // JWT 토큰으로 인증 정보 조회
-    public Authentication getAuthentication(String token) throws RuntimeException {
-        log.info("[getAuthentication] 토큰 인증 정보 조회 시작");
-        Optional<User> user = userRepository.findById(this.getUserId(token));
-        if (user.isPresent()) {
-            String email = user.get().getEmail();
-            log.info("[findEmailById] 제댜로 값을 불러옴 : {}", email);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            log.info("[getAuthentication] 토큰 인증 정보 조회 완료, UserDetails UserName : {}",
-                    userDetails.getUsername());
-            return new UsernamePasswordAuthenticationToken(userDetails, "",
-                    userDetails.getAuthorities());
-        } else {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        }
+    public Authentication getAuthentication(String token) {
+
+        User user = userRepository.findById((this.getUserId(token)))
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        String email = user.getEmail();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "",
+                userDetails.getAuthorities());
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public Long getUserId(String token) {
@@ -135,13 +123,6 @@ public class JwtTokenProvider {
     public Long getTeamId(String token) {
         Claims claims = getClaims(token);
         return claims.get("teamId", Long.class);
-    }
-
-    private Claims getClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token)
-                .getBody();
     }
 
     // JWT 토큰에서 회원 구별 정보 추출, getUserEmail로 변경필요
@@ -191,7 +172,7 @@ public class JwtTokenProvider {
     public String reissue(Long userId, Long teamId) {
         log.info("[reissue] : 토큰 재발급 시작");
         int role = 1;//role 정보도 가져와야 함
-        String reAccessToken = generateToken(userId, teamId, accessExpirationTime, role, "accessToken");
+        String reAccessToken = createToken(userId, teamId, role, accessExpirationTime, "accessToken");
         log.info("[reissue] : 토큰 재발급 완료 : {}", reAccessToken);
         return reAccessToken;
     }

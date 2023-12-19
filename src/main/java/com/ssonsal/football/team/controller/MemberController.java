@@ -45,7 +45,7 @@ public class MemberController {
 
         Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
-       if (!memberService.isTeamRecruit(teamId)) {
+        if (!memberService.isTeamRecruit(teamId)) {
             throw new CustomException(TeamErrorCode.TEAM_NOT_RECRUIT);
         } else if (memberService.isUserOtherApply(user)) {
             throw new CustomException(TeamErrorCode.HAS_OTHER_APPLY);
@@ -69,7 +69,7 @@ public class MemberController {
 
         Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
-      if (!memberService.isUserApply(user, teamId)) {
+        if (!memberService.isUserApply(user, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
         }
 
@@ -89,7 +89,7 @@ public class MemberController {
 
         Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
-         if (memberService.isTeamLeader(teamId, user)) {
+        if (memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.LEADER_IN_GROUP);
         } else if (!memberService.hasAnyTeam(user)) {
             throw new CustomException(TeamErrorCode.USER_NOT_TEAM);
@@ -155,7 +155,7 @@ public class MemberController {
 
         Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
-         if (!memberService.isTeamLeader(teamId, user)) {
+        if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         } else if (!memberService.isUserTeamMember(teamId, userId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_MEMBER);

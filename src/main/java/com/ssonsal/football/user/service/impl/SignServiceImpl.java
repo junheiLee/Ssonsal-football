@@ -55,16 +55,16 @@ public class SignServiceImpl implements SignService {
             }
             log.info("[getSignInResult] 패스워드 일치");
             log.info("[accessToken] accessToken 토큰 생성");
-            String accessToken = jwtTokenProvider.generateToken(existUser.getId(),
+            String accessToken = jwtTokenProvider.createToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
-                    accessTokenValid,
-                    existUser.getRole(), "accessToken");
+                    existUser.getRole(),
+                    accessTokenValid, "accessToken");
             log.info("[accessToken] accessToken 토큰 확인 : {}", accessToken);
             log.info("[refreshToken] refreshToken 토큰 생성");
-            String refreshToken = jwtTokenProvider.generateToken(existUser.getId(),
+            String refreshToken = jwtTokenProvider.createToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
-                    refreshTokenValid,
-                    existUser.getRole(), "refreshToken");
+                    existUser.getRole(),
+                    refreshTokenValid, "refreshToken");
             log.info("[refreshToken] refreshToken 토큰 확인 : {}", refreshToken);
             log.info("[saveTokens] 재발행을 위한 토큰 저장 만료일은 refresh와 동일 ");
             redisService.setTokens(accessToken, refreshToken, refreshTokenValid);
@@ -104,7 +104,7 @@ public class SignServiceImpl implements SignService {
 
             User savedUser = userRepository.save(user);
 
-            if (savedUser == null) {
+            if (savedUser.getId() == null) {
                 throw new RuntimeException("회원 가입 중 오류가 발생하였습니다. (저장된 사용자 정보가 null입니다.)");
             }
 

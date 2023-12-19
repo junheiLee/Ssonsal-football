@@ -33,7 +33,7 @@ public class ReviewController {
     public ResponseEntity<ResponseBodyFormatter> createReview(
             @RequestBody ReviewRequestDto reviewRequestDto, HttpServletRequest request) {
 
-                Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto, user));
     }

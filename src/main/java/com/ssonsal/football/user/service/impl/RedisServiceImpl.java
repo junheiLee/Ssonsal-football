@@ -17,13 +17,11 @@ public class RedisServiceImpl implements RedisService {
     private final RedisTemplate<String, String> redisTemplate;
 //    private final JwtTokenProvider jwtTokenProvider;
 
-    // key-value = id- refreshToken
-    public void setRefreshToken(String refreshToken, String id, long expiration) {
+    // key-value = userId: refreshToken
+    public void setRefreshToken(String userId, String refreshToken, long expiration) {
+
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        log.info("[RedisServiceImpl] setRefreshToken 호출 refreshToken={}, id={}, expiration={}", refreshToken, id, Duration.ofSeconds(expiration));
-        // 만료시간 이후 삭제
-        valueOperations.set(id, refreshToken, Duration.ofSeconds(expiration));
-        log.info("만료 시간, 분: {}", Duration.ofMinutes(expiration));
+        valueOperations.set(userId, refreshToken, Duration.ofSeconds(expiration));        // 만료시간 이후 삭제
     }
 
     public void setTokens(String accessToken, String refreshToken, long expiration) {

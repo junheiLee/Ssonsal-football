@@ -34,10 +34,7 @@ public class SubApplicantController {
      * @return 해당 게임의 해당 팀의 용병 신청 목록과 요청한 회원의 기본 정보
      */
     @GetMapping("{matchApplicationId}/sub-applicants")
-    public ResponseEntity<ResponseBodyFormatter> subApplicantsByTeamAndGame(@PathVariable Long matchApplicationId, HttpServletRequest request) {
-
-        Long userId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long userTeamId = jwtTokenProvider.getTeamId(request.getHeader("ssonToken"));
+    public ResponseEntity<ResponseBodyFormatter> readSubApplicants(@PathVariable Long matchApplicationId) {
 
         List<SubApplicantsResponseDto> subApplicants
                 = subApplicantService.getSubApplicantsByMatchApplication(matchApplicationId);
@@ -53,32 +50,13 @@ public class SubApplicantController {
      * @return 생성된 용병 신청 식별자
      */
     @PostMapping("/{matchApplicationId}/sub-applicants")
-    public ResponseEntity<ResponseBodyFormatter> applyGameAsSub(@PathVariable Long matchApplicationId, HttpServletRequest request) {
-
-        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+    public ResponseEntity<ResponseBodyFormatter> applyToGameAsSub(@PathVariable Long matchApplicationId) {
+        Long loginUserId = 11L;
 
         Long subApplicantId = subApplicantService.applySubApplicant(loginUserId, matchApplicationId);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(SUB_APPLICANT_ID, subApplicantId));
     }
 
-    /**
-     * 용병 신청을 마감하는 api
-     *
-     * @param matchApplicationId 해당 매치 팀 식별자
-     * @return 마감된 매치 팀 식별자
-     */
-    @DeleteMapping("/{matchApplicationId}/sub-applicants")
-    public ResponseEntity<ResponseBodyFormatter> closeSubApplicant(@PathVariable Long matchApplicationId, HttpServletRequest request) {
-
-        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-
-        Long closedMatchApplicationId = subApplicantService.closeSubApplicant(loginUserId, matchApplicationId);
-
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS,
-                longIdToMap(CLOSED_MATCH_APPLICATION_ID, closedMatchApplicationId));
-    }
-
-    /**
      * 용병 신청을 거절하는 api
      *
      * @param subApplicantId 거절할 용병 신청 식별자
@@ -93,6 +71,23 @@ public class SubApplicantController {
 
         Long rejectSubUserId = subApplicantService.rejectSubApplicant(loginUserId, loginUserTeamId, subApplicantId);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(REJECTED_SUB_USER_ID, rejectSubUserId));
+    }
+
+    /**
+     * 용병 신청을 마감하는 api
+     *
+     * @param matchApplicationId 해당 매치 팀 식별자
+     * @return 마감된 매치 팀 식별자
+     */
+    @DeleteMapping("/{matchApplicationId}/sub-applicants")
+    public ResponseEntity<ResponseBodyFormatter> closeSubRecruitment(@PathVariable Long matchApplicationId) {
+
+        Long loginUserId = 8L;
+
+        Long closedMatchApplicationId = subApplicantService.closeSubApplicant(loginUserId, matchApplicationId);
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS,
+                longIdToMap(CLOSED_MATCH_APPLICATION_ID, closedMatchApplicationId));
     }
 
 }

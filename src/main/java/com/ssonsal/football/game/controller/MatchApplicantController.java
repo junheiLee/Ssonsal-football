@@ -37,10 +37,7 @@ public class MatchApplicantController {
      * @return 해당 게임에서 대기중인 신청 목록과 요청한 회원의 정보
      */
     @GetMapping("/{gameId}/match-applications")
-    public ResponseEntity<ResponseBodyFormatter> matchApplications(@PathVariable Long gameId, HttpServletRequest request) {
-
-        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long loginUserTeamId = jwtTokenProvider.getTeamId(request.getHeader("ssonToken"));
+    public ResponseEntity<ResponseBodyFormatter> readMatchApplications(@PathVariable Long gameId) {
 
         List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findWaitingApplications(gameId);
         return DataResponseBodyFormatter
