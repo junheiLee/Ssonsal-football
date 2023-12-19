@@ -34,7 +34,10 @@ public class SubApplicantController {
      * @return 해당 게임의 해당 팀의 용병 신청 목록과 요청한 회원의 기본 정보
      */
     @GetMapping("{matchApplicationId}/sub-applicants")
-    public ResponseEntity<ResponseBodyFormatter> readSubApplicants(@PathVariable Long matchApplicationId) {
+    public ResponseEntity<ResponseBodyFormatter> readSubApplicants(@PathVariable Long matchApplicationId, HttpServletRequest request) {
+
+        Long userId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long userTeamId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
 
         List<SubApplicantsResponseDto> subApplicants
                 = subApplicantService.getSubApplicantsByMatchApplication(matchApplicationId);
@@ -57,7 +60,7 @@ public class SubApplicantController {
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(SUB_APPLICANT_ID, subApplicantId));
     }
 
-     * 용병 신청을 거절하는 api
+    /* 용병 신청을 거절하는 api
      *
      * @param subApplicantId 거절할 용병 신청 식별자
      * @return 거절된 용병 신청을 한 회원 아이디

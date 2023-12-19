@@ -53,7 +53,7 @@ public class SubController {
      */
     @PostMapping("/{matchApplicationId}/subs") // 용병 수락
     public ResponseEntity<ResponseBodyFormatter> acceptSub(@RequestBody ApprovalSubRequestDto approvalSubDto,
-                                                           @PathVariable Long matchApplicationId) {
+                                                           @PathVariable Long matchApplicationId, HttpServletRequest request) {
 
 
         Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
