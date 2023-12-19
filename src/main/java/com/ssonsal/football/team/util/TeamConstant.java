@@ -6,7 +6,7 @@ public final class TeamConstant {
     }
 
     /* 기본 팀 로고 이미지 URL */
-    public static final String DEFAULT_IMAGE = "https://clclt-s3-1.s3.ap-northeast-2.amazonaws.com/normalTeam.png";
+    public static final String DEFAULT_IMAGE = "https://clclt-s3-1.s3.ap-northeast-2.amazonaws.com/defaultLogo.PNG";
 
     /* json key 사용 string */
     public static final String TEAMS = "teams";
