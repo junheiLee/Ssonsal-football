@@ -105,15 +105,11 @@ public class SignController {
     public ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest request, HttpServletResponse response) throws RuntimeException {
         // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
 
-        log.info("[logOut] 로그아웃을 시도하고 있습니다.");
         String token = request.getHeader("ssonToken");
-        log.info("[logout] 로그아웃 요청에 포함되어있는 토큰정보 : {}", token);
         String logoutResult = signService.logOut(token);
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
-        log.info("[logout] 로그아웃 결과 : {}", logoutResult);
         if (logoutResult.equals("success")) {
-            log.info("[logOut] 정상적으로 refreshToken이 제거 되었습니다.");
-            log.info("[logOut] 정상적으로 쿠키의 accessToken을 제거합니다.");
+
             cookieUtil.deleteCookie(request, response, "ssonToken");
 
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "success");
@@ -144,8 +140,7 @@ public class SignController {
             // 리다이렉트 URL을 클라이언트에게 전달
 
 
-
-            return  DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
 
         } else {
             // refreshToken이 유효하지 않으면 401 Unauthorized 응답을 보냄
