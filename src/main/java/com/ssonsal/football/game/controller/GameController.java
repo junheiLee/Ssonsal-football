@@ -6,6 +6,8 @@ import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.util.TeamResult;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -16,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
@@ -43,7 +44,7 @@ public class GameController {
      * @return 성공 코드와 생성된 게임 아이디를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody GameRequestDto gameDto, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody GameRequestDto gameDto, @CurrentUser Account account) {
 
         Long loginUserId = 3L;
         Map<String, Long> createGameResponseDto;
@@ -74,10 +75,10 @@ public class GameController {
      */
     @PostMapping("/{gameId}/result")
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
-                                                             @RequestBody GameResultRequestDto gameResultDto, HttpServletRequest request) {
+                                                             @RequestBody GameResultRequestDto gameResultDto, @CurrentUser Account account) {
 
 
-        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long loginUserId = account.getId();
         GameResultResponseDto gameResult = gameService.enterResult(loginUserId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);

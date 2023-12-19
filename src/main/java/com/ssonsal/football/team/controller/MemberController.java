@@ -1,6 +1,7 @@
 package com.ssonsal.football.team.controller;
 
-import com.ssonsal.football.global.config.security.JwtTokenProvider;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -16,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static com.ssonsal.football.game.util.Transfer.objectToMap;
 import static com.ssonsal.football.team.util.TeamConstant.TEAM_NAME;
 import static com.ssonsal.football.team.util.TeamConstant.USER_NAME;
@@ -32,7 +31,6 @@ public class MemberController {
     private final TeamRejectService teamRejectService;
     private final TeamApplyService teamApplyService;
     private final MemberService memberService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 팀에 가입 신청을 보냅니다.
@@ -41,9 +39,9 @@ public class MemberController {
      * @return 성공 여부
      */
     @PostMapping("/{teamId}/application")
-    public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> createUserApply(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamRecruit(teamId)) {
             throw new CustomException(TeamErrorCode.TEAM_NOT_RECRUIT);
@@ -65,9 +63,9 @@ public class MemberController {
      * @return 성공 여부
      */
     @DeleteMapping("/{teamId}/application")
-    public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> deleteUserApply(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isUserApply(user, teamId)) {
             throw new CustomException(TeamErrorCode.USER_NOT_APPLY);
@@ -85,9 +83,9 @@ public class MemberController {
      * @return 성공 여부
      */
     @DeleteMapping("/{teamId}/team")
-    public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> leaveTeam(@PathVariable Long teamId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.LEADER_IN_GROUP);
@@ -108,9 +106,9 @@ public class MemberController {
      * @return 신청자 닉네임
      */
     @PostMapping("/{teamId}/application/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> userApplyAccept(@PathVariable Long teamId, @PathVariable Long userId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -130,9 +128,9 @@ public class MemberController {
      * @return 신청자 닉네임
      */
     @DeleteMapping("/{teamId}/application/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> userApplyReject(@PathVariable Long teamId, @PathVariable Long userId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -151,9 +149,9 @@ public class MemberController {
      * @return 위임받은 팀장 닉네임
      */
     @PatchMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> delegateLeader(@PathVariable Long teamId, @PathVariable Long userId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -172,9 +170,9 @@ public class MemberController {
      * @return 퇴출당한 회원의 닉네임
      */
     @PostMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> banUser(@PathVariable Long teamId, @PathVariable Long userId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
@@ -199,9 +197,9 @@ public class MemberController {
      * @return 밴이 풀린 회원의 닉네임
      */
     @DeleteMapping("/{teamId}/manager/{userId}")
-    public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId, HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> userBanCancel(@PathVariable Long teamId, @PathVariable Long userId, @CurrentUser Account account) {
 
-        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
 
         if (!memberService.isTeamLeader(teamId, user)) {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);

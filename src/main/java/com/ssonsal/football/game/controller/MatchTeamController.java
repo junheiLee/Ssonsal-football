@@ -55,7 +55,7 @@ public class MatchTeamController {
      * @return 성공 코드와 해당 게임 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> acceptAwayTeam(@RequestBody ApprovalTeamRequestDto approvalTeamDto) {
+    public ResponseEntity<ResponseBodyFormatter> acceptAwayTeam(@RequestBody ApprovalTeamRequestDto approvalTeamDto, HttpServletRequest request) {
 
         Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long confirmedGameId = matchTeamService.approveAwayTeam(loginUserId, approvalTeamDto);
