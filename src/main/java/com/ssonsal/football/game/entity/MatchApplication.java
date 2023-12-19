@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.entity;
 
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
@@ -47,11 +47,11 @@ public class MatchApplication extends BaseEntity {
     private String applicationStatus;
 
     @OneToMany(mappedBy = "matchApplication")
-    private List<SubApplicant> subApplicants = new ArrayList<>();
+    private final List<SubApplicant> subApplicants = new ArrayList<>();
 
     @Builder
     public MatchApplication(User applicant, Team team, Game game,
-                            String applicationStatus, MatchApplicationRequestDto matchTeamDto) {
+                            String applicationStatus, CreateMatchApplicationRequestDto matchTeamDto) {
         this.applicant = applicant;
         this.team = team;
         this.game = game;
@@ -61,7 +61,7 @@ public class MatchApplication extends BaseEntity {
         game.getMatchApplications().add(this);
     }
 
-    public MatchApplication update(MatchApplicationRequestDto updateHomeTeamDto) {
+    public MatchApplication update(CreateMatchApplicationRequestDto updateHomeTeamDto) {
 
         this.uniform = updateHomeTeamDto.getUniform();
         this.subCount = updateHomeTeamDto.getSubCount();
@@ -82,9 +82,8 @@ public class MatchApplication extends BaseEntity {
         this.applicationStatus = SUSPENSION.getDescription();
     }
 
-    public MatchApplication closeSub() {
+    public void closeSub() {
         this.subCount = 0;
-        return this;
     }
 
     public void acceptSub() {

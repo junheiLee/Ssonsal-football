@@ -23,7 +23,7 @@ import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.exception.SubErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,27 +36,15 @@ public class SubApplicantServiceImpl implements SubApplicantService {
     private final UserRepository userRepository;
 
     @Override
-    public List<SubApplicantsResponseDto> getSubApplicantsByMatchApplication(Long matchApplicationId) {
-
-        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
-
-        List<SubApplicant> SubApplicants
-                = subApplicantRepository.findAllByMatchApplicationAndSubApplicantStatus(matchApplication,
-                WAITING.getDescription());
-        return SubApplicants.stream().map(SubApplicantsResponseDto::new).collect(Collectors.toList());
-    }
-
-
-    @Override
     @Transactional
-    public Long applySubApplicant(Long userId, Long matchApplicationId) {
+    public Long applySubApplicant(Long loginUserId, Long matchApplicationId) {
 
-        User user = getUser(userId);
+        User user = getUser(loginUserId);
         MatchApplication matchApplication = getMatchApplication(matchApplicationId);
 
         validateRequireSub(matchApplication.getSubCount(), longIdToMap(MATCH_APPLICATION_ID, matchApplicationId));
         validateNotInTargetTeam(user.getTeam(), matchApplication.getTeam());
-        validateNotAlreadyApplication(userId, matchApplication);
+        validateNotAlreadyApplication(loginUserId, matchApplication);
 
         SubApplicant applicant = subApplicantRepository.save(
                 SubApplicant.builder()
@@ -87,6 +75,19 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         }
     }
 
+    @Override
+    @Transactional
+    public Long rejectSubApplicant(Team loginUserTeam, Long targetId) {
+
+        SubApplicant subApplicant = getSubApplicant(targetId);
+        Team targetTeam = subApplicant.getMatchApplication().getTeam();
+        validateInTargetTeam(targetTeam, loginUserTeam);
+
+        User targetSub = subApplicant.getUser();
+
+        subApplicant.reject();
+        return targetSub.getId();
+    }
 
     @Override
     @Transactional
@@ -102,22 +103,22 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         return matchApplication.getId();
     }
 
+    private void validateInTargetTeam(Team targetTeam, Team userTeam) {
+
+        if (!targetTeam.equals(userTeam)) {
+            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
+            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+        }
+    }
+
     @Override
-    @Transactional
-    public Long rejectSubApplicant(Long loginUserId, Long userTeamId, Long targetId) {
+    public List<SubApplicantsResponseDto> getSubApplicantsByMatchApplication(Long matchApplicationId) {
 
-        User loginUser = getUser(loginUserId);
-        Team loginUserTeam = getUserTeam(loginUser);
-
-        SubApplicant subApplicant = subApplicantRepository.findById(targetId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_SUB_APPLICANT, longIdToMap(SUB_APPLICANT_ID, targetId)));
-
-        Team targetTeam = subApplicant.getMatchApplication().getTeam();
-        User targetSub = subApplicant.getUser();
-        validateInTargetTeam(targetTeam, loginUserTeam);
-
-        subApplicant.reject();
-        return targetSub.getId();
+        MatchApplication matchApplication = getMatchApplication(matchApplicationId);
+        List<SubApplicant> SubApplicants
+                = subApplicantRepository.findAllByMatchApplicationAndSubApplicantStatus(matchApplication,
+                WAITING.getDescription());
+        return SubApplicants.stream().map(SubApplicantsResponseDto::new).collect(Collectors.toList());
     }
 
     private User getUser(Long userId) {
@@ -134,12 +135,10 @@ public class SubApplicantServiceImpl implements SubApplicantService {
         return userTeam;
     }
 
-    private void validateInTargetTeam(Team targetTeam, Team userTeam) {
+    private SubApplicant getSubApplicant(Long subApplicantId) {
+        return subApplicantRepository.findById(subApplicantId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_SUB_APPLICANT, longIdToMap(SUB_APPLICANT_ID, subApplicantId)));
 
-        if (!targetTeam.equals(userTeam)) {
-            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
-            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
-        }
     }
 
     private MatchApplication getMatchApplication(Long matchApplicationId) {
@@ -148,5 +147,4 @@ public class SubApplicantServiceImpl implements SubApplicantService {
                 .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
                         longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
     }
-
 }

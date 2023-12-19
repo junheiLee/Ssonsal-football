@@ -9,6 +9,7 @@ import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.global.exception.CustomException;
+import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.*;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +29,7 @@ import java.util.regex.Pattern;
 @Service
 @Transactional(readOnly = true)
 public class AlarmServiceImpl implements AlarmService {
+
     private final GameManagementRepository gameManagementRepository;
     private final UserRepository userRepository;
     private final CredentialServiceImpl credentialServiceImpl;
@@ -290,7 +293,7 @@ public class AlarmServiceImpl implements AlarmService {
             final SubscribeRequest subscribeRequest = SubscribeRequest.builder()
                     .protocol("SMS")  // SMS 프로토콜
                     .topicArn(topicArn)
-                    .endpoint(memberPhone)
+                    .endpoint("+82" + memberPhone)
                     .build();
 
             final SubscribeResponse subscribeResponse = snsClient.subscribe(subscribeRequest);
@@ -310,6 +313,9 @@ public class AlarmServiceImpl implements AlarmService {
     public String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO) {
         Long confirmedGameId = responseMessageDTO.getConfirmedGameId();
 
+        log.info("arn++:" + topicArn);
+        log.info(confirmedGameId + "확정된 아이디!");
+
         if (confirmedGameId == null) {
             throw new CustomException(AdminErrorCode.AWAY_APPLICANT_ID_NOT_FOUND);
         }
@@ -318,56 +324,74 @@ public class AlarmServiceImpl implements AlarmService {
             Game game = gameManagementRepository.findById(confirmedGameId)
                     .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND, confirmedGameId));
 
-            String userPhoneNumber = game.getAwayApplicant().getPhone();
+            String userPhone = game.getAwayApplicant().getPhone();
+            log.info(userPhone + "첫 번호");
+            String userPhoneNumber = "8201059673459";
 
-            MessageDTO gameInfo = getGameInfo(confirmedGameId);
+            //  String userPhoneNumber = "+"+userPhone.replaceAll("-", "");
+            log.info(userPhoneNumber + "가져온 번호");
 
-            String gameMessage = buildConfirmationMessage(gameInfo);
-
-            SnsClient snsClient = credentialServiceImpl.getSnsClient();
-
-            // 해당 주제에 등록된 구독자 목록 조회
-            ListSubscriptionsByTopicRequest listSubscriptionsRequest = ListSubscriptionsByTopicRequest.builder()
+            // ListSubscriptionsByTopic으로 Subscription 정보 가져오기
+            ListSubscriptionsByTopicRequest listRequest = ListSubscriptionsByTopicRequest.builder()
                     .topicArn(topicArn)
                     .build();
 
-            ListSubscriptionsByTopicResponse listSubscriptionsResponse = snsClient.listSubscriptionsByTopic(listSubscriptionsRequest);
+            SnsClient snsClient = credentialServiceImpl.getSnsClient();
+            ListSubscriptionsByTopicResponse listResponse = snsClient.listSubscriptionsByTopic(listRequest);
 
-            for (Subscription subscription : listSubscriptionsResponse.subscriptions()) {
+            boolean isUserSubscribed = false;
 
-                String subscriberPhoneNumber = subscription.endpoint();
+            for (Subscription subscription : listResponse.subscriptions()) {
+                String subscriptionEndpointWithPlus = subscription.endpoint();
 
-                if (subscriberPhoneNumber.equals(userPhoneNumber)) {
-                    PublishRequest publishRequest = PublishRequest.builder()
-                            .message(gameMessage)
-                            .messageStructure("json")
-                            .targetArn(subscription.subscriptionArn())  // 해당 구독자의 ARN을 명시
-                            .build();
+                // + 제외한 값 추출
+                String subscriptionEndpoint = subscriptionEndpointWithPlus.replace("+", "");
 
-                    PublishResponse publishResponse = snsClient.publish(publishRequest);
+                log.info("구독 엔드포인트 핸드폰" + subscriptionEndpointWithPlus);
 
-                    log.info("유저 번호 " + userPhoneNumber);
-                    log.info(gameMessage + " 회원에게 보낸 메시지");
-
-                    snsClient.close();
-
-                    return publishResponse + "메시지 전송 성공";
+                if (userPhoneNumber.equals(subscriptionEndpoint)) {
+                    isUserSubscribed = true;
+                    break;
                 }
             }
 
-            // 일치하는 휴대폰 번호를 찾지 못한 경우
-            snsClient.close();
-            return "일치하는 휴대폰 번호를 찾지 못함";
+            if (isUserSubscribed) {
+                MessageDTO gameInfo = getGameInfo(confirmedGameId);
+                String gameMessage = buildConfirmationMessage(gameInfo);
+
+                log.info(gameMessage + "메시지");
+
+                PublishRequest publishRequest = PublishRequest.builder()
+                        .message(gameMessage)
+                        .phoneNumber("+" + userPhoneNumber)
+                        .build();
+
+                log.info(PublishRequest.builder().phoneNumber(userPhoneNumber) + "뭐야");
+
+                PublishResponse publishResponse = snsClient.publish(publishRequest);
+
+                log.info("유저 번호 " + userPhoneNumber);
+                log.info(gameMessage + " 회원에게 보낸 메시지");
+
+                snsClient.close();
+
+                return publishResponse + "메시지 전송 성공";
+            } else {
+                log.info("유저 번호가 일치하지 않아 메시지를 보내지 않습니다.");
+                snsClient.close();
+                return "유저 번호가 일치하지 않아 메시지를 보내지 않았습니다.";
+            }
         } catch (Exception e) {
             log.error("메시지 전송 에러", e);
             return "메시지 전송 실패";
         }
     }
 
+
     @Override
     public String unsubscribeMessage(String topicArn, Long userId) {
         String userByPhone = getUserByPhone(userId);
-        String userPhoneNumber = userByPhone.replaceAll("-", "");
+        String userPhoneNumber = "+" + userByPhone.replaceAll("-", "");
 
         SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
@@ -406,5 +430,16 @@ public class AlarmServiceImpl implements AlarmService {
         }
 
         return "메시지 구독 취소 실패";
+    }
+
+    @Override
+    @Transactional
+    public void updateUserRole(Long userId) {
+        userRepository.findById(userId)
+                .ifPresent(user -> {
+                    int currentRole = user.getRole();
+                    int newRole = (currentRole == 0) ? 2 : 0;
+                    user.messageAuth(newRole);
+                });
     }
 }

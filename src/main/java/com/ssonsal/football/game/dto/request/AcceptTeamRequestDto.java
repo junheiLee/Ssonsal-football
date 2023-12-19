@@ -5,8 +5,8 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class GameResultRequestDto {
+public class AcceptTeamRequestDto {
 
-    private String target;
-    private String result;
+    private Long matchApplicationId;
+
 }
