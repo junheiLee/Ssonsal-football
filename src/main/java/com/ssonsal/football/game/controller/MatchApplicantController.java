@@ -3,6 +3,7 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
@@ -26,6 +28,7 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class MatchApplicantController {
 
     private final MatchApplicantService matchApplicantService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 해당 게임에 신청한 대기 중인 신청 목록을 반환하는 api
@@ -34,10 +37,11 @@ public class MatchApplicantController {
      * @return 해당 게임에서 대기중인 신청 목록과 요청한 회원의 정보
      */
     @GetMapping("/{gameId}/match-applications")
-    public ResponseEntity<ResponseBodyFormatter> matchApplications(@PathVariable Long gameId) {
+    public ResponseEntity<ResponseBodyFormatter> matchApplications(@PathVariable Long gameId, HttpServletRequest request) {
 
-        Long loginUserId = 2L;
-        Long loginUserTeamId = null;
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long loginUserTeamId = jwtTokenProvider.getTeamId(request.getHeader("ssonToken"));
+
         List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findWaitingApplications(gameId);
         return DataResponseBodyFormatter
                 .put(SUCCESS, toMapIncludeUserInfo(loginUserId, loginUserTeamId, MATCH_APPLICATIONS, matchApplications));
@@ -56,9 +60,9 @@ public class MatchApplicantController {
      */
     @PostMapping("/{gameId}/match-applications")
     public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody MatchApplicationRequestDto applicationTeamDto,
-                                                                   @PathVariable Long gameId) {
+                                                                   @PathVariable Long gameId, HttpServletRequest request) {
 
-        Long loginUserId = 7L;
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long matchApplicantId = matchApplicantService.applyToMatchAsAway(loginUserId, gameId, applicationTeamDto);
 
         return DataResponseBodyFormatter
@@ -74,9 +78,9 @@ public class MatchApplicantController {
      */
     @DeleteMapping("/{gameId}/match-applications/{matchApplicationId}")
     public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
-                                                                         @PathVariable Long gameId) {
+                                                                         @PathVariable Long gameId, HttpServletRequest request) {
 
-        Long loginUserId = 3L;
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long rejectedMatchApplicationId
                 = matchApplicantService.rejectMatchApplication(loginUserId, gameId, matchApplicationId);
 
