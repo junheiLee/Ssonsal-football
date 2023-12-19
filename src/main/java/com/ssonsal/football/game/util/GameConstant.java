@@ -48,6 +48,5 @@ public final class GameConstant {
     public static final int ZERO = 0;
 
     /* LocalDateTime 관련 */
-    public static final String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm";
     public static final String SCHEDULE_FORMAT = "yy년 M월 d일 HH시";
 }

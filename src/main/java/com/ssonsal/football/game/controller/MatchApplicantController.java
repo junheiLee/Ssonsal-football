@@ -17,7 +17,8 @@ import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
-import static com.ssonsal.football.global.util.transfer.Transfer.*;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
 @Slf4j
 @RequiredArgsConstructor
