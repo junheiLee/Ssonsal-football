@@ -81,30 +81,11 @@ public class GameServiceImpl implements GameService {
         }
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-    }
-
-    private Team getUserTeam(User user) {
-        Team userTeam = user.getTeam();
-
-        if (userTeam == null) {
-            throw new CustomException(NOT_IN_TEAM);
-        }
-        return userTeam;
-    }
-
     private MatchStatus isRequireAway(boolean isNeedAway) {
         if (isNeedAway) {
             return MatchStatus.WAITING;
         }
         return CONFIRMED;
-    }
-
-    private LocalDateTime stringToLocalDateTime(String dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        return LocalDateTime.parse(dateTime, formatter);
     }
 
     @Override
@@ -158,11 +139,6 @@ public class GameServiceImpl implements GameService {
         throw new CustomException(IMPOSSIBLE_RESULT);
     }
 
-    private Game getGame(Long gameId) {
-        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
-    }
-
     private void validateAbleToEnterResult(Game game) {
         if (game.getMatchStatus() != CONFIRMED.getCodeNumber()) {
             log.error("대기 중이거나 종료된 게임은 결과를 기입할 수 없음.");
@@ -210,6 +186,30 @@ public class GameServiceImpl implements GameService {
     public List<GameListResponseDto> findGamesByTeam(Long teamId) {
 
         return gameRepository.searchGameByTeam(teamId);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private Team getUserTeam(User user) {
+        Team userTeam = user.getTeam();
+
+        if (userTeam == null) {
+            throw new CustomException(NOT_IN_TEAM);
+        }
+        return userTeam;
+    }
+
+    private Game getGame(Long gameId) {
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    }
+
+    private LocalDateTime stringToLocalDateTime(String dateTime) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+        return LocalDateTime.parse(dateTime, formatter);
     }
 
 }

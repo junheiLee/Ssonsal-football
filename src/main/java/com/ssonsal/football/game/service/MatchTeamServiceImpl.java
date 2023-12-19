@@ -79,17 +79,6 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         return game.getId();
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-    }
-
-    private MatchApplication getMatchApplication(Long matchApplicationId) {
-        return matchApplicationRepository.findById(matchApplicationId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
-                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
-    }
-
     private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
 
         if (!targetTeam.equals(userTeam)) {
@@ -190,14 +179,25 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         game.end();
     }
 
-    private TeamRecord getTeamRecord(Long teamId) {
-        return teamRecordRepository.findById(teamId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
-    }
-
     private void initResult(Game game) {
         game.enterHomeTeamResult(null);
         game.enterAwayTeamResult(null);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
+    }
+
+    private TeamRecord getTeamRecord(Long teamId) {
+        return teamRecordRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
     }
 
 }

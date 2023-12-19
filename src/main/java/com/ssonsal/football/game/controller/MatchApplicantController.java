@@ -3,6 +3,8 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,8 +17,7 @@ import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
-import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
-import static com.ssonsal.football.global.util.transfer.Transfer.toMapIncludeUserInfo;
+import static com.ssonsal.football.global.util.transfer.Transfer.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,22 +27,6 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMapIncludeUse
 public class MatchApplicantController {
 
     private final MatchApplicantService matchApplicantService;
-
-    /**
-     * 해당 게임에 신청한 대기 중인 신청 목록을 반환하는 api
-     *
-     * @param gameId 해당 게임 식별자
-     * @return 해당 게임에서 대기중인 신청 목록과 요청한 회원의 정보
-     */
-    @GetMapping("/{gameId}/match-applications")
-    public ResponseEntity<ResponseBodyFormatter> readMatchApplications(@PathVariable Long gameId) {
-
-        Long loginUserId = 2L;
-        Long loginUserTeamId = null;
-        List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findWaitingApplications(gameId);
-        return DataResponseBodyFormatter
-                .put(SUCCESS, toMapIncludeUserInfo(loginUserId, loginUserTeamId, MATCH_APPLICATIONS, matchApplications));
-    }
 
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
@@ -56,10 +41,10 @@ public class MatchApplicantController {
      */
     @PostMapping("/{gameId}/match-applications")
     public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody CreateMatchApplicationRequestDto applicationTeamDto,
-                                                                   @PathVariable Long gameId) {
+                                                                   @PathVariable Long gameId,
+                                                                   @CurrentUser Account account) {
 
-        Long loginUserId = 7L;
-        Long matchApplicantId = matchApplicantService.applyToMatchAsAway(loginUserId, gameId, applicationTeamDto);
+        Long matchApplicantId = matchApplicantService.applyToGameAsAway(account.getId(), gameId, applicationTeamDto);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(MATCH_APPLICATION_ID, matchApplicantId));
@@ -74,15 +59,28 @@ public class MatchApplicantController {
      */
     @DeleteMapping("/{gameId}/match-applications/{matchApplicationId}")
     public ResponseEntity<ResponseBodyFormatter> rejectApplicationAsAway(@PathVariable Long matchApplicationId,
-                                                                         @PathVariable Long gameId) {
+                                                                         @PathVariable Long gameId,
+                                                                         @CurrentUser Account account) {
 
-        Long loginUserId = 3L;
         Long rejectedMatchApplicationId
-                = matchApplicantService.rejectMatchApplication(loginUserId, gameId, matchApplicationId);
+                = matchApplicantService.rejectMatchApplication(account.getId(), gameId, matchApplicationId);
 
         return DataResponseBodyFormatter
                 .put(SUCCESS, longIdToMap(REJECTED_MATCH_APPLICATION_ID, rejectedMatchApplicationId));
     }
 
+    /**
+     * 해당 게임에 신청한 대기 중인 신청 목록을 반환하는 api
+     *
+     * @param gameId 해당 게임 식별자
+     * @return 해당 게임에서 대기중인 신청 목록과 요청한 회원의 정보
+     */
+    @GetMapping("/{gameId}/match-applications")
+    public ResponseEntity<ResponseBodyFormatter> readMatchApplications(@PathVariable Long gameId) {
+
+        List<MatchApplicationsResponseDto> matchApplications = matchApplicantService.findWaitingApplications(gameId);
+        return DataResponseBodyFormatter
+                .put(SUCCESS, toMap(MATCH_APPLICATIONS, matchApplications));
+    }
 
 }

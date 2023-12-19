@@ -39,13 +39,8 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchApplicationRepository matchApplicationRepository;
 
     @Override
-    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
-        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
-    }
-
-    @Override
     @Transactional
-    public Long applyToMatchAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToGameAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto) {
 
         User loginUser = getUser(loginUserId);
         Team loginUserTeam = validateUserInTeam(loginUser.getTeam());
@@ -73,11 +68,6 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
             throw new CustomException(GameErrorCode.NOT_IN_TEAM);
         }
         return userTeam;
-    }
-
-    private Game getGame(Long gameId) {
-        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
-                .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
     }
 
     private void validateGameIsWaiting(Game game) {
@@ -119,11 +109,6 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         return matchApplication.getId();
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-    }
-
     private void validateUserPermission(User user, Long gameId) {
 
         if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
@@ -133,4 +118,18 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         }
     }
 
+    @Override
+    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
+        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private Game getGame(Long gameId) {
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
+                .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    }
 }
