@@ -36,11 +36,6 @@ public class MessageController {
         Long userId = account.getId();
 
 
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-
-        }
-        alarmService.updateUserRole(userId);
         try {
             return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_MESSAGE, alarmService.subscribeMessage(SSONSAL_MESSAGE, userId)));
         } catch (CustomException e) {
@@ -53,11 +48,6 @@ public class MessageController {
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody ResponseMessageDTO responseMessageDTO, @CurrentUser Account account) {
 
         Long userId = account.getId();
-
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-
-        }
 
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_MESSAGE, alarmService.publishMessage(SSONSAL_MESSAGE, responseMessageDTO)));
@@ -73,15 +63,8 @@ public class MessageController {
 
         Long userId = account.getId();
 
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-
         try {
-
-            alarmService.updateUserRole(userId);
             alarmService.unsubscribeMessage(SSONSAL_MESSAGE, userId);
-
             return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
         } catch (CustomException e) {
             log.error("메세지 구독 취소 실패", e);

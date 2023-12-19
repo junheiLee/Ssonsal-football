@@ -68,10 +68,6 @@ public class SnsController {
 
         Long userId = account.getId();
 
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-
         try {
             alarmService.subscribeEmail(SSONSAL_EMAIL, userId);
             return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
@@ -92,10 +88,6 @@ public class SnsController {
     public ResponseEntity<ResponseBodyFormatter> confirmSubscription(@CurrentUser Account account) {
 
         Long userId = account.getId();
-
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
 
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
@@ -123,10 +115,6 @@ public class SnsController {
 
         Long userId = account.getId();
 
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
         } catch (CustomException e) {
@@ -147,14 +135,8 @@ public class SnsController {
 
         Long userId = account.getId();
 
-        if (userManagementService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-
         try {
-
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
-
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

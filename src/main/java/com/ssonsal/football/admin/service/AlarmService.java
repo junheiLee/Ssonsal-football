@@ -154,6 +154,4 @@ public interface AlarmService {
      */
 
     String unsubscribeMessage(String topicArn, Long userId);
-
-    void updateUserRole(Long userId);
 }
