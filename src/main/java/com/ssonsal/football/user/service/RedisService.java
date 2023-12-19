@@ -1,7 +1,7 @@
 package com.ssonsal.football.user.service;
 
 public interface RedisService {
-    public void setRefreshToken(String refreshToken, String email, long expiration);
+    public void setRefreshToken(String userId, String refreshToken, long expiration);
 
     public void setAccessTokenLogout(String accessToken, long expiration);
 

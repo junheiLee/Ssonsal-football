@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 @Service
 @Transactional(readOnly = true)
 public class AlarmServiceImpl implements AlarmService {
+
     private final GameManagementRepository gameManagementRepository;
     private final UserRepository userRepository;
     private final CredentialServiceImpl credentialServiceImpl;

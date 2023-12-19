@@ -15,7 +15,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-
 @Entity
 @Getter
 @Setter
@@ -86,6 +85,12 @@ public class User extends BaseEntity implements UserDetails {
         this.password = password;
     }
 
+    public User(Long id, String email, String password, String auth) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+    }
+
     public void updateRole(int role) {
         this.role = role;
     }
@@ -93,7 +98,6 @@ public class User extends BaseEntity implements UserDetails {
     public void messageAuth(int role) {
         this.role = role;
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

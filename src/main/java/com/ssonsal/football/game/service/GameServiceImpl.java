@@ -46,7 +46,7 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Override
-    public GameDetailResponseDto getDetail(Long gameId) {
+    public GameDetailResponseDto findGame(Long gameId) {
 
         Game game = getGame(gameId);
         MatchApplication homeApplication = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), gameId)

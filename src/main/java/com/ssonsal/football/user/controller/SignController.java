@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,14 +49,14 @@ public class SignController {
      * 로그인 기능
      * 시큐리티에서 서비스를 요청한 유저정보가 없을시 강제적으로 이동됨
      *
-     * @param requset          CookieUtil을 사용하기 위해 필요한 HttpServletRequest
+     * @param request          CookieUtil을 사용하기 위해 필요한 HttpServletRequest
      * @param response         CookieUtil을 사용하기 위해 필요한 HttpServletRequest
      * @param signInRequestDto 유저가 로그인하기 위해 입력한 ID, Password
      * @return 로그인한 유저 객체,발급받은 accessToken ,refreshToken 반환
      */
     @Operation(summary = "로그인", description = "email 과 password를 입력해서 로그인 합니다.")
     @PostMapping(value = "/sign-in")
-    public ResponseEntity<ResponseBodyFormatter> signIn(HttpServletRequest requset, HttpServletResponse response, @RequestBody SignInRequestDto signInRequestDto) {
+    public ResponseEntity<ResponseBodyFormatter> signIn(HttpServletRequest request, HttpServletResponse response, @RequestBody SignInRequestDto signInRequestDto) {
 
         SignInResultDto signInResultDto = signService.signIn(signInRequestDto);
 
@@ -64,7 +65,7 @@ public class SignController {
                     signInResultDto.getId());
             log.info("[signIn] signResultDto가 가지고 있는 정보 : {} ", signInResultDto);
         }
-        cookieUtil.addAccessTokenToCookie(requset, response, signInResultDto.getAccessToken());
+        cookieUtil.addAccessTokenToCookie(request, response, signInResultDto.getAccessToken());
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, signInResultDto);
 
     }
@@ -96,24 +97,20 @@ public class SignController {
      * 로그아웃 기능
      * 로그아웃을 진행한 뒤, redis에 들어있는 해당 유저의 refresh토큰을 제거한다.
      *
-     * @param email LogouttRequestDto로 리팩토링 예정
      * @return 성공 메세지
      * @throws RuntimeException
      */
     @PostMapping(value = "/logout")
     @Operation(summary = "로그아웃", description = "redis 에서 해당 유저의 refreshToken을 삭제합니다.")
-    public ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest requset, HttpServletResponse response) throws RuntimeException {
+    public ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest request, HttpServletResponse response) throws RuntimeException {
         // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
 
-        log.info("[logOut] 로그아웃을 시도하고 있습니다.");
-        String token = requset.getHeader("ssonToken");
-        log.info("[logout] 로그아웃 요청에 포함되어있는 토큰정보 : {}", token);
+        String token = request.getHeader("ssonToken");
         String logoutResult = signService.logOut(token);
-        log.info("[logout] 로그아웃 결과 : {}", logoutResult);
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         if (logoutResult.equals("success")) {
-            log.info("[logOut] 정상적으로 refreshToken이 제거 되었습니다.");
-            log.info("[logOut] 정상적으로 쿠키의 accessToken을 제거합니다.");
-            cookieUtil.deleteCookie(requset, response, "ssonToken");
+
+            cookieUtil.deleteCookie(request, response, "ssonToken");
 
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "success");
         } else
@@ -138,13 +135,12 @@ public class SignController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 새로운 accessToken을 클라이언트에게 전달
-            ResponseEntity<ResponseBodyFormatter> responseEntity = DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
+
             response.setHeader("ssonToken", newAccessToken);
             // 리다이렉트 URL을 클라이언트에게 전달
 
-            responseEntity.getHeaders().set("Location", "/user/logout"); // "/path-to-redirect"는 실제 리다이렉트할 URL로 변경해야 합니다.
 
-            return responseEntity;
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
 
         } else {
             // refreshToken이 유효하지 않으면 401 Unauthorized 응답을 보냄
@@ -153,8 +149,7 @@ public class SignController {
     }
 
     /**
-     * @param req Cookie 정보가 담겨있는 requset요청
-     * @param res
+     * @param req Cookie 정보가 담겨있는 request요청
      * @return
      * @throws RuntimeException
      */
