@@ -6,6 +6,7 @@ import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.util.TeamResult;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
@@ -32,6 +34,7 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class GameController {
 
     private final GameService gameService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 게임 생성 시, 호출되는 api
@@ -40,7 +43,7 @@ public class GameController {
      * @return 성공 코드와 생성된 게임 아이디를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody GameRequestDto gameDto) {
+    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody GameRequestDto gameDto, HttpServletRequest request) {
 
         Long loginUserId = 3L;
         Map<String, Long> createGameResponseDto;
@@ -71,9 +74,10 @@ public class GameController {
      */
     @PostMapping("/{gameId}/result")
     public ResponseEntity<ResponseBodyFormatter> enterResult(@PathVariable Long gameId,
-                                                             @RequestBody GameResultRequestDto gameResultDto) {
+                                                             @RequestBody GameResultRequestDto gameResultDto, HttpServletRequest request) {
 
-        Long loginUserId = 7L;
+
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         GameResultResponseDto gameResult = gameService.enterResult(loginUserId, gameId, gameResultDto);
 
         return setHttpStatus(gameResult);
@@ -90,7 +94,6 @@ public class GameController {
 
         return DataResponseBodyFormatter.put(SUCCESS, gameResult);
     }
-
 
     /**
      * 팀을 구하고 있는 게임 글 목록을 반환하는 api
@@ -135,6 +138,9 @@ public class GameController {
     @GetMapping("/teams/{teamId}")
     public ResponseEntity<ResponseBodyFormatter> ourGamesAsTeam(@PathVariable Long teamId) {
 
+        //테스트용
+        System.out.println(gameService.findOurGamesAsTeam(teamId).toString());
+        //
         return DataResponseBodyFormatter.put(SUCCESS, gameService.findOurGamesAsTeam(teamId));
     }
 

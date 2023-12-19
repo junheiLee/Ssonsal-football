@@ -3,6 +3,7 @@ package com.ssonsal.football.game.controller;
 import com.ssonsal.football.game.dto.request.ApprovalSubRequestDto;
 import com.ssonsal.football.game.dto.response.SubsResponseDto;
 import com.ssonsal.football.game.service.SubService;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.CREATED_SUB_ID;
@@ -27,6 +29,7 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class SubController {
 
     private final SubService subService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 해당 신청 팀에 대한 용병 목록 반환 api
@@ -52,7 +55,8 @@ public class SubController {
     public ResponseEntity<ResponseBodyFormatter> acceptSub(@RequestBody ApprovalSubRequestDto approvalSubDto,
                                                            @PathVariable Long matchApplicationId) {
 
-        Long loginUserId = 8L;
+
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long createdSubId = subService.acceptSub(loginUserId, matchApplicationId, approvalSubDto);
 
         return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CREATED_SUB_ID, createdSubId));

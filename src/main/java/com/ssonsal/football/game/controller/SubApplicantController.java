@@ -2,6 +2,7 @@ package com.ssonsal.football.game.controller;
 
 import com.ssonsal.football.game.dto.response.SubApplicantsResponseDto;
 import com.ssonsal.football.game.service.SubApplicantService;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.*;
@@ -23,6 +25,7 @@ import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
 public class SubApplicantController {
 
     private final SubApplicantService subApplicantService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 팀별 용병 신청 리스트 현황
@@ -33,8 +36,6 @@ public class SubApplicantController {
     @GetMapping("{matchApplicationId}/sub-applicants")
     public ResponseEntity<ResponseBodyFormatter> readSubApplicants(@PathVariable Long matchApplicationId) {
 
-        Long userId = 11L;
-        Long userTeamId = null;
         List<SubApplicantsResponseDto> subApplicants
                 = subApplicantService.getSubApplicantsByMatchApplication(matchApplicationId);
 
@@ -56,7 +57,6 @@ public class SubApplicantController {
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(SUB_APPLICANT_ID, subApplicantId));
     }
 
-    /**
      * 용병 신청을 거절하는 api
      *
      * @param subApplicantId 거절할 용병 신청 식별자
@@ -64,9 +64,10 @@ public class SubApplicantController {
      */
     @DeleteMapping("/{matchApplicationId}/sub-applicants/{subApplicantId}")
     public ResponseEntity<ResponseBodyFormatter> rejectSubApplicant(@PathVariable Long matchApplicationId,
-                                                                    @PathVariable Long subApplicantId) {
-        Long loginUserId = 8L;
-        Long loginUserTeamId = 2L;
+                                                                    @PathVariable Long subApplicantId, HttpServletRequest request) {
+
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long loginUserTeamId = jwtTokenProvider.getTeamId(request.getHeader("ssonToken"));
 
         Long rejectSubUserId = subApplicantService.rejectSubApplicant(loginUserId, loginUserTeamId, subApplicantId);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, longIdToMap(REJECTED_SUB_USER_ID, rejectSubUserId));

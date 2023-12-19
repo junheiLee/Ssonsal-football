@@ -4,6 +4,7 @@ import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.service.GameService;
 import com.ssonsal.football.game.service.MatchTeamService;
+import com.ssonsal.football.global.config.security.JwtTokenProvider;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
 import static com.ssonsal.football.game.util.GameConstant.MATCH_TEAM;
@@ -27,6 +30,7 @@ public class MatchTeamController {
 
     private final GameService gameService;
     private final MatchTeamService matchTeamService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     /**
      * 게임에의 신청한 팀의 신청 및 팀 정보를 반환하는 api
@@ -53,7 +57,7 @@ public class MatchTeamController {
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> acceptAwayTeam(@RequestBody ApprovalTeamRequestDto approvalTeamDto) {
 
-        Long loginUserId = 6L;
+        Long loginUserId = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
         Long confirmedGameId = matchTeamService.approveAwayTeam(loginUserId, approvalTeamDto);
 
         return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CONFIRMED_GAME_ID, confirmedGameId));
