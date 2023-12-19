@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class GameResultRequestDto {
+public class EnterResultRequestDto {
 
     private String target;
     private String result;

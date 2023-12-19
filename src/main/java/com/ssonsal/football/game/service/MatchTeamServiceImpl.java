@@ -25,7 +25,7 @@ import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.TeamResult.END;
 import static com.ssonsal.football.game.util.TeamResult.peekResult;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
 
 

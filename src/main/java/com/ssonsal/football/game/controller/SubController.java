@@ -15,8 +15,8 @@ import java.util.List;
 
 import static com.ssonsal.football.game.util.GameConstant.CREATED_SUB_ID;
 import static com.ssonsal.football.game.util.GameConstant.SUBS;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @RestController
@@ -38,7 +38,7 @@ public class SubController {
     public ResponseEntity<ResponseBodyFormatter> findSubs(@PathVariable Long matchApplicationId) {
 
         List<SubsResponseDto> subs = subService.getTeamSubList(matchApplicationId);
-        return DataResponseBodyFormatter.put(SUCCESS, objectToMap(SUBS, subs));
+        return DataResponseBodyFormatter.put(SUCCESS, toMap(SUBS, subs));
     }
 
     /**

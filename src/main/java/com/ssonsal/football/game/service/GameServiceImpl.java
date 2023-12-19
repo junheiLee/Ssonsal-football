@@ -1,9 +1,9 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.GameResultRequestDto;
+import com.ssonsal.football.game.dto.request.CreateGameRequestDto;
+import com.ssonsal.football.game.dto.request.EnterResultRequestDto;
 import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
-import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
+import com.ssonsal.football.game.dto.response.GameInfoResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.entity.Game;
@@ -31,8 +31,7 @@ import static com.ssonsal.football.game.entity.ApplicantStatus.APPROVAL;
 import static com.ssonsal.football.game.entity.MatchStatus.CONFIRMED;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
-import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,11 +45,10 @@ public class GameServiceImpl implements GameService {
     private final UserRepository userRepository;
 
     @Override
-    public GameDetailResponseDto findGame(Long gameId) {
+    public GameInfoResponseDto findGame(Long gameId) {
 
         Game game = getGame(gameId);
-        MatchApplication homeApplication = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), gameId)
-                .orElse(null);
+        MatchApplication homeApplication = getHomeApplication(game);
 
         Long awayId, awayApplicationId;
         if (game.getAway() == null) {
@@ -62,12 +60,17 @@ public class GameServiceImpl implements GameService {
             awayId = awayApplication.getTeam().getId();
             awayApplicationId = awayApplication.getId();
         }
-        return new GameDetailResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
+        return new GameInfoResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
+    }
+
+    private MatchApplication getHomeApplication(Game game){
+        return matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), game.getId())
+                .orElse(null);
     }
 
     @Override
     @Transactional
-    public Long createGame(Long loginUserId, GameRequestDto gameDto) {
+    public Long insertGame(Long loginUserId, CreateGameRequestDto gameDto) {
 
         MatchApplicationRequestDto homeDto = new MatchApplicationRequestDto(gameDto);
         validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());
@@ -80,7 +83,7 @@ public class GameServiceImpl implements GameService {
                         .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
                         .schedule(stringToLocalDateTime(gameDto.getDate() + " " + gameDto.getTime()))
-                        .gameRequestDto(gameDto)
+                        .createGameRequestDto(gameDto)
                         .build());
 
         matchApplicationRepository.save(
@@ -125,13 +128,12 @@ public class GameServiceImpl implements GameService {
 
     private LocalDateTime stringToLocalDateTime(String dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        log.info("stringToLocalDateTime = {}", dateTime);
         return LocalDateTime.parse(dateTime, formatter);
     }
 
     @Override
     @Transactional
-    public GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto) {
+    public GameResultResponseDto enterResult(Long loginUserId, Long gameId, EnterResultRequestDto gameResultDto) {
 
         Game game = getGame(gameId);
         validateAbleToEnterResult(game);
@@ -181,12 +183,16 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameListResponseDto> findAllGamesForTeam() {
-        List<GameListResponseDto> asd = gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
-                .stream().map(GameListResponseDto::new).collect(Collectors.toList());
+    public List<GameListResponseDto> findAllGames() {
 
-        log.info("for-team test={}", asd.size());
-        return asd;
+        return gameRepository.findAll().stream().map(GameListResponseDto::new).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<GameListResponseDto> findAllGamesForTeam() {
+
+        return gameRepository.findAllByMatchStatus(MatchStatus.WAITING.getCodeNumber())
+                .stream().map(GameListResponseDto::new).collect(Collectors.toList());
     }
 
     @Override
@@ -207,29 +213,4 @@ public class GameServiceImpl implements GameService {
         return gameRepository.searchOurGameAsTeam(teamId);
     }
 
-    @Override
-    @Transactional
-    @Deprecated
-    public Long updateGame(Long loginUserId, Long gameId,
-                           GameRequestDto updateGameDto, MatchApplicationRequestDto updateHomeTeamDto) {
-
-        User loginUser = getUser(loginUserId);
-
-        // 요청한 사람이 해당 게임 작성자인지 확인
-        if (!gameRepository.existsByIdAndWriterEquals(gameId, loginUser)) {
-            throw new CustomException(FORBIDDEN_USER);
-        }
-
-        // 게임 정보 변경
-        Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new CustomException(ErrorCode.NOT_EXIST, longIdToMap(GAME_ID, gameId)));
-        game.update(stringToLocalDateTime(updateGameDto.getDate() + " " + updateGameDto.getTime()), updateGameDto);
-
-        MatchApplication homeTeam
-                = matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), game.getId())
-                .orElseThrow();
-        homeTeam.update(updateHomeTeamDto);
-
-        return gameId;
-    }
 }

@@ -23,7 +23,7 @@ import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.exception.SubErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor

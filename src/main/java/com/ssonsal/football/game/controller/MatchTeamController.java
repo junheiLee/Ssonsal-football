@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.game.util.GameConstant.CONFIRMED_GAME_ID;
 import static com.ssonsal.football.game.util.GameConstant.MATCH_TEAM;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
-import static com.ssonsal.football.game.util.Transfer.toMapIncludeUserInfo;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMapIncludeUserInfo;
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j

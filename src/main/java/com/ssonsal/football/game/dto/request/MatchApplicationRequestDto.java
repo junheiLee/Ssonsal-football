@@ -12,7 +12,7 @@ public class MatchApplicationRequestDto {
     private String uniform;
     private int subCount;
 
-    public MatchApplicationRequestDto(GameRequestDto gameDto) {
+    public MatchApplicationRequestDto(CreateGameRequestDto gameDto) {
         this.uniform = gameDto.getUniform();
         this.subCount = gameDto.getSubCount();
     }

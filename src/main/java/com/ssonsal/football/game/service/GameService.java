@@ -1,10 +1,9 @@
 package com.ssonsal.football.game.service;
 
 
-import com.ssonsal.football.game.dto.request.GameRequestDto;
-import com.ssonsal.football.game.dto.request.GameResultRequestDto;
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
-import com.ssonsal.football.game.dto.response.GameDetailResponseDto;
+import com.ssonsal.football.game.dto.request.CreateGameRequestDto;
+import com.ssonsal.football.game.dto.request.EnterResultRequestDto;
+import com.ssonsal.football.game.dto.response.GameInfoResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 
@@ -12,14 +11,13 @@ import java.util.List;
 
 public interface GameService {
 
-    GameDetailResponseDto findGame(Long gameId);
+    GameInfoResponseDto findGame(Long gameId);
 
-    Long createGame(Long loginUserId, GameRequestDto gameRequestDto);
+    Long insertGame(Long loginUserId, CreateGameRequestDto createGameDto);
 
-    Long updateGame(Long loginUserId, Long gameId,
-                    GameRequestDto updateGameRequestDto, MatchApplicationRequestDto updateHomeTeamDto);
+    GameResultResponseDto enterResult(Long loginUserId, Long gameId, EnterResultRequestDto gameResultDto);
 
-    GameResultResponseDto enterResult(Long loginUserId, Long gameId, GameResultRequestDto gameResultDto);
+    List<GameListResponseDto> findAllGames();
 
     List<GameListResponseDto> findAllGamesForTeam();
 

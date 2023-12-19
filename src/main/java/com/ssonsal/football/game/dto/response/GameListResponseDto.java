@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import static com.ssonsal.football.game.util.Transfer.toStringSchedule;
+import static com.ssonsal.football.global.util.transfer.Transfer.toStringSchedule;
 
 @ToString
 @Getter

@@ -26,7 +26,7 @@ import static com.ssonsal.football.game.exception.GameErrorCode.NOT_EXIST_APPLIC
 import static com.ssonsal.football.game.exception.GameErrorCode.NOT_IN_TARGET_TEAM;
 import static com.ssonsal.football.game.exception.SubErrorCode.NOT_EXIST_SUB_APPLICANT;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor

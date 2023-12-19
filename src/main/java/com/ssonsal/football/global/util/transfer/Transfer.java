@@ -1,4 +1,4 @@
-package com.ssonsal.football.game.util;
+package com.ssonsal.football.global.util.transfer;
 
 import com.ssonsal.football.game.dto.LoginUser;
 
@@ -19,7 +19,7 @@ public class Transfer {
         return dataDto;
     }
 
-    public static Map<String, Object> objectToMap(String key, Object dto) {
+    public static Map<String, Object> toMap(String key, Object dto) {
         Map<String, Object> mapData = new HashMap<>();
         mapData.put(key, dto);
 

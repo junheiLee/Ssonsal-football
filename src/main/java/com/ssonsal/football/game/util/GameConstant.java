@@ -6,21 +6,26 @@ public final class GameConstant {
     }
 
     /* json key 사용 string */
-    public static final String GAME = "game";
+
+    /*Game*/
+    public static final String GAME_ID = "gameId";
+    public static final String CREATED_GAME_ID = "createdGameId";
+    public static final String GAME_INFO = "gameInfo";
+    public static final String GAME_RESULT = "gameResult";
+    public static final String GAMES = "games";
+
     public static final String AWAY = "away";
     public static final String HOME = "home";
     public static final String MATCH_TEAM = "matchTeam";
 
     public static final String LOGIN_USER = "loginUser";
 
-    public static final String GAME_INFO = "gameInfo";
 
     public static final String MATCH_APPLICATIONS = "matchApplications";
     public static final String SUB_APPLICANTS = "subApplicants";
     public static final String SUBS = "subs";
 
     public static final String USER_ID = "userId";
-    public static final String GAME_ID = "gameId";
     public static final String TEAM_ID = "teamId";
     public static final String TEAM_RECORD_ID = "teamRecordId";
     public static final String SUB_APPLICANT_ID = "subApplicantId";
