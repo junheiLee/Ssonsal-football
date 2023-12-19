@@ -25,6 +25,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static com.ssonsal.football.admin.util.AdminConstant.*;
 import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
 
@@ -53,7 +54,7 @@ public class AdminController {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(USER_LIST, userService.userList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(USER_LIST, userService.userList()));
     }
 
     /**
@@ -73,7 +74,7 @@ public class AdminController {
 
         List<GameDTO> gameList = gameManagementService.gameList();
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(GAME_LIST, gameManagementService.gameList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(GAME_LIST, gameManagementService.gameList()));
     }
 
     /**
@@ -122,7 +123,7 @@ public class AdminController {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(DAILY_STATS, statsService.getAdminStats()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(DAILY_STATS, statsService.getAdminStats()));
     }
 
 }

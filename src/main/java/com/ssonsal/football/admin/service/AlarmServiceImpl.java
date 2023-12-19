@@ -9,7 +9,6 @@ import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.repository.GameManagementRepository;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.global.exception.CustomException;
-import com.ssonsal.football.global.util.ErrorCode;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.*;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

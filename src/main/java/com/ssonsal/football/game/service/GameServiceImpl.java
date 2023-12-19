@@ -58,7 +58,7 @@ public class GameServiceImpl implements GameService {
                         .writer(loginUser)
                         .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
-                        .schedule(toLocalDateTime(gameDto.getDatetime()))
+                        .schedule(gameDto.getDatetime())
                         .createGameRequestDto(gameDto)
                         .build());
 
@@ -205,10 +205,6 @@ public class GameServiceImpl implements GameService {
     private Game getGame(Long gameId) {
         return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
                 .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
-    }
-
-    private LocalDateTime toLocalDateTime(String dateTime) {
-        return LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
 }
