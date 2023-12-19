@@ -1,6 +1,5 @@
 package com.ssonsal.football.team.controller;
 
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.account.Account;
 import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;

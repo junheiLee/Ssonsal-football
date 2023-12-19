@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import static com.ssonsal.football.admin.util.AdminConstant.*;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
 @Slf4j
 @RestController
@@ -74,7 +74,7 @@ public class SnsController {
 
         try {
             alarmService.subscribeEmail(SSONSAL_EMAIL, userId);
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, toMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
             log.error("이메일 구독 에러", e);
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -98,7 +98,7 @@ public class SnsController {
         }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
             log.error("구독 확인 실패", e);
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
@@ -128,7 +128,7 @@ public class SnsController {
         }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
             throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED);
@@ -153,7 +153,7 @@ public class SnsController {
 
         try {
 
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
 
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
