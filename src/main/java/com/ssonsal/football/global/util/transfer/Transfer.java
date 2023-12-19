@@ -1,7 +1,5 @@
 package com.ssonsal.football.global.util.transfer;
 
-import com.ssonsal.football.game.dto.LoginUser;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
