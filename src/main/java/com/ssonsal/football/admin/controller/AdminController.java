@@ -25,8 +25,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
-import static com.ssonsal.football.admin.util.AdminConstant.*;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
+
 
 @RestController
 @Slf4j
@@ -69,6 +69,7 @@ public class AdminController {
         if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
+
 
         List<GameDTO> gameList = gameManagementService.gameList();
 

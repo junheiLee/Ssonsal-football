@@ -12,8 +12,7 @@ public class Account extends User {
     private Account account;
 
     public Account(User user) {
-        super(user.getId(), user.getEmail(), user.getPassword(), "user");
-        this.account = account;
+        super(user.getId(), user.getTeam(), user.getEmail(), user.getPassword(), "user");
     }
 
     private static Collection<? extends GrantedAuthority> authorities() {

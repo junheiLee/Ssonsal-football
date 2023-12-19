@@ -28,8 +28,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
-import static com.ssonsal.football.admin.util.AdminConstant.*;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
+
 
 @RestController
 @Slf4j
@@ -60,6 +60,7 @@ public class AdminManagementController {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
+
         userManagementService.updateRoles(userIds);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(RECOGNIZE_ADMIN, userIds));
 
@@ -84,9 +85,7 @@ public class AdminManagementController {
         }
 
         gameManagementService.deleteGames(gameIds);
-
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(DELETE_POST, gameIds));
-
     }
 
 
