@@ -4,6 +4,8 @@ import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
 import com.ssonsal.football.admin.service.UserManagementService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static com.ssonsal.football.admin.util.AdminConstant.*;
+import static com.ssonsal.football.game.util.Transfer.objectToMap;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +29,7 @@ import java.util.Map;
 public class SnsController {
 
     private final AlarmService alarmService;
-    private final UserManagementService userService;
-
+    private final UserManagementService userManagementService;
 
     /**
      * 주제 생성
@@ -47,7 +51,6 @@ public class SnsController {
 
         alarmService.createTopic(topicName);
         return ResponseBodyFormatter.put(AdminSuccessCode.TOPIC_CREATE_SUCCESS);
-
     }
 
     /**
@@ -59,23 +62,22 @@ public class SnsController {
      * @return 주제와 회원아이디를 보낸다
      */
     @PostMapping("/memberSubscribe")
-    public ResponseEntity<ResponseBodyFormatter> subscribeAllMembers() {
-        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail"; // Arn 하드 코딩
+    public ResponseEntity<ResponseBodyFormatter> subscribeAllMembers(@CurrentUser Account account) {
 
         log.info("컨트 시작");
 
-        Long userId = 2L;
+        Long userId = account.getId();
 
-        if (userService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        if (userManagementService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
         try {
-            alarmService.subscribeEmail(topicArn, userId);
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeEmail(topicArn, userId));
+            alarmService.subscribeEmail(SSONSAL_EMAIL, userId);
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
             log.error("이메일 구독 에러", e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
+            throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
         }
     }
 
@@ -87,20 +89,19 @@ public class SnsController {
      * @return 주제와 회원 email 정보와 로그인한 유저를 담아 보낸다
      */
     @PostMapping("/confirm-subscription")
-    public ResponseEntity<ResponseBodyFormatter> confirmSubscription() {
-        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail";
+    public ResponseEntity<ResponseBodyFormatter> confirmSubscription(@CurrentUser Account account) {
 
-        Long userId = 2L;
+        Long userId = account.getId();
 
-        if (userService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        if (userManagementService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.confirmSubscription(topicArn, userId));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
             log.error("구독 확인 실패", e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
+            throw new CustomException(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
         }
     }
 
@@ -116,23 +117,21 @@ public class SnsController {
      */
 
     @PostMapping("/publishEmail")
-    public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody Map<String, String> emailText) {
+    public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody Map<String, String> emailText, @CurrentUser Account account) {
 
         log.info("컨트롤러 시작");
 
-        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail";
+        Long userId = account.getId();
 
-        Long userId = 2L;
-
-        if (userService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        if (userManagementService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.publishEmail(topicArn, emailText));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
         } catch (CustomException e) {
             log.error("이메일 전송 실패", e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.EMAIL_SEND_FAILED);
+            throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED);
         }
     }
 
@@ -143,22 +142,22 @@ public class SnsController {
      *
      * @return 주제 통해 구독된 이메일인지 찾고 삭제 시킨다
      */
-
     @DeleteMapping("/unsubscribe")
-    public ResponseEntity<ResponseBodyFormatter> unsubscribe() {
+    public ResponseEntity<ResponseBodyFormatter> unsubscribe(@CurrentUser Account account) {
 
-        String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail";
+        Long userId = account.getId();
 
-        Long userId = 2L;
-
-        if (userService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
+        if (userManagementService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
+
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.unsubscribe(topicArn, userId));
+
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
+
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
-            return DataResponseBodyFormatter.put(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
+            throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }
     }
 

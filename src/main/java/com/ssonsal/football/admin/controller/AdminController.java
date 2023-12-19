@@ -7,6 +7,8 @@ import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.service.GameManagementService;
 import com.ssonsal.football.admin.service.StatsService;
 import com.ssonsal.football.admin.service.UserManagementService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
+
 @RestController
 @Slf4j
 @RequestMapping("/api/admin")
@@ -32,12 +35,9 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 @Tag(name = "AdminView", description = "Admin View")
 public class AdminController {
 
-    private final GameManagementService gameService;
-
+    private final GameManagementService gameManagementService;
     private final StatsService statsService;
-
     private final UserManagementService userService;
-
 
     /**
      * 관리자 페이지에서 모든 회원 리스트를 가져온다
@@ -45,19 +45,15 @@ public class AdminController {
      * @return 회원 글 리스트
      */
     @GetMapping("/user")
-    public ResponseEntity<ResponseBodyFormatter> adminUser() {
+    public ResponseEntity<ResponseBodyFormatter> adminUser(@CurrentUser Account account) {
 
-        Long userId = 2L;
+        Long userId = account.getId();
 
-
-        if (userId == null) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap("userList", userService.userList()));
 
-
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(USER_LIST, userService.userList()));
     }
 
     /**
@@ -66,34 +62,19 @@ public class AdminController {
      * @return 게임 글 리스트
      */
     @GetMapping("/game")
-    public ResponseEntity<ResponseBodyFormatter> adminGame() {
+    public ResponseEntity<ResponseBodyFormatter> adminGame(@CurrentUser Account account) {
 
+        Long userId = account.getId();
 
-        Long userId = 2L;
-
-        if (userId == null) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
-        List<GameDTO> gameList = gameService.gameList();
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap("gameList", gameService.gameList()));
+
+        List<GameDTO> gameList = gameManagementService.gameList();
+
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(GAME_LIST, gameManagementService.gameList()));
     }
-
-    /*    *//**
-     * 관리자 페이지에서 모든 용병 글 리스트를 가져온다
-     * @param model
-     * @return 용병 글 리스트
-     *//*
-
-    @GetMapping("/game/sub")
-    public String adminSub(Model model) {
-        model.addAttribute("subList", gameService.gameList());
-        return "admin_sub";
-
-
-    }*/
 
     /**
      * 통계 데이터를 가져와 보여준다
@@ -101,14 +82,11 @@ public class AdminController {
      * @return 이번달 통계와 이번달의 하루 통계를 보여준다
      */
     @GetMapping("/stats")
-    public ResponseEntity<ResponseBodyFormatter> getGameStats() {
+    public ResponseEntity<ResponseBodyFormatter> getGameStats(@CurrentUser Account account) {
 
+        Long userId = account.getId();
 
-        Long userId = 2L;
-
-        if (userId == null) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (userService.isAdmin(userId)) {
+        if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
@@ -121,7 +99,7 @@ public class AdminController {
 
         return DataResponseBodyFormatter.put(
                 SuccessCode.SUCCESS,
-                Map.of("monthStats", monthStats, "monthlyDailyStats", monthlyDailyStats)
+                Map.of("monthStats", monthStats, MONTHLY_DAILY_STATS, monthlyDailyStats)
         );
     }
 
@@ -136,37 +114,15 @@ public class AdminController {
      * 올라온 매치글 수 의 당일 통계를 출력
      */
     @GetMapping("/main")
-    public ResponseEntity<ResponseBodyFormatter> getUserAndGameStats() {
+    public ResponseEntity<ResponseBodyFormatter> getUserAndGameStats(@CurrentUser Account account) {
 
-        Long userId = 2L;
-
-        if (userId == null) {
-            throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
-        } else if (userService.isAdmin(userId)) {
-            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
-        }
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap("dailyStats", statsService.getAdminStats()));
-
-    }
-
-
-    /**
-     * 관리자 체크
-     * userRole ==0 이면 에러
-     * userRole==1 이면 성공
-     *
-     * @return
-     */
-    @GetMapping("/isAdmin")
-    public ResponseEntity<ResponseBodyFormatter> isAdmin() {
-        Long userId = 2L;
+        Long userId = account.getId();
 
         if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
-        return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(DAILY_STATS, statsService.getAdminStats()));
     }
-
 
 }

@@ -28,6 +28,7 @@ public class MatchApplicantController {
 
     private final MatchApplicantService matchApplicantService;
 
+
     /**
      * 상대 팀으로 게임 신청 시, 호출되는 api
      * <p>

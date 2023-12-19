@@ -51,6 +51,7 @@ public class MatchTeamController {
     public ResponseEntity<ResponseBodyFormatter> acceptAwayTeam(@RequestBody AcceptTeamRequestDto acceptTeamDto,
                                                                 @CurrentUser Account account) {
 
+
         Long loginUserId = account.getId();
         Long confirmedGameId = matchTeamService.acceptAwayTeam(loginUserId, acceptTeamDto);
 

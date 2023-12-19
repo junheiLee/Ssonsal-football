@@ -1,5 +1,10 @@
 package com.ssonsal.football.rank.controller;
 
+import com.ssonsal.football.admin.exception.AdminErrorCode;
+import com.ssonsal.football.admin.service.UserManagementService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
 import com.ssonsal.football.rank.service.RankService;
@@ -11,8 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
@@ -22,19 +25,22 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class RankController {
 
     private final RankService rankService;
+    private final UserManagementService userManagementService;
 
     @GetMapping
-    public ResponseEntity<ResponseBodyFormatter> ranks(HttpServletRequest request) {
-
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+    public ResponseEntity<ResponseBodyFormatter> ranks() {
 
         return DataResponseBodyFormatter.put(SUCCESS, rankService.findRankList());
     }
 
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> updateRanks(HttpServletRequest request) {
+    public ResponseEntity<ResponseBodyFormatter> updateRanks(@CurrentUser Account account) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        Long user = account.getId();
+
+        if (userManagementService.isAdmin(user)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
+        }
 
         return DataResponseBodyFormatter.put(SUCCESS, rankService.updateRank());
     }
