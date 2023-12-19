@@ -29,12 +29,12 @@ public class MessageController {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
 
-        Long userId = 2L;
+        Long userId = 1L;
 
         if (userService.isAdmin(userId)) {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
-
+        alarmService.updateUserRole(userId);
         try {
             return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, alarmService.subscribeMessage(topicArn, userId));
         } catch (CustomException e) {
@@ -47,6 +47,7 @@ public class MessageController {
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody ResponseMessageDTO responseMessageDTO) {
 
         String topicArn = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
+
 
         Long userId = 2L;
 
@@ -77,6 +78,7 @@ public class MessageController {
         }
         try {
             alarmService.unsubscribeMessage(topicArn, userId);
+            alarmService.updateUserRole(userId);
 
             return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
 

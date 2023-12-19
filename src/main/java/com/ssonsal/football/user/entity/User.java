@@ -90,6 +90,10 @@ public class User extends BaseEntity implements UserDetails {
         this.role = role;
     }
 
+    public void messageAuth(int role) {
+        this.role = role;
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

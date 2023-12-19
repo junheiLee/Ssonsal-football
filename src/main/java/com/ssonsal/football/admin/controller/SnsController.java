@@ -155,6 +155,7 @@ public class SnsController {
             throw new CustomException(AdminErrorCode.USER_NOT_AUTHENTICATION);
         }
         try {
+
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, alarmService.unsubscribe(topicArn, userId));
         } catch (CustomException e) {
             log.error("구독 취소 에러", e);
