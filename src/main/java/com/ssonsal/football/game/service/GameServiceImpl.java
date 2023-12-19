@@ -1,8 +1,8 @@
 package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.CreateGameRequestDto;
-import com.ssonsal.football.game.dto.request.EnterResultRequestDto;
 import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.EnterResultRequestDto;
 import com.ssonsal.football.game.dto.response.GameInfoResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
@@ -43,29 +43,6 @@ public class GameServiceImpl implements GameService {
     private final GameRepository gameRepository;
     private final MatchApplicationRepository matchApplicationRepository;
     private final UserRepository userRepository;
-
-    @Override
-    public GameInfoResponseDto findGame(Long gameId) {
-
-        Game game = getGame(gameId);
-        MatchApplication homeApplication = getTeamApplication(game.getHome().getId(), game.getId());
-
-        Long awayId, awayApplicationId;
-        if (game.getAway() == null) {
-            awayId = null;
-            awayApplicationId = null;
-        } else {
-            MatchApplication awayApplication = getTeamApplication(game.getAway().getId(), game.getId());
-            awayId = awayApplication.getTeam().getId();
-            awayApplicationId = awayApplication.getId();
-        }
-        return new GameInfoResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
-    }
-
-    private MatchApplication getTeamApplication(Long teamId, Long gameId){
-        return matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
-                .orElse(null);
-    }
 
     @Override
     @Transactional
@@ -128,6 +105,29 @@ public class GameServiceImpl implements GameService {
     private LocalDateTime stringToLocalDateTime(String dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
         return LocalDateTime.parse(dateTime, formatter);
+    }
+
+    @Override
+    public GameInfoResponseDto findGameInfo(Long gameId) {
+
+        Game game = getGame(gameId);
+        MatchApplication homeApplication = getTeamApplication(game.getHome().getId(), game.getId());
+
+        Long awayId, awayApplicationId;
+        if (game.getAway() == null) {
+            awayId = null;
+            awayApplicationId = null;
+        } else {
+            MatchApplication awayApplication = getTeamApplication(game.getAway().getId(), game.getId());
+            awayId = awayApplication.getTeam().getId();
+            awayApplicationId = awayApplication.getId();
+        }
+        return new GameInfoResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
+    }
+
+    private MatchApplication getTeamApplication(Long teamId, Long gameId) {
+        return matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
+                .orElse(null);
     }
 
     @Override
@@ -201,15 +201,15 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameListResponseDto> findMyGamesAsSub(Long userId) {
+    public List<GameListResponseDto> findGamesBySub(Long userId) {
 
-        return gameRepository.searchMyGameAsSub(userId);
+        return gameRepository.searchGameBySub(userId);
     }
 
     @Override
-    public List<GameListResponseDto> findOurGamesAsTeam(Long teamId) {
+    public List<GameListResponseDto> findGamesByTeam(Long teamId) {
 
-        return gameRepository.searchOurGameAsTeam(teamId);
+        return gameRepository.searchGameByTeam(teamId);
     }
 
 }

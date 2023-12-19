@@ -33,7 +33,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom {
                 .fetch();
     }
 
-    public List<GameListResponseDto> searchMyGameAsSub(Long userId) {
+    public List<GameListResponseDto> searchGameBySub(Long userId) {
 
         //select * from game as g join sub as s where g.id = s.game_id and s.user_id = 11; 이거 어케할지 모르겟음
 
@@ -46,7 +46,7 @@ public class GameRepositoryImpl implements GameRepositoryCustom {
     }
 
     @Override
-    public List<GameListResponseDto> searchOurGameAsTeam(Long teamId) {
+    public List<GameListResponseDto> searchGameByTeam(Long teamId) {
 
         return queryFactory
                 .select(new QGameListResponseDto(game.id, game.schedule.stringValue(), game.region,

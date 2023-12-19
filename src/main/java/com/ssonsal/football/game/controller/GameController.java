@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.GameSuccessCode.WAIT_FOR_ANOTHER_TEAM;
+import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
-import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class GameController {
     @GetMapping("/{gameId}")
     public ResponseEntity<ResponseBodyFormatter> readGameInfo(@PathVariable Long gameId) {
 
-        GameInfoResponseDto gameInfoResponseDto = gameService.findGame(gameId);
+        GameInfoResponseDto gameInfoResponseDto = gameService.findGameInfo(gameId);
         return DataResponseBodyFormatter.put(SUCCESS, toMap(GAME_INFO, gameInfoResponseDto));
     }
 
@@ -90,7 +90,7 @@ public class GameController {
     /**
      * 모든 게임 글 목록을 반환하는 api
      *
-     * @return
+     * @return 모든 팀 리스트 반환
      */
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> readGames() {
@@ -129,7 +129,7 @@ public class GameController {
     @GetMapping("/subs/{userId}")
     public ResponseEntity<ResponseBodyFormatter> myGamesAsSub(@PathVariable Long userId) {
 
-        return DataResponseBodyFormatter.put(SUCCESS, toMap(GAMES, gameService.findMyGamesAsSub(userId)));
+        return DataResponseBodyFormatter.put(SUCCESS, toMap(GAMES, gameService.findGamesBySub(userId)));
     }
 
     /**
@@ -141,7 +141,7 @@ public class GameController {
     @GetMapping("/teams/{teamId}")
     public ResponseEntity<ResponseBodyFormatter> ourGamesAsTeam(@PathVariable Long teamId) {
 
-        return DataResponseBodyFormatter.put(SUCCESS, toMap(GAMES, gameService.findOurGamesAsTeam(teamId)));
+        return DataResponseBodyFormatter.put(SUCCESS, toMap(GAMES, gameService.findGamesByTeam(teamId)));
     }
 
 }

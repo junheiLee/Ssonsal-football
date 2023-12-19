@@ -8,9 +8,9 @@ import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
-import com.ssonsal.football.global.util.transfer.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.global.util.transfer.Transfer;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
@@ -25,8 +25,8 @@ import java.util.Objects;
 import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
