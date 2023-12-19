@@ -58,7 +58,7 @@ public class GameServiceImpl implements GameService {
                         .writer(loginUser)
                         .home(home)
                         .matchStatus(isRequireAway(gameDto.isFindAway()))
-                        .schedule(stringToLocalDateTime(gameDto.getDate() + " " + gameDto.getTime()))
+                        .schedule(toLocalDateTime(gameDto.getDatetime()))
                         .createGameRequestDto(gameDto)
                         .build());
 
@@ -207,9 +207,8 @@ public class GameServiceImpl implements GameService {
                 .orElseThrow(() -> new CustomException(NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
     }
 
-    private LocalDateTime stringToLocalDateTime(String dateTime) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-        return LocalDateTime.parse(dateTime, formatter);
+    private LocalDateTime toLocalDateTime(String dateTime) {
+        return LocalDateTime.parse(dateTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
 }
