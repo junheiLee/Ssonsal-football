@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
+import com.ssonsal.football.game.dto.request.AcceptTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
@@ -41,7 +41,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     private final SubRepository subRepository;
 
     @Override
-    public MatchTeamResponseDto getMatchTeam(Long matchTeamId) {
+    public MatchTeamResponseDto findMatchTeamInfo(Long matchTeamId) {
 
 
         MatchTeamResponseDto matchTeam = matchApplicationRepository.searchMatchTeamDto(matchTeamId);
@@ -60,7 +60,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     @Override
     @Transactional
-    public Long approveAwayTeam(Long loginUserId, ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public Long acceptAwayTeam(Long loginUserId, AcceptTeamRequestDto approvalAwayTeamDto) {
 
         User loginUser = getUser(loginUserId);
 

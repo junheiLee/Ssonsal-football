@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public interface MatchApplicantService {
      * @param applicationTeamDto 신청 시 기입한 정보
      * @return 신청서 식별자
      */
-    Long applyToMatchAsAway(Long loginUserId, Long gameId, MatchApplicationRequestDto applicationTeamDto);
+    Long applyToMatchAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto);
 
     /**
      * 회원이 해당 게임의 작성자인 경우,

@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.controller;
 
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.service.MatchApplicantService;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
@@ -55,7 +55,7 @@ public class MatchApplicantController {
      * @return 성공 코드와 생성된 매치팀 아이디를 ResponseBody에 담아 반환
      */
     @PostMapping("/{gameId}/match-applications")
-    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody MatchApplicationRequestDto applicationTeamDto,
+    public ResponseEntity<ResponseBodyFormatter> applyToGameAsAway(@RequestBody CreateMatchApplicationRequestDto applicationTeamDto,
                                                                    @PathVariable Long gameId) {
 
         Long loginUserId = 7L;

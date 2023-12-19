@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
@@ -45,7 +45,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
 
     @Override
     @Transactional
-    public Long applyToMatchAsAway(Long loginUserId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToMatchAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto) {
 
         User loginUser = getUser(loginUserId);
         Team loginUserTeam = validateUserInTeam(loginUser.getTeam());

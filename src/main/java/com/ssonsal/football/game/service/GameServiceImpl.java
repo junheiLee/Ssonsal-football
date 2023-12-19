@@ -2,7 +2,7 @@ package com.ssonsal.football.game.service;
 
 import com.ssonsal.football.game.dto.request.CreateGameRequestDto;
 import com.ssonsal.football.game.dto.request.EnterResultRequestDto;
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.GameInfoResponseDto;
 import com.ssonsal.football.game.dto.response.GameListResponseDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
@@ -48,23 +48,22 @@ public class GameServiceImpl implements GameService {
     public GameInfoResponseDto findGame(Long gameId) {
 
         Game game = getGame(gameId);
-        MatchApplication homeApplication = getHomeApplication(game);
+        MatchApplication homeApplication = getTeamApplication(game.getHome().getId(), game.getId());
 
         Long awayId, awayApplicationId;
         if (game.getAway() == null) {
             awayId = null;
             awayApplicationId = null;
         } else {
-            MatchApplication awayApplication =
-                    matchApplicationRepository.findByTeamIdAndGameId(game.getAway().getId(), gameId).get();
+            MatchApplication awayApplication = getTeamApplication(game.getAway().getId(), game.getId());
             awayId = awayApplication.getTeam().getId();
             awayApplicationId = awayApplication.getId();
         }
         return new GameInfoResponseDto(game, homeApplication.getId(), awayId, awayApplicationId);
     }
 
-    private MatchApplication getHomeApplication(Game game){
-        return matchApplicationRepository.findByTeamIdAndGameId(game.getHome().getId(), game.getId())
+    private MatchApplication getTeamApplication(Long teamId, Long gameId){
+        return matchApplicationRepository.findByTeamIdAndGameId(teamId, gameId)
                 .orElse(null);
     }
 
@@ -72,7 +71,7 @@ public class GameServiceImpl implements GameService {
     @Transactional
     public Long insertGame(Long loginUserId, CreateGameRequestDto gameDto) {
 
-        MatchApplicationRequestDto homeDto = new MatchApplicationRequestDto(gameDto);
+        CreateMatchApplicationRequestDto homeDto = new CreateMatchApplicationRequestDto(gameDto);
         validateHasTarget(gameDto.isFindAway(), homeDto.getSubCount());
         User loginUser = getUser(loginUserId);
         Team home = getUserTeam(loginUser);

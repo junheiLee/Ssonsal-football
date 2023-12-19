@@ -14,9 +14,12 @@ public final class GameConstant {
     public static final String GAME_RESULT = "gameResult";
     public static final String GAMES = "games";
 
+    /*MatchTeam*/
+    public static final String MATCH_TEAM_INFO = "matchTeamInfo";
+    public static final String CONFIRMED_GAME_ID = "confirmedGameId";
+
     public static final String AWAY = "away";
     public static final String HOME = "home";
-    public static final String MATCH_TEAM = "matchTeam";
 
     public static final String LOGIN_USER = "loginUser";
 
@@ -30,7 +33,6 @@ public final class GameConstant {
     public static final String TEAM_RECORD_ID = "teamRecordId";
     public static final String SUB_APPLICANT_ID = "subApplicantId";
 
-    public static final String CONFIRMED_GAME_ID = "confirmedGameId";
     public static final String MATCH_APPLICATION_ID = "matchApplicationId";
     public static final String CLOSED_MATCH_APPLICATION_ID = "closeMatchApplicationId";
     public static final String REJECTED_MATCH_APPLICATION_ID = "rejectedMatchApplicationId";
@@ -39,7 +41,6 @@ public final class GameConstant {
 
 
     /* code */
-    public static final int DELETED = 1;
     public static final int NOT_DELETED = 0;
 
     /* count */

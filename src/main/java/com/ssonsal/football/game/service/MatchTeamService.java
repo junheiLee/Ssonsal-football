@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
+import com.ssonsal.football.game.dto.request.AcceptTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
@@ -14,16 +14,16 @@ public interface MatchTeamService {
      * @param matchTeamId 해당 게임 신청 식별자
      * @return 확정된 게임 정보
      */
-    MatchTeamResponseDto getMatchTeam(Long matchTeamId);
+    MatchTeamResponseDto findMatchTeamInfo(Long matchTeamId);
 
     /**
      * 승인할 팀 정보를 통해 대상 게임의 상대 팀 신청을 승인하는 기능
      *
      * @param loginUserId     해당 기능을 호출한 회원 식별자
-     * @param approvalAwayDto 신청을 승인할 팀 정보
+     * @param acceptTeamDto 신청을 승인할 팀 정보
      * @return 상대팀이 확정된 게임의 아이디 반환
      */
-    Long approveAwayTeam(Long loginUserId, ApprovalTeamRequestDto approvalAwayDto);
+    Long acceptAwayTeam(Long loginUserId, AcceptTeamRequestDto acceptTeamDto);
 
     /**
      * 등록팀의 입력일 경우, 상대팀의 결과 기입에 따라 롤백이나 입력 완료.
