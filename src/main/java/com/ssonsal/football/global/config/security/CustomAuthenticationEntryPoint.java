@@ -23,7 +23,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException ex) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        log.info("[commence] 인증 실패로 response.sendError 발생");
 
         EntryPointErrorResponse entryPointErrorResponse = new EntryPointErrorResponse();
         entryPointErrorResponse.setMsg("인증이 실패하였습니다.");
