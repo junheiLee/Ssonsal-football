@@ -31,12 +31,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportResponseDto> getAllReports() {
-        List<Report> reports = reportRepository.findAll();
-//        List<Team> teamList = teamRepository.findAllByOrderByIdDesc();
-//
-//        return teamList.stream()
-//                .map(team -> new TeamListDto(team, findRank(team.getId()), findAgeAverage(team.getId())))
-//                .collect(Collectors.toList());
+        List<Report> reports = reportRepository.findByReportCode(0);
 
         return reports.stream()
                 .map(report -> new ReportResponseDto(report))
@@ -65,14 +60,13 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Transactional
-    public void updateDeleteCode(Long reportId, Integer reportCode) {
+    public void updateDeleteCode(Long reportId, Long reviewId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.ID_NOT_FOUND));
 
-        if (!(reportCode == 0 || reportCode == 1)) {
-            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
-        }
+        int reportCode = 1;
 
+        reviewRepository.updateDeleteCodeByReviewId(reviewId);
         report.updateReport(reportCode);
     }
 }

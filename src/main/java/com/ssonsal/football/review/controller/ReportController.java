@@ -63,7 +63,7 @@ public class ReportController {
      */
     @PatchMapping("/{reportId}")
     public ResponseEntity<ResponseBodyFormatter> updateReportCode(
-            @PathVariable Long reportId, @RequestParam(name = "reportCode", required = false) Integer reportCode, @CurrentUser Account account) {
+            @PathVariable Long reportId, @RequestBody Long reviewId, @CurrentUser Account account) {
 
         Long user = account.getId();
 
@@ -71,7 +71,7 @@ public class ReportController {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
-        reportService.updateDeleteCode(reportId, reportCode);
+        reportService.updateDeleteCode(reportId, reviewId);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS);
     }
