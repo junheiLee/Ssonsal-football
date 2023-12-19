@@ -8,8 +8,7 @@ import lombok.ToString;
 @Getter
 public class CreateGameRequestDto {
 
-    private String date;
-    private String time;
+    private String datetime;
     private int gameTime;
     private String region;
     private String stadium;

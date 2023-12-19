@@ -37,8 +37,8 @@ public class MatchTeamController {
     @GetMapping("/{matchApplicationId}")
     public ResponseEntity<ResponseBodyFormatter> readMatchTeamInfo(@PathVariable Long matchApplicationId) {
 
-        MatchTeamResponseDto matchTeam = matchTeamService.findMatchTeamInfo(matchApplicationId);
-        return DataResponseBodyFormatter.put(SUCCESS, toMap(MATCH_TEAM_INFO, matchTeam));
+        MatchTeamResponseDto matchTeamInfo = matchTeamService.findMatchTeamInfo(matchApplicationId);
+        return DataResponseBodyFormatter.put(SUCCESS, toMap(MATCH_TEAM_INFO, matchTeamInfo));
     }
 
     /**

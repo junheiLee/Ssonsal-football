@@ -116,7 +116,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
         // 한 팀만 승패를 입력한 경우
         if (awayResultInKo == null) {
-            return gameResultResponseDto.setTotalScore(homeScore);
+            return gameResultResponseDto.calTotalScore(homeScore);
         }
 
         TeamResult awayResult = peekResult(awayResultInKo);
@@ -126,7 +126,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         if (totalScore.equals(END.getScore())) {
 
             enterResult(game, homeResult, awayResult);
-            return gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto.calTotalScore(totalScore);
         }
 
         // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
@@ -148,7 +148,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
         // 한 팀만 승패를 입력한 경우
         if (homeResultInKo == null) {
-            return gameResultResponseDto.setTotalScore(awayScore);
+            return gameResultResponseDto.calTotalScore(awayScore);
         }
 
         TeamResult homeResult = peekResult(homeResultInKo);
@@ -158,7 +158,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         if (totalScore.equals(END.getScore())) {
 
             enterResult(game, homeResult, awayResult);
-            return gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto.calTotalScore(totalScore);
         }
 
         // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
