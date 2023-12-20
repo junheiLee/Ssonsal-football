@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.MatchApplicationRequestDto;
+import com.ssonsal.football.game.dto.request.CreateMatchApplicationRequestDto;
 import com.ssonsal.football.game.dto.response.MatchApplicationsResponseDto;
 import com.ssonsal.football.game.entity.Game;
 import com.ssonsal.football.game.entity.MatchApplication;
@@ -8,9 +8,9 @@ import com.ssonsal.football.game.entity.MatchStatus;
 import com.ssonsal.football.game.exception.GameErrorCode;
 import com.ssonsal.football.game.repository.GameRepository;
 import com.ssonsal.football.game.repository.MatchApplicationRepository;
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.ErrorCode;
+import com.ssonsal.football.global.util.transfer.Transfer;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.repository.UserRepository;
@@ -25,8 +25,8 @@ import java.util.Objects;
 import static com.ssonsal.football.game.entity.ApplicantStatus.WAITING;
 import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.FORBIDDEN_USER;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,15 +39,11 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     private final MatchApplicationRepository matchApplicationRepository;
 
     @Override
-    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
-        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
-    }
-
-    @Override
     @Transactional
-    public Long applyToMatchAsAway(Long loginUserId, Long gameId, MatchApplicationRequestDto applicationTeamDto) {
+    public Long applyToGameAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto) {
 
         User loginUser = getUser(loginUserId);
+        log.info("MatchApplicantServiceImpl.applyToGameAsAway loginUserId={}, userTeam = {}", loginUserId, loginUser.getTeam().getId());
         Team loginUserTeam = validateUserInTeam(loginUser.getTeam());
         Game game = getGame(gameId);
 
@@ -73,11 +69,6 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
             throw new CustomException(GameErrorCode.NOT_IN_TEAM);
         }
         return userTeam;
-    }
-
-    private Game getGame(Long gameId) {
-        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
-                .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
     }
 
     private void validateGameIsWaiting(Game game) {
@@ -119,11 +110,6 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         return matchApplication.getId();
     }
 
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-    }
-
     private void validateUserPermission(User user, Long gameId) {
 
         if (!gameRepository.existsByIdAndWriterEquals(gameId, user)) {
@@ -133,4 +119,18 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
         }
     }
 
+    @Override
+    public List<MatchApplicationsResponseDto> findWaitingApplications(Long gameId) {
+        return matchApplicationRepository.findByGameIdAndApplicationStatusIs(gameId, WAITING.getDescription());
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private Game getGame(Long gameId) {
+        return gameRepository.findByIdAndDeleteCodeIs(gameId, NOT_DELETED)
+                .orElseThrow(() -> new CustomException(GameErrorCode.NOT_EXIST_GAME, longIdToMap(GAME_ID, gameId)));
+    }
 }

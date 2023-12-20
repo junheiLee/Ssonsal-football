@@ -1,12 +1,12 @@
 package com.ssonsal.football.team.controller;
 
-import com.ssonsal.football.game.util.Transfer;
 import com.ssonsal.football.global.account.Account;
 import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import com.ssonsal.football.global.util.transfer.Transfer;
 import com.ssonsal.football.team.dto.request.TeamCreateDto;
 import com.ssonsal.football.team.dto.request.TeamEditDto;
 import com.ssonsal.football.team.exception.TeamErrorCode;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Map;
 
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 import static com.ssonsal.football.team.util.TeamConstant.*;
 
 
@@ -42,7 +42,7 @@ public class TeamController {
     @GetMapping
     public ResponseEntity<ResponseBodyFormatter> findAllTeams() {
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findAllTeams()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(TEAMS, teamService.findAllTeams()));
     }
 
     /**
@@ -53,7 +53,7 @@ public class TeamController {
     @GetMapping("/recruit")
     public ResponseEntity<ResponseBodyFormatter> findAllRecruitTeams() {
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findRecruitList()));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(TEAMS, teamService.findRecruitList()));
     }
 
     /**
@@ -65,7 +65,7 @@ public class TeamController {
     @GetMapping("/search")
     public ResponseEntity<ResponseBodyFormatter> findAllSearchTeams(@RequestParam String keyword) {
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(TEAMS, teamService.findSearchList(keyword)));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(TEAMS, teamService.findSearchList(keyword)));
     }
 
     /**
@@ -148,7 +148,7 @@ public class TeamController {
             throw new CustomException(TeamErrorCode.MEMBER_NOT_LEADER);
         }
 
-        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(FORM, teamService.loadEditTeam(teamId)));
+        return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(FORM, teamService.loadEditTeam(teamId)));
     }
 
     /**

@@ -13,6 +13,8 @@ import java.time.Period;
 @ToString
 public class ProfileResultDto {
 
+    private Long id;
+
     private String email;
 
     private Long teamId;
@@ -43,10 +45,10 @@ public class ProfileResultDto {
 
 
     public ProfileResultDto(User user) {
-
+        this.id = user.getId();
         this.email = user.getEmail();
         this.teamId = (user.getTeam() != null) ? user.getTeam().getId() : 0L; // 혹은 다른 기본값으로 설정
-        this.teamName = (user.getTeam() != null) ? user.getTeam().getName() : "팀에 소속되어 있지 않습니다"; // 혹은 다른 기본값으로 설정
+        this.teamName = (user.getTeam() != null) ? user.getTeam().getName() : "무소속"; // 혹은 다른 기본값으로 설정
         this.name = user.getName();
         this.age = calculateAge(user.getBirth());
         this.gender = user.getGender();
@@ -54,7 +56,6 @@ public class ProfileResultDto {
         this.position = user.getPosition();
         this.phone = user.getPhone();
         this.intro = user.getIntro();
-        ;
         this.preferredArea = user.getPreferredArea();
         this.preferredTime = user.getPreferredTime();
         this.skillScore = user.getSkillScore();

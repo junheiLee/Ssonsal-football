@@ -6,12 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import static com.ssonsal.football.game.util.Transfer.toStringSchedule;
+import static com.ssonsal.football.global.util.transfer.Transfer.toStringSchedule;
 
 @ToString
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameDetailResponseDto {
+public class GameInfoResponseDto {
 
     private Long homeId;
     private Long awayId;
@@ -30,7 +30,7 @@ public class GameDetailResponseDto {
     private String homeResult;
     private String awayResult;
 
-    public GameDetailResponseDto(Game game, Long homeApplicationId, Long awayId, Long awayApplicationId) {
+    public GameInfoResponseDto(Game game, Long homeApplicationId, Long awayId, Long awayApplicationId) {
         this.homeId = game.getHome().getId();
         this.awayId = awayId;
         this.homeApplicationId = homeApplicationId;

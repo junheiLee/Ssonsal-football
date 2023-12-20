@@ -1,5 +1,7 @@
 package com.ssonsal.football.admin.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssonsal.football.admin.exception.AdminErrorCode;
 import com.ssonsal.football.admin.exception.AdminSuccessCode;
 import com.ssonsal.football.admin.service.AlarmService;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 import static com.ssonsal.football.admin.util.AdminConstant.*;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
 @Slf4j
 @RestController
@@ -68,7 +70,7 @@ public class SnsController {
 
         try {
             alarmService.subscribeEmail(SSONSAL_EMAIL, userId);
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, toMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
 
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -88,7 +90,7 @@ public class SnsController {
         Long userId = account.getId();
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
 
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
@@ -109,13 +111,24 @@ public class SnsController {
     @PostMapping("/publishEmail")
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody Map<String, String> emailText, @CurrentUser Account account) {
 
+        Long userId = account.getId();
 
-         Long userId = account.getId();
+        if (userManagementService.isAdmin(userId)) {
+            throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
+        }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
+            ObjectMapper objectMapper = new ObjectMapper();
+            String emailTextJson = objectMapper.writeValueAsString(emailText);
+
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailTextJson)));
         } catch (CustomException e) {
+
             throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED);
+
+        } catch (JsonProcessingException e) {
+            log.error("JSON 처리 실패", e);
+            throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED, e);
         }
     }
 
@@ -132,7 +145,7 @@ public class SnsController {
         Long userId = account.getId();
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
 
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

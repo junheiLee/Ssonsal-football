@@ -180,15 +180,12 @@ public class AlarmServiceImpl implements AlarmService {
     }
 
     @Override
-    public String publishEmail(String topicArn, Map<String, String> payload) {
+    public String publishEmail(String topicArn,String emailTextJson) {
         try {
             SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
-            // "emailText" 키에 해당하는 값을 추출
-            String emailText = payload.get("emailText");
-
             // HTML에서 <p> 태그를 제거하고 텍스트만 추출
-            String emailContent = removePTags(emailText);
+            String emailContent = removePTags(emailTextJson);
 
             final PublishRequest publishRequest = PublishRequest.builder()
                     .topicArn(topicArn)
@@ -265,7 +262,7 @@ public class AlarmServiceImpl implements AlarmService {
     @Override
     public String subscribeMessage(String topicArn, Long userId) {
 
-     //   String memberPhone = getUserByPhone(userId);
+        //   String memberPhone = getUserByPhone(userId);
         String memberPhone = "010-5967-3459";
         String phoneNumber = "+82" + memberPhone.substring(2).replace("-", "");
 
@@ -298,7 +295,7 @@ public class AlarmServiceImpl implements AlarmService {
             Game game = gameManagementRepository.findById(confirmedGameId)
                     .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND, confirmedGameId));
 
-          //  String userPhoneNumber = game.getAwayApplicant().getPhone();
+            //  String userPhoneNumber = game.getAwayApplicant().getPhone();
 
             String userPhoneNumber = "8201059673459";
 
@@ -308,16 +305,16 @@ public class AlarmServiceImpl implements AlarmService {
 
             SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
-                    PublishRequest publishRequest = PublishRequest.builder()
-                            .phoneNumber(userPhoneNumber)
-                            .message(gameMessage)
-                            .build();
+            PublishRequest publishRequest = PublishRequest.builder()
+                    .phoneNumber(userPhoneNumber)
+                    .message(gameMessage)
+                    .build();
 
-                    PublishResponse publishResponse = snsClient.publish(publishRequest);
+            PublishResponse publishResponse = snsClient.publish(publishRequest);
 
-                    snsClient.close();
+            snsClient.close();
 
-                    return publishResponse + "메시지 전송 성공";
+            return publishResponse + "메시지 전송 성공";
 
         } catch (Exception e) {
 

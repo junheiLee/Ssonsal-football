@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.service;
 
-import com.ssonsal.football.game.dto.request.ApprovalTeamRequestDto;
+import com.ssonsal.football.game.dto.request.AcceptTeamRequestDto;
 import com.ssonsal.football.game.dto.response.GameResultResponseDto;
 import com.ssonsal.football.game.dto.response.MatchTeamResponseDto;
 import com.ssonsal.football.game.entity.Game;
@@ -25,8 +25,8 @@ import static com.ssonsal.football.game.exception.GameErrorCode.*;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.TeamResult.END;
 import static com.ssonsal.football.game.util.TeamResult.peekResult;
-import static com.ssonsal.football.game.util.Transfer.longIdToMap;
 import static com.ssonsal.football.global.util.ErrorCode.USER_NOT_FOUND;
+import static com.ssonsal.football.global.util.transfer.Transfer.longIdToMap;
 
 
 @Slf4j
@@ -41,7 +41,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
     private final SubRepository subRepository;
 
     @Override
-    public MatchTeamResponseDto getMatchTeam(Long matchTeamId) {
+    public MatchTeamResponseDto findMatchTeamInfo(Long matchTeamId) {
 
 
         MatchTeamResponseDto matchTeam = matchApplicationRepository.searchMatchTeamDto(matchTeamId);
@@ -60,7 +60,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
     @Override
     @Transactional
-    public Long approveAwayTeam(Long loginUserId, ApprovalTeamRequestDto approvalAwayTeamDto) {
+    public Long acceptAwayTeam(Long loginUserId, AcceptTeamRequestDto approvalAwayTeamDto) {
 
         User loginUser = getUser(loginUserId);
 
@@ -73,21 +73,10 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         validateGameIsWaiting(game);
         validateIsNotHome(game, targetApplication.getTeam());
 
-        game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
+        game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경, SubCount = 0으로 변경
         targetApplication.approve();
 
         return game.getId();
-    }
-
-    private User getUser(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
-    }
-
-    private MatchApplication getMatchApplication(Long matchApplicationId) {
-        return matchApplicationRepository.findById(matchApplicationId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
-                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
     }
 
     private void validateUserInTargetTeam(Team targetTeam, Team userTeam) {
@@ -127,7 +116,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
         // 한 팀만 승패를 입력한 경우
         if (awayResultInKo == null) {
-            return gameResultResponseDto.setTotalScore(homeScore);
+            return gameResultResponseDto.calTotalScore(homeScore);
         }
 
         TeamResult awayResult = peekResult(awayResultInKo);
@@ -137,7 +126,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         if (totalScore.equals(END.getScore())) {
 
             enterResult(game, homeResult, awayResult);
-            return gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto.calTotalScore(totalScore);
         }
 
         // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
@@ -159,7 +148,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
 
         // 한 팀만 승패를 입력한 경우
         if (homeResultInKo == null) {
-            return gameResultResponseDto.setTotalScore(awayScore);
+            return gameResultResponseDto.calTotalScore(awayScore);
         }
 
         TeamResult homeResult = peekResult(homeResultInKo);
@@ -169,7 +158,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         if (totalScore.equals(END.getScore())) {
 
             enterResult(game, homeResult, awayResult);
-            return gameResultResponseDto.setTotalScore(totalScore);
+            return gameResultResponseDto.calTotalScore(totalScore);
         }
 
         // 승-패, 패-승, 무-무 외의 입력은 양팀에서 입력한 결과를 초기화 시킨다.
@@ -190,14 +179,25 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         game.end();
     }
 
-    private TeamRecord getTeamRecord(Long teamId) {
-        return teamRecordRepository.findById(teamId)
-                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
-    }
-
     private void initResult(Game game) {
         game.enterHomeTeamResult(null);
         game.enterAwayTeamResult(null);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND, longIdToMap(USER_ID, userId)));
+    }
+
+    private MatchApplication getMatchApplication(Long matchApplicationId) {
+        return matchApplicationRepository.findById(matchApplicationId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_APPLICATION,
+                        longIdToMap(MATCH_APPLICATION_ID, matchApplicationId)));
+    }
+
+    private TeamRecord getTeamRecord(Long teamId) {
+        return teamRecordRepository.findById(teamId)
+                .orElseThrow(() -> new CustomException(NOT_EXIST_TEAM, longIdToMap(TEAM_RECORD_ID, teamId)));
     }
 
 }
