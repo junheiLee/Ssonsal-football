@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MatchApplicationsResponseDto {
 
+    private Long id;
     private Long teamId;
     private String name;
     private String uniform;
@@ -18,6 +19,7 @@ public class MatchApplicationsResponseDto {
     private LocalDateTime createdAt;
 
     public MatchApplicationsResponseDto(MatchApplication matchApplication) {
+        this.id = matchApplication.getId();
         this.teamId = matchApplication.getTeam().getId();
         this.name = matchApplication.getTeam().getName();
         this.uniform = matchApplication.getUniform();

@@ -22,7 +22,7 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/match-teams")
+@RequestMapping("/api/match-teams")
 @Tag(name = "MatchTeam", description = "MatchTeam API")
 public class MatchTeamController {
 

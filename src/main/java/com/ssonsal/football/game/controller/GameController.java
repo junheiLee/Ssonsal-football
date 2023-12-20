@@ -29,7 +29,7 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/games")
+@RequestMapping("/api/games")
 @Tag(name = "Game", description = "Game API")
 public class GameController {
 

@@ -80,6 +80,7 @@ public class MatchApplication extends BaseEntity {
 
     public void changeStatusToSuspension() {
         this.applicationStatus = SUSPENSION.getDescription();
+        this.subCount = 0;
     }
 
     public void closeSub() {

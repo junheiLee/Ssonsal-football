@@ -24,7 +24,7 @@ import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/match-teams")
+@RequestMapping("/api/match-teams")
 @Tag(name = "Sub", description = "Sub API")
 public class SubController {
 

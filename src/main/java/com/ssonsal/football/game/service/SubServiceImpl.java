@@ -73,7 +73,7 @@ public class SubServiceImpl implements SubService {
 
         // 해당 게임에 참여하는 각 팀에 소속된 용병 목록
         List<Sub> subs = subRepository.findByGameIdAndTeamId(team.getId(), game.getId());
-
+        log.info("리스트 크기={}", subs.size());
         return subs.stream()
                 .map(SubsResponseDto::new)
                 .collect(Collectors.toList());
