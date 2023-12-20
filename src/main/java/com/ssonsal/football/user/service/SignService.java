@@ -18,6 +18,6 @@ public interface SignService {
 
     String logOut(String email) throws RuntimeException;
 
-    ProfileResultDto viewProfile(String token) throws RuntimeException;
+    ProfileResultDto viewProfile(Long userId);
 
 }

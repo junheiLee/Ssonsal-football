@@ -145,15 +145,11 @@ public class SignServiceImpl implements SignService {
     }
 
     @Override
-    public ProfileResultDto viewProfile(String token) throws RuntimeException {
-        Long userId = jwtTokenProvider.getUserId(token);
-        log.info("[viewPofile] : 토큰에서 유저ID가져옴 : {}", userId);
-        log.info("[viewPofile] 유저 정보 검색 시작");
+    public ProfileResultDto viewProfile(Long userId) {
+
         Optional<User> user = userRepository.findById(userId);
-        log.info("[viewPofile] 유저ID로 검색한 유저 정보 Optional : {}", user);
+
         if (user.isPresent()) {
-            log.info("[viewPofile] 유저ID로 검색한 유저 정보 : {}", user.get());
-            log.info("[viewPofile] Dto 생성결과 : {}", new ProfileResultDto(user.get()));
             return new ProfileResultDto(user.get());
         } else {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
