@@ -100,7 +100,6 @@ public class AdminManagementController {
     @PostMapping("/stats/changeMonth")
     public ResponseEntity<ResponseBodyFormatter> updateMonth(@RequestBody UpdateMonthDto selectedDate, @CurrentUser Account account) {
 
-        log.info(selectedDate + " 날짜데이터");
         Long userId = account.getId();
 
         if (userManagementService.isAdmin(userId)) {
@@ -121,8 +120,6 @@ public class AdminManagementController {
                     SuccessCode.SUCCESS,
                     Map.of(MONTH_STATS, monthStats, MONTHLY_DAILY_STATS, monthlyDailyStats));
         } catch (DateTimeParseException e) {
-            // 파싱에 실패한 경우 예외 처리
-            log.error("날짜 파싱에 실패했습니다.", e);
             throw new CustomException(AdminErrorCode.INVALID_DATE_FORMAT);
         }
     }

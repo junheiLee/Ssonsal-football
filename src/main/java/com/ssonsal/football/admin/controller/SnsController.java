@@ -64,15 +64,13 @@ public class SnsController {
     @PostMapping("/memberSubscribe")
     public ResponseEntity<ResponseBodyFormatter> subscribeAllMembers(@CurrentUser Account account) {
 
-        log.info("컨트 시작");
-
         Long userId = account.getId();
 
         try {
             alarmService.subscribeEmail(SSONSAL_EMAIL, userId);
             return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_EMAIL, alarmService.subscribeEmail(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
-            log.error("이메일 구독 에러", e);
+
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
         }
     }
@@ -92,7 +90,7 @@ public class SnsController {
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(CONFIRM_SUBSCRIPTION, alarmService.confirmSubscription(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
-            log.error("구독 확인 실패", e);
+
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CHECK_FAILED);
         }
     }
@@ -111,14 +109,12 @@ public class SnsController {
     @PostMapping("/publishEmail")
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody Map<String, String> emailText, @CurrentUser Account account) {
 
-        log.info("컨트롤러 시작");
 
-        Long userId = account.getId();
+         Long userId = account.getId();
 
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailText)));
         } catch (CustomException e) {
-            log.error("이메일 전송 실패", e);
             throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED);
         }
     }
@@ -138,7 +134,7 @@ public class SnsController {
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
         } catch (CustomException e) {
-            log.error("구독 취소 에러", e);
+
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }
     }

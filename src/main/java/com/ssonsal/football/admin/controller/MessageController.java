@@ -39,7 +39,7 @@ public class MessageController {
         try {
             return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_MESSAGE, alarmService.subscribeMessage(SSONSAL_MESSAGE, userId)));
         } catch (CustomException e) {
-            log.error("구독 생성 실패", e);
+
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
         }
     }
@@ -47,12 +47,12 @@ public class MessageController {
     @PostMapping("/publishMessage")
     public ResponseEntity<ResponseBodyFormatter> publish(@RequestBody ResponseMessageDTO responseMessageDTO, @CurrentUser Account account) {
 
-        Long userId = account.getId();
+        Long userId = 30L;
 
         try {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_MESSAGE, alarmService.publishMessage(SSONSAL_MESSAGE, responseMessageDTO)));
         } catch (CustomException e) {
-            log.error("메세지 전송 실패", e);
+
             throw new CustomException(AdminErrorCode.MESSAGE_SEND_FAILED);
         }
     }
@@ -63,11 +63,12 @@ public class MessageController {
 
         Long userId = account.getId();
 
+
         try {
             alarmService.unsubscribeMessage(SSONSAL_MESSAGE, userId);
             return ResponseBodyFormatter.put(SuccessCode.SUCCESS);
         } catch (CustomException e) {
-            log.error("메세지 구독 취소 실패", e);
+
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);
         }
     }

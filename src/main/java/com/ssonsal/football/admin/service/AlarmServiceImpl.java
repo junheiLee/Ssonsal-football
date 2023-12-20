@@ -77,7 +77,7 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public String buildConfirmationMessage(MessageDTO gameInfo) {
-        log.info("문자 데이터" + gameInfo);
+
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -91,16 +91,12 @@ public class AlarmServiceImpl implements AlarmService {
                     "비용: " + gameInfo.getAccount();
 
 
-            log.info("메세지 내용: {}", message);
-
             String jsonMessage = objectMapper.writeValueAsString(Map.of("message", message));
-
-            log.info("JSON Message: {}", jsonMessage);
 
             return jsonMessage;
 
         } catch (Exception e) {
-            log.error("처리 중 오류 발생", e);
+
             return "오류 발생";
         }
     }
@@ -118,9 +114,6 @@ public class AlarmServiceImpl implements AlarmService {
                 throw new CustomException(AdminErrorCode.TOPIC_RESPONSE_FAILED, createTopicResponse);
             }
 
-            log.info("주제 이름 = " + createTopicResponse.topicArn());
-            log.info("주제 list = " + snsClient.listTopics());
-
         }
     }
 
@@ -128,10 +121,8 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public String subscribeEmail(String topicArn, Long userId) {
-        log.info("컨트 시작");
 
         String userEmail = getUserByEmail(userId);
-        log.info("유저 아이디" + userEmail);
 
         SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
@@ -143,8 +134,6 @@ public class AlarmServiceImpl implements AlarmService {
 
         SubscribeResponse subscribeResponse = snsClient.subscribe(subscribeRequest);
 
-        log.info("구독 request" + subscribeRequest);
-        log.info("구독 Response" + subscribeResponse);
 
         if (!subscribeResponse.sdkHttpResponse().isSuccessful()) {
             throw new CustomException(AdminErrorCode.SUBSCRIBE_RESPONSE_FAILED, subscribeResponse);
@@ -153,9 +142,6 @@ public class AlarmServiceImpl implements AlarmService {
         // DTO에 정보 저장 (subscriptionArn은 아직 pending confirmation 상태로 가정)
         AlarmDTO alarmEmailInfo = saveAlarmInfo("pending confirmation", userEmail);
 
-        log.info("구독 정보" + alarmEmailInfo);
-
-        log.info("Subscribed member: " + userEmail);
         snsClient.close();
 
         return "이메일 구독 성공";
@@ -167,7 +153,6 @@ public class AlarmServiceImpl implements AlarmService {
         // 사용자 정보 가져오기
         String userByEmail = getUserByEmail(userId);
 
-        log.info("현재 유저 이메일: " + userByEmail);
 
         SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
@@ -181,8 +166,6 @@ public class AlarmServiceImpl implements AlarmService {
         for (Subscription subscription : listResponse.subscriptions()) {
             String subscriptionArn = subscription.subscriptionArn();
             String endpoint = subscription.endpoint();
-            log.info(endpoint + "엔드포인트");
-            log.info(subscriptionArn + "구독 arn");
 
             if (userByEmail.equals(endpoint)) {
                 if ("PendingConfirmation".equals(subscriptionArn)) {
@@ -204,8 +187,6 @@ public class AlarmServiceImpl implements AlarmService {
             // "emailText" 키에 해당하는 값을 추출
             String emailText = payload.get("emailText");
 
-            log.info("파싱전 이메일 내용" + emailText);
-
             // HTML에서 <p> 태그를 제거하고 텍스트만 추출
             String emailContent = removePTags(emailText);
 
@@ -222,7 +203,7 @@ public class AlarmServiceImpl implements AlarmService {
 
             return publishResponse + "이메일 전송 성공";
         } catch (Exception e) {
-            log.error("메세지 전송 에러: " + e.getMessage(), e);
+
             return "이메일 전송 실패";
         }
     }
@@ -269,7 +250,7 @@ public class AlarmServiceImpl implements AlarmService {
                 snsClient.close();
 
                 if (unsubscribeResponse.sdkHttpResponse().isSuccessful()) {
-                    log.info("구독 취소 성공: " + subscription.subscriptionArn());
+
                     return "구독 취소 성공";
                 } else {
                     throw new CustomException(AdminErrorCode.EMAIL_NOT_FOUND);
@@ -283,15 +264,16 @@ public class AlarmServiceImpl implements AlarmService {
 
     @Override
     public String subscribeMessage(String topicArn, Long userId) {
-        log.info("메세지");
 
-        String memberPhone = getUserByPhone(userId);
+     //   String memberPhone = getUserByPhone(userId);
+        String memberPhone = "010-5967-3459";
+        String phoneNumber = "+82" + memberPhone.substring(2).replace("-", "");
 
         try (SnsClient snsClient = credentialServiceImpl.getSnsClient()) {
             final SubscribeRequest subscribeRequest = SubscribeRequest.builder()
                     .protocol("SMS")  // SMS 프로토콜
                     .topicArn(topicArn)
-                    .endpoint(memberPhone)
+                    .endpoint(phoneNumber)
                     .build();
 
             final SubscribeResponse subscribeResponse = snsClient.subscribe(subscribeRequest);
@@ -300,16 +282,13 @@ public class AlarmServiceImpl implements AlarmService {
                 throw new CustomException(AdminErrorCode.SUBSCRIBE_RESPONSE_FAILED, subscribeResponse);
             }
 
-            log.info("주제안 구독 Arn = " + subscribeResponse.subscriptionArn());
-            log.info("구독 리시트 = " + snsClient.listSubscriptions());
-
             return "메시지 구독 성공";
         }
     }
 
     @Override
     public String publishMessage(String topicArn, ResponseMessageDTO responseMessageDTO) {
-        Long confirmedGameId = responseMessageDTO.getConfirmedGameId();
+        Long confirmedGameId = 2L;
 
         if (confirmedGameId == null) {
             throw new CustomException(AdminErrorCode.AWAY_APPLICANT_ID_NOT_FOUND);
@@ -319,7 +298,9 @@ public class AlarmServiceImpl implements AlarmService {
             Game game = gameManagementRepository.findById(confirmedGameId)
                     .orElseThrow(() -> new CustomException(AdminErrorCode.GAME_NOT_FOUND, confirmedGameId));
 
-            String userPhoneNumber = game.getAwayApplicant().getPhone();
+          //  String userPhoneNumber = game.getAwayApplicant().getPhone();
+
+            String userPhoneNumber = "8201059673459";
 
             MessageDTO gameInfo = getGameInfo(confirmedGameId);
 
@@ -327,40 +308,19 @@ public class AlarmServiceImpl implements AlarmService {
 
             SnsClient snsClient = credentialServiceImpl.getSnsClient();
 
-            // 해당 주제에 등록된 구독자 목록 조회
-            ListSubscriptionsByTopicRequest listSubscriptionsRequest = ListSubscriptionsByTopicRequest.builder()
-                    .topicArn(topicArn)
-                    .build();
-
-            ListSubscriptionsByTopicResponse listSubscriptionsResponse = snsClient.listSubscriptionsByTopic(listSubscriptionsRequest);
-
-            for (Subscription subscription : listSubscriptionsResponse.subscriptions()) {
-
-                String subscriberPhoneNumber = subscription.endpoint();
-
-                if (subscriberPhoneNumber.equals(userPhoneNumber)) {
                     PublishRequest publishRequest = PublishRequest.builder()
+                            .phoneNumber(userPhoneNumber)
                             .message(gameMessage)
-                            .messageStructure("json")
-                            .targetArn(subscription.subscriptionArn())  // 해당 구독자의 ARN을 명시
                             .build();
 
                     PublishResponse publishResponse = snsClient.publish(publishRequest);
 
-                    log.info("유저 번호 " + userPhoneNumber);
-                    log.info(gameMessage + " 회원에게 보낸 메시지");
-
                     snsClient.close();
 
                     return publishResponse + "메시지 전송 성공";
-                }
-            }
 
-            // 일치하는 휴대폰 번호를 찾지 못한 경우
-            snsClient.close();
-            return "일치하는 휴대폰 번호를 찾지 못함";
         } catch (Exception e) {
-            log.error("메시지 전송 에러", e);
+
             return "메시지 전송 실패";
         }
     }
@@ -384,8 +344,6 @@ public class AlarmServiceImpl implements AlarmService {
 
             // + 제외한 값 추출
             String subscriptionEndpoint = subscriptionEndpointWithPlus.replace("+", "");
-
-            log.info("구독 엔드포인트 핸드폰" + subscriptionEndpoint);
 
             // 이메일과 endpoint 일치 여부 확인
             if (userPhoneNumber.equals(subscriptionEndpoint)) {

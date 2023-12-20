@@ -42,8 +42,6 @@ public class StatsServiceImpl implements StatsService {
 
         long totalGameCount = monthlyGames.size();
 
-        log.info("달별 성사 경기" + confirmedGameCount);
-        log.info("달별 취소 경기" + cancelledGameCount);
 
         return StatsDTO.builder()
                 .cancelledGameCount(cancelledGameCount)
@@ -68,10 +66,7 @@ public class StatsServiceImpl implements StatsService {
 
         LocalDate startDate = LocalDate.of(year, month, 1);
 
-        log.info("시작날" + startDate);
-
         LocalDate endDate = startDate.with(TemporalAdjusters.lastDayOfMonth());
-        log.info("마지막날" + endDate);
 
         List<Game> monthlyGames = gameManagementRepository.findByScheduleBetween(
                 startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
@@ -140,8 +135,6 @@ public class StatsServiceImpl implements StatsService {
             StatsDTO dailyStats = dayStats(date, dailyGames);
             monthDayStats.put(date, dailyStats);
         }
-
-        log.info(monthDayStats + "일별 데이터");
 
         return monthDayStats;
     }
