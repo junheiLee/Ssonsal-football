@@ -149,9 +149,10 @@ public class SignController {
     }
 
     /**
-     * @param userId 유저 아이디값
-     * @return
-     * @throws RuntimeException
+     * 특정 유저의 상세정보를 반환한다.
+     *
+     * @param userId 유저 아이디
+     * @return profileResultDto 유저 프로필 정보
      */
     @GetMapping(value = "/profile/{userId}")
     public ResponseEntity<ResponseBodyFormatter> myProfile(@PathVariable Long userId){
