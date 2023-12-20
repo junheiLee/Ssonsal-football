@@ -14,6 +14,7 @@ import com.ssonsal.football.user.dto.SignUpRequestDto;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.SignService;
+import com.ssonsal.football.user.service.impl.EmailValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +48,7 @@ public class SignController {
     private final RedisService redisService;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieUtil cookieUtil;
+    private final EmailValidator emailValidator;
 
     /**
      * 로그인 기능
@@ -79,8 +84,26 @@ public class SignController {
      */
     @PostMapping(value = "/sign-up")
     @Operation(summary = "회원가입", description = "회원가입에 필요한 데이터를 입력받아서 회원가입 합니다.")
-    public ResponseEntity<ResponseBodyFormatter> signUp(@RequestBody SignUpRequestDto signUpRequestDto) throws RuntimeException {
+    public ResponseEntity<ResponseBodyFormatter> signUp(@Validated @RequestBody SignUpRequestDto signUpRequestDto, BindingResult result) throws RuntimeException {
         log.info("[signUp] 회원가입 입력값 확인 : {}", signUpRequestDto);
+        emailValidator.validate(signUpRequestDto,result);
+        if(result.hasErrors()) {
+            return DataResponseBodyFormatter.put(ErrorCode.DUPLICATED_EMAIL, result.toString());
+        }
+        if(result.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            result.getAllErrors().forEach(error -> {
+                FieldError field = (FieldError) error;
+                String msg = error.getDefaultMessage();
+                System.err.println("field : " + field.getField() + ", msg : " + msg);
+
+                sb.append("field : ").append(field.getField())
+                        .append(", message : ").append(msg);
+            });
+
+            return DataResponseBodyFormatter.put(ErrorCode.WRONG_JSON_FORMAT, sb.toString());
+            }
+
         Optional<User> user = signService.signUp(signUpRequestDto);
         if (user.isPresent()) {
             User newUser = user.get();
