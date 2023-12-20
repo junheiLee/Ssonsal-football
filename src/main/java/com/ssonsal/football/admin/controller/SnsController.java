@@ -118,10 +118,12 @@ public class SnsController {
         }
 
         try {
+
             ObjectMapper objectMapper = new ObjectMapper();
             String emailTextJson = objectMapper.writeValueAsString(emailText);
 
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(PUBLISH_EMAIL, alarmService.publishEmail(SSONSAL_EMAIL, emailTextJson)));
+
         } catch (CustomException e) {
 
             throw new CustomException(AdminErrorCode.EMAIL_SEND_FAILED);
@@ -145,7 +147,9 @@ public class SnsController {
         Long userId = account.getId();
 
         try {
+
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(UNSUBSCRIBE, alarmService.unsubscribe(SSONSAL_EMAIL, userId)));
+
         } catch (CustomException e) {
 
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CANCEL_FAILED);

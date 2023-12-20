@@ -70,6 +70,7 @@ public class AdminController {
             throw new CustomException(AdminErrorCode.ADMIN_AUTH_FAILED);
         }
 
+
         List<GameDTO> gameList = gameManagementService.gameList();
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(GAME_LIST, gameManagementService.gameList()));

@@ -60,6 +60,7 @@ public class AdminManagementController {
             throw new CustomException(AdminErrorCode.USER_SELECTED_FAILED);
         }
 
+
         userManagementService.updateRoles(userIds);
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(RECOGNIZE_ADMIN, userIds));
 

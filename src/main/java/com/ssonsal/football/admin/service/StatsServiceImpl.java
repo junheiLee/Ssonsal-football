@@ -60,8 +60,6 @@ public class StatsServiceImpl implements StatsService {
         }
 
         int year = currentDate.getYear();
-
-
         int month = currentDate.getMonthValue();
 
         LocalDate startDate = LocalDate.of(year, month, 1);
