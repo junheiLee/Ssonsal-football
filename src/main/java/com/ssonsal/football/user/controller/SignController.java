@@ -34,7 +34,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Tag(name = "Sign Controller", description = "Sign API Controller")
 public class SignController {
@@ -117,7 +117,7 @@ public class SignController {
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "fail");
     }
 
-    @PostMapping("/user/refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<ResponseBodyFormatter> refreshToken(HttpServletRequest request, HttpServletResponse response) {
 
         log.info("[refresh-token] accessToken 만료 재발급 시작");
