@@ -15,6 +15,7 @@ public class Account extends User {
         super(user.getId(), user.getTeam(), user.getEmail(), user.getPassword(), "user");
     }
 
+
     private static Collection<? extends GrantedAuthority> authorities() {
         return List.of(new SimpleGrantedAuthority("user"));
     }

@@ -18,7 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.admin.util.AdminConstant.*;
-import static com.ssonsal.football.game.util.Transfer.objectToMap;
+import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,7 +42,7 @@ public class MessageController {
         }
         alarmService.updateUserRole(userId);
         try {
-            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, objectToMap(SUBSCRIBE_MESSAGE, alarmService.subscribeMessage(SSONSAL_MESSAGE, userId)));
+            return DataResponseBodyFormatter.put(AdminSuccessCode.SUBSCRIBE_CREATE_SUCCESS, toMap(SUBSCRIBE_MESSAGE, alarmService.subscribeMessage(SSONSAL_MESSAGE, userId)));
         } catch (CustomException e) {
             log.error("구독 생성 실패", e);
             throw new CustomException(AdminErrorCode.SUBSCRIBE_CREATE_FAILED);
@@ -60,7 +60,7 @@ public class MessageController {
         }
 
         try {
-            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, objectToMap(PUBLISH_MESSAGE, alarmService.publishMessage(SSONSAL_MESSAGE, responseMessageDTO)));
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, toMap(PUBLISH_MESSAGE, alarmService.publishMessage(SSONSAL_MESSAGE, responseMessageDTO)));
         } catch (CustomException e) {
             log.error("메세지 전송 실패", e);
             throw new CustomException(AdminErrorCode.MESSAGE_SEND_FAILED);
