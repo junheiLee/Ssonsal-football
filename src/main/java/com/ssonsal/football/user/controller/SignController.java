@@ -149,18 +149,15 @@ public class SignController {
     }
 
     /**
-     * @param req Cookie 정보가 담겨있는 request요청
-     * @return
-     * @throws RuntimeException
+     * 특정 유저의 상세정보를 반환한다.
+     *
+     * @param userId 유저 아이디
+     * @return profileResultDto 유저 프로필 정보
      */
-    @GetMapping(value = "/profile")
-    @Operation(summary = "프로필", description = "쿠키에있는 토큰정보로 프로필을 표시함")
-    public ResponseEntity<ResponseBodyFormatter> myProfile(HttpServletRequest req) throws RuntimeException {
-        // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
-        String token = req.getHeader("ssonToken");
-        ProfileResultDto profileResultDto = signService.viewProfile(token);
-        log.info("[profile] 헤더의 토큰정보 확인 token : {}", token);
+    @GetMapping(value = "/profile/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> myProfile(@PathVariable Long userId){
 
+        ProfileResultDto profileResultDto = signService.viewProfile(userId);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, profileResultDto);
     }

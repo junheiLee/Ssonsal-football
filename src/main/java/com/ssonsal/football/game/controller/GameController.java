@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 import static com.ssonsal.football.game.exception.GameErrorCode.NOT_MATCHING_RESULT;
 import static com.ssonsal.football.game.util.GameConstant.*;
 import static com.ssonsal.football.game.util.GameSuccessCode.WAIT_FOR_ANOTHER_TEAM;
@@ -40,7 +42,7 @@ public class GameController {
      * @return 성공 코드와 생성된 게임 아이디를 ResponseBody 에 담아 반환
      */
     @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> createGame(@RequestBody CreateGameRequestDto gameDto, @CurrentUser Account account) {
+    public ResponseEntity<ResponseBodyFormatter> createGame(@Valid @RequestBody CreateGameRequestDto gameDto, @CurrentUser Account account) {
 
         Long createdGameId = gameService.insertGame(account.getId(), gameDto);
         return DataResponseBodyFormatter.put(SUCCESS, longIdToMap(CREATED_GAME_ID, createdGameId));

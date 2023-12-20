@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.ssonsal.football.global.util.transfer.Transfer.toMap;
-
 import static com.ssonsal.football.team.util.TeamConstant.TEAM_NAME;
 import static com.ssonsal.football.team.util.TeamConstant.USER_NAME;
 

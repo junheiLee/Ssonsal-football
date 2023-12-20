@@ -1,7 +1,8 @@
 package com.ssonsal.football.admin.util;
 
 public final class AdminConstant {
-    private AdminConstant(){}
+    private AdminConstant() {
+    }
 
     public static final String SSONSAL_MESSAGE = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalMessage";
     public static final String SSONSAL_EMAIL = "arn:aws:sns:ap-northeast-1:047191174675:SsonsalEmail";
