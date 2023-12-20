@@ -81,6 +81,7 @@ public class SubApplicantServiceImpl implements SubApplicantService {
 
         SubApplicant subApplicant = getSubApplicant(targetId);
         Team targetTeam = subApplicant.getMatchApplication().getTeam();
+        log.info("왜 안되냐면요 loginUserTeam={}, targetId={}, targetTeam={}", loginUserTeam, targetId, targetTeam);
         validateInTargetTeam(targetTeam, loginUserTeam);
 
         User targetSub = subApplicant.getUser();
@@ -105,9 +106,14 @@ public class SubApplicantServiceImpl implements SubApplicantService {
 
     private void validateInTargetTeam(Team targetTeam, Team userTeam) {
 
-        if (!targetTeam.equals(userTeam)) {
-            log.error("user 가 접근하려는 Team 의 팀원이 아님.");
-            throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+        try {
+            if(!(targetTeam.getId() == userTeam.getId())) {
+                log.error("user 가 접근하려는 Team 의 팀원이 아님.");
+                throw new CustomException(NOT_IN_TARGET_TEAM, longIdToMap(TEAM_ID, targetTeam.getId()));
+
+            }
+        } catch(NullPointerException e) {
+            throw new CustomException(NOT_IN_TEAM);
         }
     }
 

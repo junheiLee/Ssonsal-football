@@ -73,7 +73,7 @@ public class MatchTeamServiceImpl implements MatchTeamService {
         validateGameIsWaiting(game);
         validateIsNotHome(game, targetApplication.getTeam());
 
-        game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경
+        game.changeRemainApplicationsStatus();// 모든 Applicant Status 대기 -> 보류로 변경, SubCount = 0으로 변경
         targetApplication.approve();
 
         return game.getId();

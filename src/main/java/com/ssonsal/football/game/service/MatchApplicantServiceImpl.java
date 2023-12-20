@@ -43,6 +43,7 @@ public class MatchApplicantServiceImpl implements MatchApplicantService {
     public Long applyToGameAsAway(Long loginUserId, Long gameId, CreateMatchApplicationRequestDto applicationTeamDto) {
 
         User loginUser = getUser(loginUserId);
+        log.info("MatchApplicantServiceImpl.applyToGameAsAway loginUserId={}, userTeam = {}", loginUserId, loginUser.getTeam().getId());
         Team loginUserTeam = validateUserInTeam(loginUser.getTeam());
         Game game = getGame(gameId);
 
