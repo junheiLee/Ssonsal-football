@@ -16,6 +16,7 @@ public enum AdminErrorCode implements ResponseCode {
     AWAY_APPLICANT_ID_NOT_FOUND(HttpStatus.NOT_FOUND, "신청자 아이디를 찾을 수 없습니다"),
 
     GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "게임을 찾을 수 없습니다."),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
     GAME_NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "확정된 게임이 아닙니다."),
 
     MONTH_UPDATE_FAILED(HttpStatus.BAD_REQUEST, "달 변경 실패."),

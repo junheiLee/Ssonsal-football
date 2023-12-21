@@ -52,17 +52,15 @@ public class RankServiceImpl implements RankService {
                 LocalDateTime lastMonthStartDate;
                 LocalDateTime lastMonthEndDate;
 
-                if (month != null) {
-                    // 선택된 달에 대한 초기화
-                    startDate = LocalDateTime.of(currentDate.getYear(), month, 1, 0, 0);
-                    lastMonthStartDate = startDate.minusMonths(1);
-                    lastMonthEndDate = startDate.minusDays(1);
-                } else {
-                    // 현재 달에 대한 초기화
-                    startDate = currentDate.withDayOfMonth(1);
-                    lastMonthStartDate = currentDate.minusMonths(1).withDayOfMonth(1);
-                    lastMonthEndDate = startDate.minusDays(1);
-                }
+                    if (null != month) {
+                        startDate = LocalDateTime.of(currentDate.getYear(), month, 1, 0, 0);
+                        lastMonthStartDate = startDate.minusMonths(1);
+                        lastMonthEndDate = startDate.minusDays(1);
+                    } else {
+                        startDate = currentDate.withDayOfMonth(1);
+                        lastMonthStartDate = currentDate.minusMonths(1).withDayOfMonth(1);
+                        lastMonthEndDate = startDate.minusDays(1);
+                    }
 
                 List<TeamRecord> lastMonthTeamRecords = teamRecordRepository.findByModifiedAtBetween(
                         lastMonthStartDate, lastMonthEndDate);
@@ -75,6 +73,7 @@ public class RankServiceImpl implements RankService {
             }
         }
 
+        // 한달간 포인트 계산
     @Transactional
     public List<TeamRecord> calculatePointsAndResetRanks(Integer month) {
         LocalDateTime currentDate = LocalDateTime.now();
@@ -91,10 +90,8 @@ public class RankServiceImpl implements RankService {
         LocalDateTime endDate = startDate.with(TemporalAdjusters.lastDayOfMonth()).withHour(23).withMinute(59).withSecond(59);
         List<TeamRecord> teamRecords = teamRecordRepository.findByModifiedAtBetween(startDate, endDate);
 
-        // 각 팀의 랭크 계산
         Map<Long, Integer> teamRankMap = calculateTeamRanks(teamRecords);
 
-        // 랭크를 반영하여 저장
         for (TeamRecord target : teamRecords) {
             rankRepository.save(
                     Rank.builder()

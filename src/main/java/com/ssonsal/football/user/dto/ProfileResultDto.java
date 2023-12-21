@@ -42,6 +42,7 @@ public class ProfileResultDto {
     private float skillScore;
 
     private float mannerScore;
+    private int role;
 
 
     public ProfileResultDto(User user) {
@@ -60,6 +61,7 @@ public class ProfileResultDto {
         this.preferredTime = user.getPreferredTime();
         this.skillScore = user.getSkillScore();
         this.mannerScore = user.getMannerScore();
+        this.role=user.getRole();
     }
 
     public static int calculateAge(LocalDate birth) {
