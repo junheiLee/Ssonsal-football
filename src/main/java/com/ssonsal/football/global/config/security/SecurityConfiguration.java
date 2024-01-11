@@ -1,6 +1,7 @@
 package com.ssonsal.football.global.config.security;
 
 import com.ssonsal.football.user.service.impl.RedisServiceImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 //@EnableWebSecurity // Spring Security에 대한 디버깅 모드를 사용하기 위한 어노테이션 (default : false)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     //WebSecurityConfigurerAdapter 가 deprecated SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> 또는
@@ -26,18 +28,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisServiceImpl redisService;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     @Value("${spring.jwt.token.access-expiration-time}")
     private long accessExpirationTime;
 
     @Value("${spring.jwt.token.refresh-expiration-time}")
     private long refreshExpirationTime;
-
-    @Autowired
-    public SecurityConfiguration(JwtTokenProvider jwtTokenProvider, RedisServiceImpl redisService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.redisService = redisService;
-    }
-
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception { // SecurityFilter 으로 변경 필요함
@@ -50,10 +46,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         SessionCreationPolicy.STATELESS) // JWT Token 인증방식으로 세션은 필요 없으므로 비활성화
                 .and()
                 .authorizeRequests() // 리퀘스트에 대한 사용권한 체크
-                .antMatchers("/user/sign-in", "/user/sign-up",
-                        "/user/exception").permitAll() // 가입 및 로그인 주소는 허용
+                .antMatchers("/api/user/sign-in", "/api/user/sign-up",
+                        "/api/user/exception","/api/teams/**","/api/ranks").permitAll() // 가입 및 로그인 주소는 허용
                 .antMatchers("**exception**").permitAll()
-                .antMatchers("/api/**").permitAll()
+                //.antMatchers("/api/**").permitAll()
 
                 .anyRequest().authenticated()
                 .and()
@@ -62,7 +58,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
 
                 .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisService),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisService, customAuthenticationEntryPoint),
                         UsernamePasswordAuthenticationFilter.class); // JWT Token 필터를 id/password 인증 필터 이전에 추가
 
 

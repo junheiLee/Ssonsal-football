@@ -5,8 +5,8 @@ import lombok.ToString;
 
 @ToString
 @Getter
-public class ApprovalTeamRequestDto {
+public class EnterResultRequestDto {
 
-    private Long matchApplicationId;
-
+    private String target;
+    private String result;
 }

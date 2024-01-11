@@ -17,8 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 import javax.transaction.Transactional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -55,16 +59,16 @@ public class SignServiceImpl implements SignService {
             }
             log.info("[getSignInResult] 패스워드 일치");
             log.info("[accessToken] accessToken 토큰 생성");
-            String accessToken = jwtTokenProvider.generateToken(existUser.getId(),
+            String accessToken = jwtTokenProvider.createToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
-                    accessTokenValid,
-                    existUser.getRole(), "accessToken");
+                    existUser.getRole(),
+                    accessTokenValid, "accessToken");
             log.info("[accessToken] accessToken 토큰 확인 : {}", accessToken);
             log.info("[refreshToken] refreshToken 토큰 생성");
-            String refreshToken = jwtTokenProvider.generateToken(existUser.getId(),
+            String refreshToken = jwtTokenProvider.createToken(existUser.getId(),
                     ((existUser.getTeam() != null) ? existUser.getTeam().getId() : 0L),
-                    refreshTokenValid,
-                    existUser.getRole(), "refreshToken");
+                    existUser.getRole(),
+                    refreshTokenValid, "refreshToken");
             log.info("[refreshToken] refreshToken 토큰 확인 : {}", refreshToken);
             log.info("[saveTokens] 재발행을 위한 토큰 저장 만료일은 refresh와 동일 ");
             redisService.setTokens(accessToken, refreshToken, refreshTokenValid);
@@ -96,7 +100,7 @@ public class SignServiceImpl implements SignService {
                     .intro(signUpRequestDto.getIntro())
                     .preferredTime(signUpRequestDto.getPreferredTime())
                     .preferredArea(signUpRequestDto.getPreferredArea())
-                    .role(signUpRequestDto.getRole())
+                    .role(1)
                     .build();
 
 
@@ -104,7 +108,7 @@ public class SignServiceImpl implements SignService {
 
             User savedUser = userRepository.save(user);
 
-            if (savedUser == null) {
+            if (savedUser.getId() == null) {
                 throw new RuntimeException("회원 가입 중 오류가 발생하였습니다. (저장된 사용자 정보가 null입니다.)");
             }
 
@@ -145,19 +149,28 @@ public class SignServiceImpl implements SignService {
     }
 
     @Override
-    public ProfileResultDto viewProfile(String token) throws RuntimeException {
-        Long userId = jwtTokenProvider.getUserId(token);
-        log.info("[viewPofile] : 토큰에서 유저ID가져옴 : {}", userId);
-        log.info("[viewPofile] 유저 정보 검색 시작");
+    public ProfileResultDto viewProfile(Long userId) {
+
         Optional<User> user = userRepository.findById(userId);
-        log.info("[viewPofile] 유저ID로 검색한 유저 정보 Optional : {}", user);
+
         if (user.isPresent()) {
-            log.info("[viewPofile] 유저ID로 검색한 유저 정보 : {}", user.get());
-            log.info("[viewPofile] Dto 생성결과 : {}", new ProfileResultDto(user.get()));
             return new ProfileResultDto(user.get());
         } else {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
+    }
+    @Transactional
+    @Override
+    public Map<String, String> validateHandling(Errors errors) {
+        Map<String, String> validatorResult = new HashMap<>();
+
+        /* 유효성 및 중복 검사에 실패한 필드 목록을 받음 */
+        for (FieldError error : errors.getFieldErrors()) {
+            String validKeyName = String.format("valid_%s", error.getField());
+            validatorResult.put(validKeyName, error.getDefaultMessage());
+        }
+
+        return validatorResult;
     }
 
 

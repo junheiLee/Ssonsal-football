@@ -1,6 +1,6 @@
 package com.ssonsal.football.game.entity;
 
-import com.ssonsal.football.game.dto.request.GameRequestDto;
+import com.ssonsal.football.game.dto.request.CreateGameRequestDto;
 import com.ssonsal.football.global.entity.BaseEntity;
 import com.ssonsal.football.team.entity.Team;
 import com.ssonsal.football.user.entity.User;
@@ -64,30 +64,30 @@ public class Game extends BaseEntity {
     @Builder
     public Game(User writer, Team home,
                 LocalDateTime schedule, MatchStatus matchStatus,
-                GameRequestDto gameRequestDto) {
+                CreateGameRequestDto createGameRequestDto) {
         this.writer = writer;
         this.home = home;
         this.schedule = schedule;
         this.matchStatus = matchStatus.getCodeNumber();
-        this.gameTime = gameRequestDto.getGameTime();
-        this.region = gameRequestDto.getRegion();
-        this.stadium = gameRequestDto.getStadium();
-        this.vsFormat = gameRequestDto.getVsFormat();
-        this.gender = gameRequestDto.getGender();
-        this.rule = gameRequestDto.getRule();
-        this.account = gameRequestDto.getAccount();
+        this.gameTime = createGameRequestDto.getGameTime();
+        this.region = createGameRequestDto.getRegion();
+        this.stadium = createGameRequestDto.getStadium();
+        this.vsFormat = createGameRequestDto.getVsFormat();
+        this.gender = createGameRequestDto.getGender();
+        this.rule = createGameRequestDto.getRule();
+        this.account = createGameRequestDto.getAccount();
     }
 
-    public Game update(LocalDateTime schedule, GameRequestDto gameRequestDto) {
+    public Game update(LocalDateTime schedule, CreateGameRequestDto createGameRequestDto) {
 
         this.schedule = schedule;
-        this.gameTime = gameRequestDto.getGameTime();
-        this.region = gameRequestDto.getRegion();
-        this.stadium = gameRequestDto.getStadium();
-        this.vsFormat = gameRequestDto.getVsFormat();
-        this.gender = gameRequestDto.getGender();
-        this.rule = gameRequestDto.getRule();
-        this.account = gameRequestDto.getAccount();
+        this.gameTime = createGameRequestDto.getGameTime();
+        this.region = createGameRequestDto.getRegion();
+        this.stadium = createGameRequestDto.getStadium();
+        this.vsFormat = createGameRequestDto.getVsFormat();
+        this.gender = createGameRequestDto.getGender();
+        this.rule = createGameRequestDto.getRule();
+        this.account = createGameRequestDto.getAccount();
 
         return this;
     }

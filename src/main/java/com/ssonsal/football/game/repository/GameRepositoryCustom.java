@@ -8,7 +8,7 @@ public interface GameRepositoryCustom {
 
     List<GameListResponseDto> searchAllGameForSub();
 
-    List<GameListResponseDto> searchMyGameAsSub(Long userId);
+    List<GameListResponseDto> searchGameBySub(Long userId);
 
-    List<GameListResponseDto> searchOurGameAsTeam(Long teamId);
+    List<GameListResponseDto> searchGameByTeam(Long teamId);
 }

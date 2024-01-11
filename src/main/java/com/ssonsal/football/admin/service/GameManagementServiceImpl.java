@@ -28,7 +28,7 @@ public class GameManagementServiceImpl implements GameManagementService {
         List<Game> games = gameManagementRepository.findAll();
 
         return games.stream()
-                .filter(game -> game.getMatchStatus() == 0)
+                .filter(game -> game.getMatchStatus() == 0 || game.getMatchStatus() == 1)
                 .map(game -> gameFactory(game))
                 .collect(Collectors.toList());
     }

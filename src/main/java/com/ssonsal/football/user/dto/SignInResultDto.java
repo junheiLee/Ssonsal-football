@@ -30,11 +30,12 @@ public class SignInResultDto {
     private Float mannerScore;
     private String accessToken;
     private String refreshToken;
-
+    private String teamName;
 
     public SignInResultDto(User user, String accessToken, String refreshToken) {
         this.id = user.getId();
         this.teamId = (user.getTeam() != null) ? user.getTeam().getId() : 0L; // 혹은 다른 기본값으로 설정
+        this.teamName = (user.getTeam() != null) ? user.getTeam().getName() : "무소속"; // 혹은 다른 기본값으로 설정
         this.email = user.getEmail();
         this.name = user.getName();
         this.age = calculateAge(user.getBirth());

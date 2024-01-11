@@ -14,6 +14,7 @@ import com.ssonsal.football.user.dto.SignUpRequestDto;
 import com.ssonsal.football.user.entity.User;
 import com.ssonsal.football.user.service.RedisService;
 import com.ssonsal.football.user.service.SignService;
+import com.ssonsal.football.user.service.impl.EmailValidator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +38,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 @Tag(name = "Sign Controller", description = "Sign API Controller")
 public class SignController {
@@ -43,19 +48,20 @@ public class SignController {
     private final RedisService redisService;
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieUtil cookieUtil;
+    private final EmailValidator emailValidator;
 
     /**
      * 로그인 기능
      * 시큐리티에서 서비스를 요청한 유저정보가 없을시 강제적으로 이동됨
      *
-     * @param requset          CookieUtil을 사용하기 위해 필요한 HttpServletRequest
+     * @param request          CookieUtil을 사용하기 위해 필요한 HttpServletRequest
      * @param response         CookieUtil을 사용하기 위해 필요한 HttpServletRequest
      * @param signInRequestDto 유저가 로그인하기 위해 입력한 ID, Password
      * @return 로그인한 유저 객체,발급받은 accessToken ,refreshToken 반환
      */
     @Operation(summary = "로그인", description = "email 과 password를 입력해서 로그인 합니다.")
     @PostMapping(value = "/sign-in")
-    public ResponseEntity<ResponseBodyFormatter> signIn(HttpServletRequest requset, HttpServletResponse response, @RequestBody SignInRequestDto signInRequestDto) {
+    public ResponseEntity<ResponseBodyFormatter> signIn(HttpServletRequest request, HttpServletResponse response, @RequestBody SignInRequestDto signInRequestDto) {
 
         SignInResultDto signInResultDto = signService.signIn(signInRequestDto);
 
@@ -64,7 +70,7 @@ public class SignController {
                     signInResultDto.getId());
             log.info("[signIn] signResultDto가 가지고 있는 정보 : {} ", signInResultDto);
         }
-        cookieUtil.addAccessTokenToCookie(requset, response, signInResultDto.getAccessToken());
+        cookieUtil.addAccessTokenToCookie(request, response, signInResultDto.getAccessToken());
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, signInResultDto);
 
     }
@@ -78,8 +84,26 @@ public class SignController {
      */
     @PostMapping(value = "/sign-up")
     @Operation(summary = "회원가입", description = "회원가입에 필요한 데이터를 입력받아서 회원가입 합니다.")
-    public ResponseEntity<ResponseBodyFormatter> signUp(@RequestBody SignUpRequestDto signUpRequestDto) throws RuntimeException {
+    public ResponseEntity<ResponseBodyFormatter> signUp(@Validated @RequestBody SignUpRequestDto signUpRequestDto, BindingResult result) throws RuntimeException {
         log.info("[signUp] 회원가입 입력값 확인 : {}", signUpRequestDto);
+        emailValidator.validate(signUpRequestDto,result);
+        if(result.hasErrors()) {
+            return DataResponseBodyFormatter.put(ErrorCode.DUPLICATED_EMAIL, result.toString());
+        }
+        if(result.hasErrors()){
+            StringBuilder sb = new StringBuilder();
+            result.getAllErrors().forEach(error -> {
+                FieldError field = (FieldError) error;
+                String msg = error.getDefaultMessage();
+                System.err.println("field : " + field.getField() + ", msg : " + msg);
+
+                sb.append("field : ").append(field.getField())
+                        .append(", message : ").append(msg);
+            });
+
+            return DataResponseBodyFormatter.put(ErrorCode.WRONG_JSON_FORMAT, sb.toString());
+            }
+
         Optional<User> user = signService.signUp(signUpRequestDto);
         if (user.isPresent()) {
             User newUser = user.get();
@@ -96,31 +120,27 @@ public class SignController {
      * 로그아웃 기능
      * 로그아웃을 진행한 뒤, redis에 들어있는 해당 유저의 refresh토큰을 제거한다.
      *
-     * @param email LogouttRequestDto로 리팩토링 예정
      * @return 성공 메세지
      * @throws RuntimeException
      */
     @PostMapping(value = "/logout")
     @Operation(summary = "로그아웃", description = "redis 에서 해당 유저의 refreshToken을 삭제합니다.")
-    public ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest requset, HttpServletResponse response) throws RuntimeException {
+    public ResponseEntity<ResponseBodyFormatter> logOut(HttpServletRequest request, HttpServletResponse response) throws RuntimeException {
         // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
 
-        log.info("[logOut] 로그아웃을 시도하고 있습니다.");
-        String token = requset.getHeader("ssonToken");
-        log.info("[logout] 로그아웃 요청에 포함되어있는 토큰정보 : {}", token);
+        String token = request.getHeader("ssonToken");
         String logoutResult = signService.logOut(token);
-        log.info("[logout] 로그아웃 결과 : {}", logoutResult);
+        new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         if (logoutResult.equals("success")) {
-            log.info("[logOut] 정상적으로 refreshToken이 제거 되었습니다.");
-            log.info("[logOut] 정상적으로 쿠키의 accessToken을 제거합니다.");
-            cookieUtil.deleteCookie(requset, response, "ssonToken");
+
+            cookieUtil.deleteCookie(request, response, "ssonToken");
 
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "success");
         } else
             return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, "fail");
     }
 
-    @PostMapping("/user/refresh-token")
+    @PostMapping("/refresh-token")
     public ResponseEntity<ResponseBodyFormatter> refreshToken(HttpServletRequest request, HttpServletResponse response) {
 
         log.info("[refresh-token] accessToken 만료 재발급 시작");
@@ -138,13 +158,12 @@ public class SignController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             // 새로운 accessToken을 클라이언트에게 전달
-            ResponseEntity<ResponseBodyFormatter> responseEntity = DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
+
             response.setHeader("ssonToken", newAccessToken);
             // 리다이렉트 URL을 클라이언트에게 전달
 
-            responseEntity.getHeaders().set("Location", "/user/logout"); // "/path-to-redirect"는 실제 리다이렉트할 URL로 변경해야 합니다.
 
-            return responseEntity;
+            return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, newAccessToken);
 
         } else {
             // refreshToken이 유효하지 않으면 401 Unauthorized 응답을 보냄
@@ -153,19 +172,15 @@ public class SignController {
     }
 
     /**
-     * @param req Cookie 정보가 담겨있는 requset요청
-     * @param res
-     * @return
-     * @throws RuntimeException
+     * 특정 유저의 상세정보를 반환한다.
+     *
+     * @param userId 유저 아이디
+     * @return profileResultDto 유저 프로필 정보
      */
-    @GetMapping(value = "/profile")
-    @Operation(summary = "프로필", description = "쿠키에있는 토큰정보로 프로필을 표시함")
-    public ResponseEntity<ResponseBodyFormatter> myProfile(HttpServletRequest req) throws RuntimeException {
-        // signIn 메서드를 호출하고 로그인을 시도하면서 인풋값이 잘못되었을경우 throw RuntimeException 를 던지게된다
-        String token = req.getHeader("ssonToken");
-        ProfileResultDto profileResultDto = signService.viewProfile(token);
-        log.info("[profile] 헤더의 토큰정보 확인 token : {}", token);
+    @GetMapping(value = "/profile/{userId}")
+    public ResponseEntity<ResponseBodyFormatter> myProfile(@PathVariable Long userId){
 
+        ProfileResultDto profileResultDto = signService.viewProfile(userId);
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, profileResultDto);
     }

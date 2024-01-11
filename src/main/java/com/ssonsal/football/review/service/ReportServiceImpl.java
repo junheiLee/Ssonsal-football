@@ -31,15 +31,10 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<ReportResponseDto> getAllReports() {
-        List<Report> reports = reportRepository.findAll();
-
-        if (reports.isEmpty()) {
-            log.error("신고된 리뷰가 없습니다.");
-            throw new CustomException(ReviewErrorCode.REPORT_NOT_FOUND);
-        }
+        List<Report> reports = reportRepository.findByReportCode(0);
 
         return reports.stream()
-                .map(ReportResponseDto::fromEntity)
+                .map(report -> new ReportResponseDto(report))
                 .collect(Collectors.toList());
     }
 
@@ -61,18 +56,17 @@ public class ReportServiceImpl implements ReportService {
 
         Report newReport = reportRepository.save(report);
 
-        return ReportResponseDto.fromEntity(newReport);
+        return new ReportResponseDto(newReport);
     }
 
     @Transactional
-    public void updateDeleteCode(Long reportId, Integer reportCode) {
+    public void updateDeleteCode(Long reportId, Long reviewId) {
         Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(ReviewErrorCode.ID_NOT_FOUND));
 
-        if (!(reportCode == 0 || reportCode == 1)) {
-            throw new CustomException(ReviewErrorCode.STATUS_ERROR);
-        }
+        int reportCode = 1;
 
+        reviewRepository.updateDeleteCodeByReviewId(reviewId);
         report.updateReport(reportCode);
     }
 }

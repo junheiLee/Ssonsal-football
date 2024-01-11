@@ -25,8 +25,6 @@ public class CredentialServiceImpl implements CredentialService {
     @Override
     public SnsClient getSnsClient() {
 
-        log.info("AWS Access Key: {}", awsConfig.getAwsAccessKey());
-        log.info("AWS Secret Key: {}", awsConfig.getAwsSecretKey());
 
         return SnsClient.builder()
                 .credentialsProvider(

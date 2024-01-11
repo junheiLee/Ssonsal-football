@@ -7,12 +7,12 @@ import lombok.ToString;
 @ToString
 @Getter
 @NoArgsConstructor
-public class MatchApplicationRequestDto {
+public class CreateMatchApplicationRequestDto {
 
     private String uniform;
     private int subCount;
 
-    public MatchApplicationRequestDto(GameRequestDto gameDto) {
+    public CreateMatchApplicationRequestDto(CreateGameRequestDto gameDto) {
         this.uniform = gameDto.getUniform();
         this.subCount = gameDto.getSubCount();
     }

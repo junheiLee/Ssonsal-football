@@ -39,4 +39,12 @@ public class RankListResponseDto {
         this.point = teamRecord.getPoint();
 
     }
+
+    public void resetRank() {
+        this.totalGameCount = 0;
+        this.winCount = 0;
+        this.drawCount = 0;
+        this.loseCount = 0;
+        this.point = 0;
+    }
 }

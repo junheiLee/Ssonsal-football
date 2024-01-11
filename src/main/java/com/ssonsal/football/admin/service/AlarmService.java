@@ -95,7 +95,7 @@ public interface AlarmService {
      * @return 메세지와 메시지id
      */
 
-    String publishEmail(String topicArn, Map<String, String> payload);
+    String publishEmail(String topicArn, String emailText);
 
 
     /**

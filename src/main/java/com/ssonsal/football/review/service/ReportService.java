@@ -10,5 +10,5 @@ public interface ReportService {
 
     ReportResponseDto createReport(ReportRequestDto reportRequestDto, Long userId);
 
-    void updateDeleteCode(Long reportId, Integer reportCode);
+    void updateDeleteCode(Long reportId, Long reviewId);
 }

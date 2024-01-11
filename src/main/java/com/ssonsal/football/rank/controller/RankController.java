@@ -1,17 +1,21 @@
 package com.ssonsal.football.rank.controller;
 
+import com.ssonsal.football.admin.exception.AdminErrorCode;
+import com.ssonsal.football.admin.service.UserManagementService;
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
+import com.ssonsal.football.global.exception.CustomException;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
+import com.ssonsal.football.rank.dto.MonthRequest;
+import com.ssonsal.football.rank.dto.UpdatedRankDto;
 import com.ssonsal.football.rank.service.RankService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 
@@ -22,19 +26,29 @@ import static com.ssonsal.football.global.util.SuccessCode.SUCCESS;
 public class RankController {
 
     private final RankService rankService;
+    private final UserManagementService userManagementService;
 
-    @GetMapping
-    public ResponseEntity<ResponseBodyFormatter> ranks(HttpServletRequest request) {
+    @GetMapping("/list")
+    public ResponseEntity<ResponseBodyFormatter> getRanks(@CurrentUser Account account,
+                                                          @RequestParam(required = false) Integer month) {
+        Long user = account.getId();
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-
-        return DataResponseBodyFormatter.put(SUCCESS, rankService.findRankList());
+        return DataResponseBodyFormatter.put(SUCCESS, rankService.findRankList(month));
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseBodyFormatter> updateRanks(HttpServletRequest request) {
+        @PostMapping("/changeMonth")
+        public ResponseEntity<ResponseBodyFormatter> getRanksByMonth(@CurrentUser Account account,
+                                                                     @RequestBody(required = false)  Integer month) {
+        Long user = account.getId();
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
+        return DataResponseBodyFormatter.put(SUCCESS, rankService.findRankList(month));
+    }
+
+    @GetMapping("/reset")
+    public ResponseEntity<ResponseBodyFormatter> updateRanks(@CurrentUser Account account) {
+
+        log.info("리셋 시작");
+        Long user = account.getId();
 
         return DataResponseBodyFormatter.put(SUCCESS, rankService.updateRank());
     }

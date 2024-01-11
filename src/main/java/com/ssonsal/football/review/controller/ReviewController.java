@@ -1,5 +1,7 @@
 package com.ssonsal.football.review.controller;
 
+import com.ssonsal.football.global.account.Account;
+import com.ssonsal.football.global.account.CurrentUser;
 import com.ssonsal.football.global.util.SuccessCode;
 import com.ssonsal.football.global.util.formatter.DataResponseBodyFormatter;
 import com.ssonsal.football.global.util.formatter.ResponseBodyFormatter;
@@ -9,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 
 @Slf4j
@@ -29,10 +29,9 @@ public class ReviewController {
      */
     @PostMapping
     public ResponseEntity<ResponseBodyFormatter> createReview(
-            @RequestBody ReviewRequestDto reviewRequestDto, HttpServletRequest request) {
+            @RequestBody ReviewRequestDto reviewRequestDto, @CurrentUser Account account) {
 
-        //        Long user = jwtTokenProvider.getUserId(request.getHeader("ssonToken"));
-        Long user = 1L;
+        Long user = account.getId();
 
         return DataResponseBodyFormatter.put(SuccessCode.SUCCESS, reviewService.createReview(reviewRequestDto, user));
     }

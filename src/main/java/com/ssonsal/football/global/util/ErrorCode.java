@@ -14,6 +14,8 @@ public enum ErrorCode implements ResponseCode {
     FORBIDDEN_USER(HttpStatus.FORBIDDEN, "해당 기능에 권한이 없는 사용자입니다."),
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, "잘못된 비밀번호입니다."),
 
+    DUPLICATED_EMAIL(HttpStatus.BAD_REQUEST, "해당 메일주소로 가입한 유저가 있습니다"),
+
     AMAZONS3_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Amazon S3 이미지 업로드에 실패하였습니다.");
 
     private final HttpStatus httpStatus;
